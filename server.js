@@ -1,62 +1,59 @@
-const express = require("express");
-const path = require("path");
+const express = require('express');
+const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-app.use(express.json({ limit: "20kb" }));
-app.use(express.static(path.join(__dirname, "public")));
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
-const SYSTEM_PROMPT = `
-You are LUMORA AI, an AI assistant created by John Theuri.
-PERSONALITY: Be helpful, professional, friendly, respectful, and occasionally funny. Use natural Gen-Z energy without forcing slang.
-LANGUAGE: Reply in the language the user uses. Support English, Kiswahili sanifu, and Nairobi Sheng. If asked, help with other languages too.
-WHAT YOU HELP WITH: Education, science, technology, programming, business, writing, translations, relationships, brainstorming, and everyday questions.
-SAFETY AND HONESTY: Do not encourage harm, hate, or illegal activity. Be careful with medical, legal, and financial topics. Never pretend to know something you do not know. Do not claim to create images or videos unless the relevant tool is actually available. Do not claim to be ChatGPT. You are LUMORA AI.
-`;
+const SYSTEM_PROMPT = `You are Lumora AI, created by John Theuri. You are a smart, safe, friendly, multilingual AI assistant. You speak English, Swahili, Sheng, and any language the user uses. You are funny, Gen-Z, professional when needed. You help with business, coding, study, writing, and everyday life. Always be helpful and safe. Creator: John Theuri (lenz.itz).`;
 
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true, app: "LUMORA AI", creator: "John Theuri" });
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'Lumora AI is Live!', creator: 'John Theuri' });
 });
 
-app.post("/api/chat", async (req, res) => {
+app.post('/api/chat', async (req, res) => {
   try {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      return res.status(503).json({ error: "AI is not connected yet. Add GROQ_API_KEY in Secrets." });
-    }
-    const messages = req.body.messages;
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ error: "Please enter a message." });
-    }
-    const history = messages.slice(-12).map((m) => {
-      if (!["user", "assistant"].includes(m.role)) throw new Error("Invalid message role.");
-      if (typeof m.content !== "string") throw new Error("Invalid message content.");
-      return { role: m.role, content: m.content.slice(0, 4000) };
-    });
-    if (history[history.length - 1].role !== "user") {
-      return res.status(400).json({ error: "Your latest message must be from the user." });
-    }
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
+    const { message, history } = req.body;
+    if (!message) return res.status(400).json({ error: 'Message required' });
+    if (!GROQ_API_KEY) return res.status(500).json({ error: 'GROQ_API_KEY missing' });
+
+    const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+    if (Array.isArray(history)) messages.push(...history.slice(-10));
+    messages.push({ role: 'user', content: message });
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...history],
-        temperature: 0.7, max_tokens: 800
+        model: GROQ_MODEL,
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1024
       })
     });
-    if (!response.ok) {
-      return res.status(502).json({ error: "The AI service could not answer. Try again shortly." });
-    }
+
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
-    if (!reply) return res.status(502).json({ error: "The AI returned an empty response. Please try again." });
+    if (!response.ok) throw new Error(data.error?.message || 'Groq API error');
+    
+    const reply = data.choices?.[0]?.message?.content || 'Sorry, I had an error.';
     res.json({ reply });
-  } catch (error) {
-    res.status(500).json({ error: "Something went wrong. Please try again." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("LUMORA AI is running on port " + PORT);
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`LUMORA AI running on port ${PORT}`);
 });
