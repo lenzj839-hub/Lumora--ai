@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10101b">
+  <title>LUMORA AI — Your AI Companion</title>
+  <style>
+    :root { color-scheme: dark; --bg:#10101b; --panel:#191927; --border:#303044; --purple:#8170ff; --text:#f5f4ff; --muted:#aaa8c0; }
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:system-ui,Arial,sans-serif}
+    header{position:sticky;top:0;z-index:2;background:#10101bf5;border-bottom:1px solid var(--border);padding:15px;display:flex;align-items:center;gap:12px}
+    .logo{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#a58cff,#5444d8);font-size:22px}
+    h1{font-size:19px;margin:0;letter-spacing:1px} header p{color:var(--muted);font-size:12px;margin:3px 0 0}
+    main{max-width:760px;margin:auto;padding:20px 14px 155px} #welcome{text-align:center;padding:36px 4px 20px} #welcome .big{font-size:46px} #welcome h2{font-size:27px;margin:10px 0} #welcome p{color:var(--muted);line-height:1.6}
+    .suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:22px}
+    button,textarea{font:inherit} .suggestion{min-height:66px;text-align:left;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:13px;padding:12px;cursor:pointer}
+    .suggestion:active,.send:active{opacity:.8} #chat{display:flex;flex-direction:column;gap:18px}
+    .message{max-width:94%;padding:13px 15px;border-radius:17px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+    .user{align-self:flex-end;background:#37305f;border-bottom-right-radius:5px} .assistant{align-self:flex-start;background:var(--panel);border:1px solid var(--border);border-bottom-left-radius:5px}
+    .who{display:block;color:#b8adff;font-size:11px;font-weight:700;margin-bottom:5px;letter-spacing:.6px}
+    .composer-wrap{position:fixed;bottom:0;left:0;right:0;z-index:3;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 14%)}
+    .composer{max-width:760px;margin:auto;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:9px;display:flex;align-items:flex-end;gap:8px}
+    textarea{flex:1;min-width:0;resize:none;max-height:120px;border:0;outline:0;color:var(--text);background:transparent;padding:10px 5px;line-height:1.5}
+    .send{border:0;border-radius:12px;padding:12px 15px;color:white;background:var(--purple);font-weight:700;cursor:pointer} .send:disabled{opacity:.45}
+    .note{text-align:center;font-size:11px;color:var(--muted);margin:8px auto 0} .top-actions{margin-left:auto} .clear{color:var(--muted);background:transparent;border:1px solid var(--border);padding:8px 10px;border-radius:10px;cursor:pointer}
+    @media(max-width:420px){main{padding-left:10px;padding-right:10px} .suggestions{grid-template-columns:1fr} #welcome{padding-top:24px} .message{max-width:98%} .clear{font-size:12px}}
+  </style>
+</head>
+<body>
+  <header><div class="logo">✦</div><div><h1>LUMORA AI</h1><p>Created by John Theuri</p></div><div class="top-actions"><button class="clear" id="newChat">New chat</button></div></header>
+  <main>
+    <section id="welcome"><div class="big">✧</div><h2>Hey, welcome to Lumora.</h2><p>Your ideas, questions and next big moves start here.<br>Talk to me in English, Kiswahili or Sheng.</p>
+      <div class="suggestions">
+        <button class="suggestion" data-prompt="Help me create a realistic business plan with a small budget.">💡 Business ideas</button>
+        <button class="suggestion" data-prompt="Teach me programming step by step as a beginner.">💻 Learn coding</button>
+        <button class="suggestion" data-prompt="Explain a difficult school topic in simple Kiswahili.">📚 Study help</button>
+        <button class="suggestion" data-prompt="Niaje msee! Nisaidie na idea fiti ya leo.">⚡ Talk in Sheng</button>
+      </div>
+    </section>
+    <section id="chat" aria-live="polite"></section>
+  </main>
+  <div class="composer-wrap">
+    <form class="composer" id="form"><textarea id="input" rows="1" maxlength="4000" placeholder="Message Lumora..." aria-label="Your message"></textarea><button class="send" id="send" type="submit">Send ↑</button></form>
+    <p class="note">AI can make mistakes. Check important information.</p>
+  </div>
+  <script>
+    const form=document.getElementById("form"),input=document.getElementById("input"),send=document.getElementById("send"),chat=document.getElementById("chat"),welcome=document.getElementById("welcome");const history=[];let busy=false;
+    function addMessage(role,content){welcome.hidden=true;const bubble=document.createElement("div");bubble.className="message "+role;const who=document.createElement("span");who.className="who";who.textContent=role==="user"?"YOU":"LUMORA AI";const text=document.createElement("div");text.textContent=content;bubble.append(who,text);chat.appendChild(bubble);window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});return text}
+    async function sendMessage(message){message=message.trim();if(!message||busy)return;busy=true;send.disabled=true;input.disabled=true;history.push({role:"user",content:message});addMessage("user",message);input.value="";const replyBox=addMessage("assistant","Lumora is thinking...");try{const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});const d=await r.json();if(!r.ok)throw new Error(d.error||"The request failed.");replyBox.textContent=d.reply;history.push({role:"assistant",content:d.reply})}catch(e){replyBox.textContent="Sorry, I couldn't connect just now. "+e.message+" Please try again."}finally{busy=false;send.disabled=false;input.disabled=false;input.focus();window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}}
+    form.addEventListener("submit",e=>{e.preventDefault();sendMessage(input.value)});
+    input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,120)+"px"});
+    input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+    document.querySelectorAll("[data-prompt]").forEach(b=>b.addEventListener("click",()=>sendMessage(b.dataset.prompt)));
+    document.getElementById("newChat").addEventListener("click",()=>{if(busy)return;history.length=0;chat.replaceChildren();welcome.hidden=false;input.value="";input.focus()});
+  </script>
+</body>
+    </html>
