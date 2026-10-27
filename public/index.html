@@ -122,22 +122,7 @@ body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:#0f0a1a;color:#ff
   <div class="media-preview" id="mediaPreview"></div>
 
   <div class="chat-area" id="chatArea">
-    <div class="message ai">👋 Hi! I'm <strong>Lumora AI</strong> — built by <strong>John Theuri (lenz.itz)</strong> in Kenya 🇰🇪
-
-I can:
-💬 Chat with memory (I remember what you said)
-🔍 Self-search (I check facts, no lying — China Square = Unicity Mall Thika Road, Carrefour = Two Rivers)
-📷 See photos (yellow jerrican, room, etc.)
-🎨 Create images like ChatGPT/Meta AI (African Kenyan HD, flux model, not Asian anime)
-✏️ Beautify / Edit images (regenerate like ChatGPT)
-🎤 Voice (sw-KE, en-KE)
-📦 Artefacts, Scheduled, Glasses, Vibes
-
-Try: "Create two students coming from school" — now good Kenyan HD!
-Or: "From when is China Square" — I will tell true location (Unicity Mall next to Kenyatta University, not Ruiru Road)
-
-Built with 380 lines, no reduction, no deploy fail!
-https://lumora-ai-ncmb.onrender.com</div>
+    <div class="message ai">Hey there I'm lumora, what do you want us to create today?</div>
   </div>
 
   <div class="beautify-bar" id="beautifyBar">
@@ -185,7 +170,7 @@ function renderCurrent(){chatArea.innerHTML='';currentChat.forEach(m=>{addMessag
 
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
 function switchTab(tab){document.querySelectorAll('.menu-item').forEach(e=>e.classList.remove('active'));event.currentTarget.classList.add('active');if(tab==='chat'){newChat();}else{addMessage(`You opened ${tab} - Coming soon! Like Meta AI sidebar`, 'ai');}}
-function newChat(){if(currentChat.length>0){const title=currentChat[0]?.content?.slice(0,40)||'Chat';chatHistory.push({title, ...currentChat, ...{0:currentChat[0]}});chatHistory.push(currentChat);localStorage.setItem('lumora_chats',JSON.stringify(chatHistory));}currentChat=[];localStorage.setItem('lumora_current',JSON.stringify([]));chatArea.innerHTML='<div class="message ai">New chat started! Ask me anything — Create image, self-search, camera, mic.</div>';renderChats();}
+function newChat(){if(currentChat.length>0){const title=currentChat[0]?.content?.slice(0,40)||'Chat';chatHistory.push({title, ...currentChat, ...{0:currentChat[0]}});chatHistory.push(currentChat);localStorage.setItem('lumora_chats',JSON.stringify(chatHistory));}currentChat=[];localStorage.setItem('lumora_current',JSON.stringify([]));chatArea.innerHTML='<div class="message ai">Hey there I\'m lumora, what do you want us to create today?</div>';renderChats();}
 
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
