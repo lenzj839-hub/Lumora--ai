@@ -161,7 +161,7 @@ app.post('/api/chat', async (req, res) => {
     if (isImageCreateRequest && !image) {
       console.log(`[Image Create] Direct generation (bypassing Groq tools) for: "${lastUserMsg}"`);
       const enhancedPrompt = `${lastUserMsg}, ultra HD, professional photography, vibrant, detailed, 8k, beautiful, Kenyan students, school uniform, realistic`;
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=1024&nologo=true&enhance=true&seed=${Date.now()}`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=1024&model=flux&nologo=true&enhance=true&seed=${Date.now()}`;
       
       // Return immediately with generated image - no Groq tool calling, so no "Tool choice is none" error!
       return res.json({ 
@@ -291,8 +291,8 @@ app.post('/api/generate-image', async (req, res) => {
     console.log(`[Generate Image] Prompt: ${prompt}`);
     
     // Use Pollinations AI - FREE, no API key, like ChatGPT/DALL-E
-    const enhancedPrompt = `${prompt}, ultra HD, professional photography, vibrant, detailed, 8k, beautiful, sharp focus, Kenyan context`;
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=1024&nologo=true&enhance=true&seed=${Date.now()}`;
+    const enhancedPrompt = `${prompt}, African, Kenyan, dark skin, realistic, professional photography, ultra HD, 8k, vibrant, detailed, sharp focus, Nairobi Kenya, not Asian, not anime, not cartoon, natural skin tone`;
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?width=1024&height=1024&model=flux&nologo=true&enhance=true&seed=${Date.now()}`;
     
     res.json({ 
       success: true, 
