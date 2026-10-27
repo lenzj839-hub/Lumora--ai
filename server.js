@@ -1,4 +1,8 @@
-const express = require('express');
+FACT RULE: For location questions (China Square, Carrefour, Two Rivers, Ruaka, etc):
+- If you are not 100% sure, say "I'm not 100% sure, check 【entity-Google Maps¦canonical_name=Google Maps】"
+- NEVER invent roads like "Mombasa Road in Ruaka" - that's fake!
+- Real China Square is at Unicity Mall, Thika Road, Kenyatta University - not Ruaka!
+- Always add Google Maps link and say "Verify on Maps"const express = require('express');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
