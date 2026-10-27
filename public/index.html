@@ -75,7 +75,7 @@ body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:#0f0a1a;color:#ff
 .beautify-bar.active{display:flex}
 .beautify-bar button{padding:8px 14px;border-radius:20px;border:1px solid #7c3aed;background:transparent;color:#fff;cursor:pointer}
 .beautify-bar button:hover{background:#7c3aed}
-@media(max-width:768px){.sidebar{position:fixed;left:-100%;z-index:100;height:100%}.sidebar.open{left:0}.hamburger{display:block}}
+@media(max-width:768px){.sidebar{position:fixed;left:-100%;z-index:1000;height:100%;width:280px;box-shadow:4px 0 20px rgba(0,0,0,0.5)}.sidebar.open{left:0;animation:slideIn 0.3s ease}.hamburger{display:block;z-index:1001}} @keyframes slideIn{from{left:-100%}to{left:0}}
 .loading{display:flex;gap:4px;padding:14px}
 .dot{width:8px;height:8px;background:#7c3aed;border-radius:50%;animation:bounce 1.4s infinite}
 .dot:nth-child(2){animation-delay:0.2s}.dot:nth-child(3){animation-delay:0.4s}
@@ -169,7 +169,28 @@ function renderChats(){chatsList.innerHTML='<div style="font-size:12px;opacity:0
 function renderCurrent(){chatArea.innerHTML='';currentChat.forEach(m=>{addMessage(m.content,m.role==='user'?'user':'ai',false,m.image)});}
 
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
-function switchTab(tab){document.querySelectorAll('.menu-item').forEach(e=>e.classList.remove('active'));event.currentTarget.classList.add('active');if(tab==='chat'){newChat();}else{addMessage(`You opened ${tab} - Coming soon! Like Meta AI sidebar`, 'ai');}}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');}
+function switchTab(tab){
+  document.querySelectorAll('.menu-item').forEach(e=>e.classList.remove('active'));
+  if(event && event.currentTarget) event.currentTarget.classList.add('active');
+  // Close sidebar after tap - fixes hanging bug
+  setTimeout(()=>closeSidebar(), 200);
+  if(tab==='chat'){newChat();}
+  else if(tab==='media'){addMessage('Media gallery - Coming soon! Will show your created images like Meta AI.', 'ai');}
+  else if(tab==='artefacts'){addMessage('Artefacts - Coming soon! Like Meta AI artefacts for code, docs.', 'ai');}
+  else if(tab==='scheduled'){addMessage('Scheduled - Coming soon! Schedule chats.', 'ai');}
+  else if(tab==='glasses'){addMessage('Glasses - Coming soon! Smart glasses integration.', 'ai');}
+  else if(tab==='vibes'){addMessage('Vibes - Coming soon! Like Meta AI vibes ✨', 'ai');}
+  else{addMessage(`You opened ${tab} - Coming soon! Like Meta AI sidebar`, 'ai');}
+}
+// Close sidebar when clicking outside
+document.addEventListener('click', (e)=>{
+  const sidebar = document.getElementById('sidebar');
+  const hamburger = document.querySelector('.hamburger');
+  if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !hamburger.contains(e.target)){
+    closeSidebar();
+  }
+});
 function newChat(){if(currentChat.length>0){const title=currentChat[0]?.content?.slice(0,40)||'Chat';chatHistory.push({title, ...currentChat, ...{0:currentChat[0]}});chatHistory.push(currentChat);localStorage.setItem('lumora_chats',JSON.stringify(chatHistory));}currentChat=[];localStorage.setItem('lumora_current',JSON.stringify([]));chatArea.innerHTML='<div class="message ai">Hey there I\'m lumora, what do you want us to create today?</div>';renderChats();}
 
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
