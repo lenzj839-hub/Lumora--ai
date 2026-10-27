@@ -151,6 +151,8 @@ https://lumora-ai-ncmb.onrender.com</div>
 
   <div class="input-area">
     <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Upload image">🖼️</button>
+    <button class="icon-btn" onclick="document.getElementById('cameraInput').click()" title="Camera 📷">📷</button>
+    <button class="icon-btn" onclick="toggleMic()" id="micBtn" title="Mic 🎤">🎤</button>
     <textarea id="messageInput" placeholder="Ask Lumora... (e.g., Create two students coming from school, From when is China Square, Edit this photo)" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
     <button class="send-btn" onclick="sendMessage()">➤</button>
   </div>
