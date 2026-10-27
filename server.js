@@ -144,14 +144,15 @@ app.post('/api/chat', async (req,res)=>{
       reply = "Poa, I get you! Let me give you a better angle on that — kuna smart way ya ku-handle... " + reply.replace(/I'm sorry, but I can't help with that./gi, "") + " Hapa ndio unaeza anza: 1) Think skill, not shortcut 2) Start small na 5000 KES 3) Use M-Pesa, TikTok, freelance. Niko rada kuku-guide step by step — unataka nini exactly?";
     }
 
-    res.json({reply});
-  }catch(e){
-    console.error('Server error:', e);
-    res.json({reply: `Server Error: ${e.message} — Check Render logs`});
+    res.json({reply});: ${e.message} — Check Render logs`});
   }
 });
 
-app.get('/*', (req,res)=>{
+app.get('*',(req,res)=>{
+  res.sendFile(path.join(__dirname, 'public','index.html'));
+});
+
+app.listen(PORT, ()=> console.log('LUMORA AI LIVE '+PORT));
   res.sendFile(path.join(__dirname, 'public','index.html'));
 });
 
