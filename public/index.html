@@ -233,11 +233,20 @@ async function sendMessage(){
 
 function handleFile(e){
   const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();reader.onload=(ev)=>{
+  const reader=new FileReader();reader.onload=async (ev)=>{
     selectedImage=ev.target.result;
     mediaPreview.innerHTML=`<img src="${selectedImage}" alt="preview"><span style="cursor:pointer" onclick="clearImage()">✕</span>`;
     document.getElementById('beautifyBar').classList.add('active');
-    addMessage('📷 Image attached - I can see it (yellow jerrican, room, etc.) - Ask "What is in this photo?" or "Beautify this"','ai',false,selectedImage);
+    // REAL VISION - Call backend to actually SEE image, not lie about photo content
+    addMessage('📷 Image attached - Analyzing...','ai',false,selectedImage);
+    try{
+      showLoading();
+      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'What is in this photo? Describe in detail what you see, no lying.', history:currentChat, image:selectedImage})});
+      const data=await res.json();hideLoading();
+      if(data.reply){
+        addMessage(data.reply,'ai',true,selectedImage);
+      }
+    }catch(err){hideLoading(); addMessage('Failed to analyze image: '+err.message,'ai');}
   };reader.readAsDataURL(file);
 }
 
