@@ -1,160 +1,308 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Axenova AI - By John Theuri</title>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#8a2be2">
-<meta name="description" content="Axenova AI - Answers everything except porn, ChatGPT-like, self-search internet, camera, mic, by John Theuri Kiambu">
-<link rel="apple-touch-icon" href="/icon-192.png">
-<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100vh}
-.sidebar{width:260px;background:#17171f;border-right:1px solid #222;padding:12px;overflow-y:auto}
-.main{flex:1;display:flex;flex-direction:column}
-.header{padding:16px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
-.header h1{background:linear-gradient(90deg,#8a2be2,#ff6b9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:20px}
-.chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.bubble{max-width:80%;padding:12px 16px;border-radius:18px;line-height:1.5;white-space:pre-wrap}
-.user{align-self:flex-end;background:linear-gradient(135deg,#8a2be2,#c751ff)}
-.ai{align-self:flex-start;background:#1e1e2a;border:1px solid #2a2a3a}
-.inputBar{padding:12px;border-top:1px solid #222;display:flex;gap:8px;align-items:center}
-.inputBar input{flex:1;background:#1e1e2a;border:1px solid #333;border-radius:24px;padding:12px 18px;color:#fff;outline:none}
-.inputBar button{background:linear-gradient(135deg,#8a2be2,#ff6b9d);border:none;border-radius:50%;width:44px;height:44px;color:#fff;cursor:pointer;font-size:18px}
-.iconBtn{background:#1e1e2a;border:1px solid #333;border-radius:50%;width:42px;height:42px;color:#fff;cursor:pointer}
-</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10091d">
+  <title>Lumora AI</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #0e0818;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 17px;
+      background: #160d23;
+      border-bottom: 1px solid #352344;
+      position: sticky;
+      top: 0;
+    }
+
+    header h2 { margin: 0; }
+
+    header p {
+      margin: 5px 0 0;
+      color: #c9b8d8;
+      font-size: 13px;
+    }
+
+    #chat {
+      max-width: 850px;
+      margin: auto;
+      padding: 18px 12px 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .message {
+      padding: 13px 15px;
+      max-width: 90%;
+      border-radius: 17px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: linear-gradient(120deg, #8539e8, #d83fb4);
+    }
+
+    .ai {
+      align-self: flex-start;
+      background: #251436;
+    }
+
+    .sources {
+      margin-top: 12px;
+      border-top: 1px solid #514060;
+      padding-top: 8px;
+    }
+
+    .sources a {
+      display: block;
+      color: #dfbfff;
+      margin: 7px 0;
+    }
+
+    .generated-image {
+      display: block;
+      max-width: 100%;
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 12px;
+    }
+
+    .composer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a0e29;
+      padding: 12px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid #352344;
+    }
+
+    .composer-inner {
+      display: flex;
+      gap: 9px;
+      max-width: 850px;
+      margin: auto;
+    }
+
+    textarea {
+      flex: 1;
+      min-width: 0;
+      min-height: 52px;
+      max-height: 130px;
+      resize: vertical;
+      padding: 14px;
+      border: 1px solid #493458;
+      border-radius: 16px;
+      background: #10091d;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 50%;
+      width: 52px;
+      min-width: 52px;
+      height: 52px;
+      background: linear-gradient(120deg, #8539e8, #d83fb4);
+      color: white;
+      font-size: 21px;
+      cursor: pointer;
+    }
+
+    button:disabled { opacity: 0.5; }
+
+    .small {
+      text-align: center;
+      color: #bba9ca;
+      font-size: 11px;
+      margin-top: 7px;
+    }
+  </style>
 </head>
+
 <body>
-<div class="sidebar" id="sidebar">
-<h3>Axenova AI</h3>
-<p style="font-size:12px;color:#888;margin:8px 0">By John Theuri lenz.itz<br>Answers everything except porn</p>
-<div id="history"></div>
-</div>
-<div class="main">
-<div class="header">
-<div style="display:flex;gap:12px;align-items:center">
-<button onclick="document.getElementById('sidebar').style.display=document.getElementById('sidebar').style.display==='none'?'block':'none'" style="background:none;border:none;color:#fff;font-size:22px">☰</button>
-<h1>Axenova AI</h1>
-<span style="font-size:12px;color:#888">Answers everything except porn, ChatGPT-like, internet, camera, mic</span>
-</div>
-<div>
-<button class="iconBtn" onclick="document.getElementById('fileInput').click()">🖼️</button>
-<button class="iconBtn" onclick="startCamera()">📷</button>
-</div>
-</div>
-<div class="chat" id="chat">
-<div class="bubble ai">Hey there I'm Axenova, what do you want us to create today? 🚀 I answer everything except pornographic questions!</div>
-</div>
-<div class="inputBar">
-<input type="file" id="fileInput" accept="image/*" hidden onchange="handleImage(this)">
-<button class="iconBtn" onclick="document.getElementById('fileInput').click()" title="Upload">🖼️</button>
-<button class="iconBtn" onclick="startCamera()" title="Camera">📷</button>
-<button class="iconBtn" onclick="startMic()" title="Mic">🎤</button>
-<input id="msg" placeholder="Ask Axenova... (e.g., Create two students, Where is China Square, What does Kalenjin call God, Edit this photo)" onkeypress="if(event.key==='Enter')send()">
-<button onclick="send()">➤</button>
-</div>
-</div>
-<video id="camera" autoplay playsinline style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:99"></video>
-<canvas id="canvas" style="display:none"></canvas>
-<script>
-let historyChats = JSON.parse(localStorage.getItem('axenova_history')||'[]');
-let currentImage = null;
-const chatEl = document.getElementById('chat');
-const msgEl = document.getElementById('msg');
-function renderHistory(){
-  const h=document.getElementById('history');
-  h.innerHTML=historyChats.slice().reverse().map((c,i)=>`<div style="padding:8px;border-radius:8px;background:#1e1e2a;margin:4px 0;cursor:pointer;font-size:13px" onclick="loadChat(${historyChats.length-1-i})">${c.title.slice(0,30)}</div>`).join('');
-}
-function loadChat(idx){
-  const c=historyChats[idx];
-  chatEl.innerHTML=c.messages.map(m=>`<div class="bubble ${m.role}">${m.text}</div>`).join('');
-}
-function saveHistory(){
-  if(historyChats.length>0){localStorage.setItem('axenova_history', JSON.stringify(historyChats));renderHistory();}
-}
-async function send(){
-  const text=msgEl.value.trim();
-  if(!text && !currentImage) return;
-  const userBubble=`<div class="bubble user">${text}${currentImage?'<br><img src="'+currentImage+'" style="max-width:200px;border-radius:12px;margin-top:8px">':''}</div>`;
-  chatEl.innerHTML+=userBubble;
-  msgEl.value='';
-  const payload={message:text, image:currentImage, history: historyChats.length>0 ? historyChats[historyChats.length-1].messages : []};
-  currentImage=null;
-  chatEl.scrollTop=chatEl.scrollHeight;
-  if(historyChats.length===0 || historyChats[historyChats.length-1].messages.length>10){
-    historyChats.push({title:text.slice(0,30), messages:[]});
-  }
-  historyChats[historyChats.length-1].messages.push({role:'user', text:text});
-  try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const data=await res.json();
-    let reply=data.reply||data.response||"Hey I'm Axenova!";
-    if(data.image){reply+=`<br><img src="${data.image}" style="max-width:100%;border-radius:12px;margin-top:12px">`;}
-    chatEl.innerHTML+=`<div class="bubble ai">${reply}</div>`;
-    historyChats[historyChats.length-1].messages.push({role:'ai', text:reply});
-    saveHistory();
-  }catch(e){chatEl.innerHTML+=`<div class="bubble ai">Pole error: ${e.message}. Try again.</div>`;}
-  chatEl.scrollTop=chatEl.scrollHeight;
-}
-function handleImage(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    currentImage=e.target.result;
-    chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Image ready - what to do?</div>`;
-    chatEl.scrollTop=chatEl.scrollHeight;
-  };
-  reader.readAsDataURL(file);
-}
-async function startCamera(){
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    const video=document.getElementById('camera');
-    video.srcObject=stream;
-    video.style.display='block';
-    video.onclick=()=>{
-      const canvas=document.getElementById('canvas');
-      canvas.width=video.videoWidth;canvas.height=video.videoHeight;
-      canvas.getContext('2d').drawImage(video,0,0);
-      currentImage=canvas.toDataURL('image/jpeg');
-      stream.getTracks().forEach(t=>t.stop());
-      video.style.display='none';
-      chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Photo captured!</div>`;
-      chatEl.scrollTop=chatEl.scrollHeight;
-    };
-  }catch(e){alert('Camera error:'+e.message);}
-}
-function startMic(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('Mic not supported');return;}
-  const rec=new SR();rec.lang='en-KE';
-  rec.onresult=e=>{msgEl.value=e.results[0][0].transcript;};
-  rec.start();
-}
-renderHistory();
-</script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+  <header>
+    <h2>✨ Lumora AI</h2>
+    <p>Your assistant for questions, web search and images</p>
+  </header>
+
+  <main id="chat" aria-live="polite">
+    <div class="message ai">
+      Hi! I'm Lumora AI. What can I help you with today?
+    </div>
+  </main>
+
+  <div class="composer">
+    <div class="composer-inner">
+      <textarea
+        id="input"
+        placeholder="Ask Lumora anything..."
+        aria-label="Your message"
+      ></textarea>
+
+      <button id="send" aria-label="Send">➤</button>
+    </div>
+    <div class="small">
+      For images, type: Generate an image of...
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+
+    const history = [];
+
+    function addMessage(role, text, extras = {}) {
+      const bubble = document.createElement("div");
+      bubble.className =
+        "message " + (role === "user" ? "user" : "ai");
+
+      const textNode = document.createElement("div");
+      textNode.textContent = text;
+      bubble.appendChild(textNode);
+
+      if (extras.image) {
+        const img = document.createElement("img");
+        img.className = "generated-image";
+        img.src = extras.image;
+        img.alt = "Image generated by Lumora AI";
+        bubble.appendChild(img);
+      }
+
+      if (extras.sources?.length) {
+        const sourcesBox = document.createElement("div");
+        sourcesBox.className = "sources";
+
+        const heading = document.createElement("strong");
+        heading.textContent = "Sources";
+        sourcesBox.appendChild(heading);
+
+        extras.sources.forEach(source => {
+          const link = document.createElement("a");
+          link.href = source.link;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = source.title || source.link;
+          sourcesBox.appendChild(link);
+        });
+
+        bubble.appendChild(sourcesBox);
+      }
+
+      chat.appendChild(bubble);
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+      });
+
+      return bubble;
+    }
+
+    async function sendMessage() {
+      const message = input.value.trim();
+
+      if (!message || send.disabled) return;
+
+      addMessage("user", message);
+      input.value = "";
+      send.disabled = true;
+
+      const waiting = addMessage("ai", "Thinking...");
+
+      try {
+        // Image requests use a separate backend endpoint.
+        const wantsImage =
+          /\b(generate|create|make|draw)\b.*\b(image|picture|illustration|logo)\b/i
+            .test(message);
+
+        const endpoint = wantsImage
+          ? "/api/image"
+          : "/api/chat";
+
+        const body = wantsImage
+          ? { prompt: message }
+          : { message, history };
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+        waiting.remove();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Request failed.");
+        }
+
+        if (wantsImage) {
+          addMessage(
+            "ai",
+            data.image
+              ? "Here is your generated image!"
+              : data.error || "I couldn't generate that image.",
+            { image: data.image }
+          );
+        } else {
+          const reply = data.reply ||
+            data.error ||
+            "Please try asking again.";
+
+          addMessage("ai", reply, {
+            sources: data.sources || []
+          });
+
+          history.push(
+            { role: "user", content: message },
+            { role: "assistant", content: reply }
+          );
+
+          // Keep recent context without sending an unlimited history.
+          if (history.length > 10) {
+            history.splice(0, history.length - 10);
+          }
+        }
+      } catch (error) {
+        waiting.remove();
+        addMessage(
+          "ai",
+          "Sorry, something went wrong: " + error.message
+        );
+      } finally {
+        send.disabled = false;
+        input.focus();
+      }
+    }
+
+    send.addEventListener("click", sendMessage);
+
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
+</body>
 </html>
