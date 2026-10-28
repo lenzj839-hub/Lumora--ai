@@ -24,279 +24,161 @@
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMORA AI - By John Theuri | ChatGPT-like AI Kenya</title>
-
-<!-- PWA APP - Makes Lumora installable like Instagram / Facebook -->
+<title>Axenova AI - By John Theuri</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#7c3aed">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Lumora AI">
-<link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2728.png">
-<link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2728.png">
-<meta name="description" content="Lumora AI - Chat, Create Images like ChatGPT, Self-Search, Camera, Mic by John Theuri (lenz.itz)">
-<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').then(r=>console.log('Lumora app ready - installable!',r.scope)).catch(e=>console.log('SW fail',e))});}</script>
-<!-- END PWA APP -->
-
+<meta name="theme-color" content="#8a2be2">
+<meta name="description" content="Axenova AI - ChatGPT-like with self-search, camera, mic, by John Theuri Kiambu">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Roboto,Arial,sans-serif;background:#0f0a1a;color:#fff;display:flex;height:100vh;overflow:hidden}
-.sidebar{width:280px;background:#1a102e;border-right:1px solid #2d1b4e;display:flex;flex-direction:column;transition:0.3s}
-.sidebar-header{padding:20px;border-bottom:1px solid #2d1b4e;display:flex;align-items:center;gap:12px}
-.logo{font-size:24px;font-weight:bold;background:linear-gradient(45deg,#7c3aed,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.new-chat-btn{margin:16px;background:linear-gradient(45deg,#7c3aed,#ec4899);color:#fff;border:none;padding:12px;border-radius:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
-.new-chat-btn:hover{opacity:0.9}
-.menu{flex:1;overflow-y:auto;padding:8px}
-.menu-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer;transition:0.2s;margin-bottom:4px}
-.menu-item:hover{background:#2d1b4e}
-.menu-item.active{background:#2d1b4e;border-left:3px solid #7c3aed}
-.menu-icon{font-size:18px}
-.chats-list{border-top:1px solid #2d1b4e;padding:12px;max-height:300px;overflow-y:auto}
-.chat-history-item{padding:10px;border-radius:8px;cursor:pointer;margin-bottom:6px;background:#1f1235;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
-.chat-history-item:hover{background:#2d1b4e}
-.main{flex:1;display:flex;flex-direction:column;background:#0f0a1a}
-.top-bar{padding:16px 24px;border-bottom:1px solid #2d1b4e;display:flex;align-items:center;justify-content:space-between}
-.chat-area{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
-.message{max-width:80%;padding:14px 18px;border-radius:18px;line-height:1.5;animation:fadeIn 0.3s}
-.message.user{align-self:flex-end;background:linear-gradient(45deg,#7c3aed,#ec4899);color:#fff;border-bottom-right-radius:4px}
-.message.ai{align-self:flex-start;background:#1f1235;border:1px solid #2d1b4e;border-bottom-left-radius:4px;white-space:pre-wrap}
-.message img{max-width:100%;border-radius:12px;margin-top:10px;cursor:pointer}
-.input-area{padding:16px 24px;border-top:1px solid #2d1b4e;background:#1a102e;display:flex;align-items:center;gap:12px}
-.input-area textarea{flex:1;background:#0f0a1a;border:1px solid #2d1b4e;border-radius:24px;padding:12px 18px;color:#fff;resize:none;outline:none;max-height:120px;min-height:48px}
-.input-area button{width:48px;height:48px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:0.2s}
-.send-btn{background:linear-gradient(45deg,#7c3aed,#ec4899);color:#fff}
-.icon-btn{background:#2d1b4e;color:#fff}
-.icon-btn:hover{background:#3d2b5e}
-.media-preview{padding:0 24px;display:flex;gap:8px;flex-wrap:wrap}
-.media-preview img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid #7c3aed}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.hamburger{display:none;font-size:24px;cursor:pointer}
-.beautify-bar{display:none;padding:12px 24px;background:#1f1235;border-top:1px solid #2d1b4e;gap:8px;flex-wrap:wrap}
-.beautify-bar.active{display:flex}
-.beautify-bar button{padding:8px 14px;border-radius:20px;border:1px solid #7c3aed;background:transparent;color:#fff;cursor:pointer}
-.beautify-bar button:hover{background:#7c3aed}
-@media(max-width:768px){.sidebar{position:fixed;left:-100%;z-index:1000;height:100%;width:280px;box-shadow:4px 0 20px rgba(0,0,0,0.5)}.sidebar.open{left:0;animation:slideIn 0.3s ease}.hamburger{display:block;z-index:1001}} @keyframes slideIn{from{left:-100%}to{left:0}}
-.loading{display:flex;gap:4px;padding:14px}
-.dot{width:8px;height:8px;background:#7c3aed;border-radius:50%;animation:bounce 1.4s infinite}
-.dot:nth-child(2){animation-delay:0.2s}.dot:nth-child(3){animation-delay:0.4s}
-@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100vh}
+.sidebar{width:260px;background:#17171f;border-right:1px solid #222;padding:12px;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column}
+.header{padding:16px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
+.header h1{background:linear-gradient(90deg,#8a2be2,#ff6b9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:20px}
+.chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:80%;padding:12px 16px;border-radius:18px;line-height:1.5}
+.user{align-self:flex-end;background:linear-gradient(135deg,#8a2be2,#c751ff)}
+.ai{align-self:flex-start;background:#1e1e2a;border:1px solid #2a2a3a}
+.inputBar{padding:12px;border-top:1px solid #222;display:flex;gap:8px;align-items:center}
+.inputBar input{flex:1;background:#1e1e2a;border:1px solid #333;border-radius:24px;padding:12px 18px;color:#fff;outline:none}
+.inputBar button{background:linear-gradient(135deg,#8a2be2,#ff6b9d);border:none;border-radius:50%;width:44px;height:44px;color:#fff;cursor:pointer;font-size:18px}
+.iconBtn{background:#1e1e2a;border:1px solid #333;border-radius:50%;width:42px;height:42px;color:#fff;cursor:pointer}
 </style>
 </head>
 <body>
-
-<!-- Sidebar like Meta AI -->
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="logo">✨ LUMORA AI</div>
-    <div style="margin-left:auto;font-size:12px;opacity:0.6">by John Theuri</div>
-  </div>
-  <button class="new-chat-btn" onclick="newChat()">+ New chat</button>
-  <div class="menu">
-    <div class="menu-item active" onclick="switchTab('chat')"><span class="menu-icon">💬</span> Chat</div>
-    <div class="menu-item" onclick="switchTab('media')"><span class="menu-icon">🖼️</span> Media</div>
-    <div class="menu-item" onclick="switchTab('artefacts')"><span class="menu-icon">📦</span> Artefacts</div>
-    <div class="menu-item" onclick="switchTab('scheduled')"><span class="menu-icon">⏰</span> Scheduled</div>
-    <div class="menu-item" onclick="switchTab('glasses')"><span class="menu-icon">👓</span> Glasses</div>
-    <div class="menu-item" onclick="switchTab('vibes')"><span class="menu-icon">✨</span> Vibes</div>
-    <div class="menu-item" onclick="document.getElementById('imageInput').click()"><span class="menu-icon">🎨</span> Create Image like ChatGPT</div>
-    <div class="menu-item" onclick="document.getElementById('fileInput').click()"><span class="menu-icon">✏️</span> Beautify / Edit Image</div>
-  </div>
-  <div class="chats-list" id="chatsList">
-    <div style="font-size:12px;opacity:0.6;margin-bottom:8px">Chats history</div>
-  </div>
-  <div style="padding:12px;border-top:1px solid #2d1b4e;font-size:12px;opacity:0.5">Owner: John Theuri (lenz.itz)<br>https://lumora-ai-ncmb.onrender.com</div>
+<h3>Axenova AI</h3>
+<p style="font-size:12px;color:#888;margin:8px 0">By John Theuri lenz.itz</p>
+<div id="history"></div>
 </div>
-
 <div class="main">
-  <div class="top-bar">
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="hamburger" onclick="toggleSidebar()">☰</span>
-      <div><strong id="chatTitle">Lumora AI</strong> <span style="opacity:0.6;font-size:12px">ChatGPT-like with self-search, camera, mic</span></div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="icon-btn" onclick="document.getElementById('cameraInput').click()" title="Camera 📷">📷</button>
-      <button class="icon-btn" onclick="toggleMic()" id="micBtn" title="Mic 🎤">🎤</button>
-    </div>
-  </div>
-
-  <div class="media-preview" id="mediaPreview"></div>
-
-  <div class="chat-area" id="chatArea">
-    <div class="message ai">Hey there I'm lumora, what do you want us to create today?</div>
-  </div>
-
-  <div class="beautify-bar" id="beautifyBar">
-    <button onclick="beautifyImage('enhance')">✨ Enhance HD</button>
-    <button onclick="beautifyImage('vibrant')">🌈 Vibrant</button>
-    <button onclick="beautifyImage('professional')">📸 Professional</button>
-    <button onclick="beautifyImage('african')">🇰🇪 Kenyan African</button>
-    <button onclick="beautifyImage('remove-bg')">🪄 Remove BG</button>
-    <button onclick="closeBeautify()">✕ Close</button>
-  </div>
-
-  <div class="input-area">
-    <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Upload image">🖼️</button>
-    <button class="icon-btn" onclick="document.getElementById('cameraInput').click()" title="Camera 📷">📷</button>
-    <button class="icon-btn" onclick="toggleMic()" id="micBtn" title="Mic 🎤">🎤</button>
-    <textarea id="messageInput" placeholder="Ask Lumora... (e.g., Create two students coming from school, From when is China Square, Edit this photo)" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-    <button class="send-btn" onclick="sendMessage()">➤</button>
-  </div>
+<div class="header">
+<div style="display:flex;gap:12px;align-items:center">
+<button onclick="document.getElementById('sidebar').style.display=document.getElementById('sidebar').style.display==='none'?'block':'none'" style="background:none;border:none;color:#fff;font-size:22px">☰</button>
+<h1>Axenova AI</h1>
+<span style="font-size:12px;color:#888">ChatGPT-like with self-search, camera, mic</span>
 </div>
-
-<!-- Hidden inputs -->
-<input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)">
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleFile(event)">
-<input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleCreateImage(event)">
-
+<div>
+<button class="iconBtn" onclick="document.getElementById('fileInput').click()">🖼️</button>
+<button class="iconBtn" onclick="startCamera()">📷</button>
+</div>
+</div>
+<div class="chat" id="chat">
+<div class="bubble ai">Hey there I'm Axenova, what do you want us to create today? 🚀</div>
+</div>
+<div class="inputBar">
+<input type="file" id="fileInput" accept="image/*" hidden onchange="handleImage(this)">
+<button class="iconBtn" onclick="document.getElementById('fileInput').click()" title="Upload">🖼️</button>
+<button class="iconBtn" onclick="startCamera()" title="Camera">📷</button>
+<button class="iconBtn" onclick="startMic()" title="Mic">🎤</button>
+<input id="msg" placeholder="Ask Axenova... (e.g., Create two students from school, From when is China Square, Edit this photo)" onkeypress="if(event.key==='Enter')send()">
+<button onclick="send()">➤</button>
+</div>
+</div>
+<video id="camera" autoplay playsinline style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:99"></video>
+<canvas id="canvas" style="display:none"></canvas>
 <script>
-// ========== LUMORA AI FRONTEND - FULL 600+ LINES, NO REDUCTION ==========
-const API = '/api/chat';
-const GEN_API = '/api/generate-image';
-const EDIT_API = '/api/edit-image';
-const BEAUTIFY_API = '/api/beautify';
-const chatArea = document.getElementById('chatArea');
-const messageInput = document.getElementById('messageInput');
-const mediaPreview = document.getElementById('mediaPreview');
-const chatsList = document.getElementById('chatsList');
-let chatHistory = JSON.parse(localStorage.getItem('lumora_chats')||'[]');
-let currentChat = JSON.parse(localStorage.getItem('lumora_current')||'[]');
-let selectedImage = null;
-let recognition = null;
-let isRecording = false;
+let historyChats = JSON.parse(localStorage.getItem('axenova_history')||'[]');
+let currentImage = null;
+const chatEl = document.getElementById('chat');
+const msgEl = document.getElementById('msg');
 
-// Render chats history sidebar
-function renderChats(){chatsList.innerHTML='<div style="font-size:12px;opacity:0.6;margin-bottom:8px">Chats history</div>';chatHistory.slice().reverse().forEach((c,i)=>{const d=document.createElement('div');d.className='chat-history-item';d.textContent=c.title||c[0]?.content?.slice(0,30)||'Chat';d.onclick=()=>{currentChat=c;renderCurrent();chatArea.scrollTop=chatArea.scrollHeight};chatsList.appendChild(d);});}
-function renderCurrent(){chatArea.innerHTML='';currentChat.forEach(m=>{addMessage(m.content,m.role==='user'?'user':'ai',false,m.image)});}
-
-function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');}
-function switchTab(tab){
-  document.querySelectorAll('.menu-item').forEach(e=>e.classList.remove('active'));
-  if(event && event.currentTarget) event.currentTarget.classList.add('active');
-  // Close sidebar after tap - fixes hanging bug
-  setTimeout(()=>closeSidebar(), 200);
-  if(tab==='chat'){newChat();}
-  else if(tab==='media'){addMessage('Media gallery - Coming soon! Will show your created images like Meta AI.', 'ai');}
-  else if(tab==='artefacts'){addMessage('Artefacts - Coming soon! Like Meta AI artefacts for code, docs.', 'ai');}
-  else if(tab==='scheduled'){addMessage('Scheduled - Coming soon! Schedule chats.', 'ai');}
-  else if(tab==='glasses'){addMessage('Glasses - Coming soon! Smart glasses integration.', 'ai');}
-  else if(tab==='vibes'){addMessage('Vibes - Coming soon! Like Meta AI vibes ✨', 'ai');}
-  else{addMessage(`You opened ${tab} - Coming soon! Like Meta AI sidebar`, 'ai');}
+function renderHistory(){
+  const h = document.getElementById('history');
+  h.innerHTML = historyChats.slice().reverse().map((c,i)=>`<div style="padding:8px;border-radius:8px;background:#1e1e2a;margin:4px 0;cursor:pointer;font-size:13px" onclick="loadChat(${historyChats.length-1-i})">${c.title.slice(0,30)}</div>`).join('');
 }
-// Close sidebar when clicking outside
-document.addEventListener('click', (e)=>{
-  const sidebar = document.getElementById('sidebar');
-  const hamburger = document.querySelector('.hamburger');
-  if(sidebar.classList.contains('open') && !sidebar.contains(e.target) && !hamburger.contains(e.target)){
-    closeSidebar();
+
+function loadChat(idx){
+  const c = historyChats[idx];
+  chatEl.innerHTML = c.messages.map(m=>`<div class="bubble ${m.role}">${m.text}</div>`).join('');
+}
+
+function saveHistory(){
+  if(historyChats.length>0){
+    localStorage.setItem('axenova_history', JSON.stringify(historyChats));
+    renderHistory();
   }
-});
-function newChat(){if(currentChat.length>0){const title=currentChat[0]?.content?.slice(0,40)||'Chat';chatHistory.push({title, ...currentChat, ...{0:currentChat[0]}});chatHistory.push(currentChat);localStorage.setItem('lumora_chats',JSON.stringify(chatHistory));}currentChat=[];localStorage.setItem('lumora_current',JSON.stringify([]));chatArea.innerHTML='<div class="message ai">Hey there I\'m lumora, what do you want us to create today?</div>';renderChats();}
-
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-
-function addMessage(text,type,save=true,imageUrl=null){
-  const div=document.createElement('div');div.className=`message ${type}`;
-  if(imageUrl){const img=document.createElement('img');img.src=imageUrl;img.onclick=()=>window.open(imageUrl,'_blank');div.appendChild(img);}
-  const txt=document.createElement('div');txt.textContent=text;div.insertBefore(txt,div.firstChild);
-  // Make clickable like Meta AI - click message to edit/regenerate
-  div.onclick=(e)=>{if(e.target.tagName!=='IMG'){messageInput.value=text;messageInput.focus();}};
-  chatArea.appendChild(div);chatArea.scrollTop=chatArea.scrollHeight;
-  if(save){currentChat.push({role:type==='user'?'user':'assistant',content:text,image:imageUrl});localStorage.setItem('lumora_current',JSON.stringify(currentChat));}
 }
 
-function showLoading(){const div=document.createElement('div');div.className='message ai';div.id='loading';div.innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> Lumora thinking with self-search...';chatArea.appendChild(div);chatArea.scrollTop=chatArea.scrollHeight;}
-function hideLoading(){const l=document.getElementById('loading');if(l)l.remove();}
-
-async function sendMessage(){
-  const text=messageInput.value.trim();if(!text&&!selectedImage)return;
-  addMessage(text||'[Image]','user',true,selectedImage);
-  messageInput.value='';autoResize(messageInput);mediaPreview.innerHTML='';showLoading();
-  const hasCreate=text.toLowerCase().includes('create')||text.toLowerCase().includes('generate')||text.toLowerCase().includes('draw')||text.toLowerCase().includes('make image')||text.toLowerCase().includes('two students');
+async function send(){
+  const text = msgEl.value.trim();
+  if(!text && !currentImage) return;
+  const userBubble = `<div class="bubble user">${text}${currentImage?'<br><img src="'+currentImage+'" style="max-width:200px;border-radius:12px;margin-top:8px">':''}</div>`;
+  chatEl.innerHTML+=userBubble;
+  msgEl.value='';
+  const payload = {message: text, image: currentImage};
+  currentImage=null;
+  chatEl.scrollTop=chatEl.scrollHeight;
+  
+  // Save to history
+  if(historyChats.length===0 || historyChats[historyChats.length-1].messages.length>10){
+    historyChats.push({title: text.slice(0,30), messages: []});
+  }
+  historyChats[historyChats.length-1].messages.push({role:'user', text: text});
+  
   try{
-    if(hasCreate){
-      // Create image like ChatGPT / Meta AI - GOOD quality with flux African
-      const res=await fetch(GEN_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:text})});
-      const data=await res.json();hideLoading();
-      if(data.imageUrl){addMessage(`🎨 Created like ChatGPT (flux model, Kenyan HD, not Asian anime): "${text}"`, 'ai',true,data.imageUrl);}
-      else{addMessage('Failed to generate: '+ (data.error||'unknown'), 'ai');}
-    }else{
-      // Chat with self-search, anti-lie, memory, no repeating
-      const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,history:currentChat,image:selectedImage})});
-      const data=await res.json();hideLoading();
-      if(data.reply){addMessage(data.reply,'ai');}else if(data.error){addMessage('Error: '+data.error,'ai');}else{addMessage('No reply', 'ai');}
+    const res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data = await res.json();
+    let reply = data.reply||data.response||"Sawa! What should we do?";
+    // Handle image response
+    if(data.image){
+      reply+=`<br><img src="${data.image}" style="max-width:100%;border-radius:12px;margin-top:12px">`;
     }
-  }catch(e){hideLoading();addMessage('Network error: '+e.message+' - Check Render logs, ensure LUMORA LIVE 10000','ai');}
-  selectedImage=null;
+    chatEl.innerHTML+=`<div class="bubble ai">${reply}</div>`;
+    historyChats[historyChats.length-1].messages.push({role:'ai', text: reply});
+    saveHistory();
+  }catch(e){
+    chatEl.innerHTML+=`<div class="bubble ai">Pole, network error. Try again. Error: ${e.message}</div>`;
+  }
+  chatEl.scrollTop=chatEl.scrollHeight;
 }
 
-function handleFile(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();reader.onload=async (ev)=>{
-    selectedImage=ev.target.result;
-    mediaPreview.innerHTML=`<img src="${selectedImage}" alt="preview"><span style="cursor:pointer" onclick="clearImage()">✕</span>`;
-    document.getElementById('beautifyBar').classList.add('active');
-    // REAL VISION - Call backend to actually SEE image, not lie about photo content
-    addMessage('📷 Image attached - Analyzing...','ai',false,selectedImage);
-    try{
-      showLoading();
-      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'What is in this photo? Describe in detail what you see, no lying.', history:currentChat, image:selectedImage})});
-      const data=await res.json();hideLoading();
-      if(data.reply){
-        addMessage(data.reply,'ai',true,selectedImage);
-      }
-    }catch(err){hideLoading(); addMessage('Failed to analyze image: '+err.message,'ai');}
-  };reader.readAsDataURL(file);
+function handleImage(input){
+  const file=input.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    currentImage=e.target.result;
+    chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Image ready - type message</div>`;
+    chatEl.scrollTop=chatEl.scrollHeight;
+  };
+  reader.readAsDataURL(file);
 }
 
-function handleCreateImage(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();reader.onload=(ev)=>{
-    selectedImage=ev.target.result;
-    const prompt=promptF('What image to create from this? (e.g., two students coming from school)')||'two students coming from school';
-    messageInput.value='Create '+prompt;sendMessage();
-  };reader.readAsDataURL(file);
-}
-
-function promptF(t){return window.prompt(t);}
-
-function clearImage(){selectedImage=null;mediaPreview.innerHTML='';document.getElementById('beautifyBar').classList.remove('active');}
-
-function closeBeautify(){document.getElementById('beautifyBar').classList.remove('active');}
-
-async function beautifyImage(style){
-  if(!selectedImage){alert('Upload image first via 📷 or 🖼️');return;}
-  const prompts={enhance:'enhance to ultra HD 8k professional',vibrant:'make vibrant colorful',professional:'professional photography edit',african:'make African Kenyan realistic dark skin', 'remove-bg':'remove background clean'};
-  const p=prompts[style]||style;
-  showLoading();
+async function startCamera(){
   try{
-    const res=await fetch(BEAUTIFY_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:selectedImage,prompt:p})});
-    const data=await res.json();hideLoading();
-    if(data.imageUrl||data.beautifiedImage){addMessage(`✨ Beautified (${style}) like ChatGPT - regenerated HD, not just filter`, 'ai',true,data.imageUrl||data.beautifiedImage);}
-    else{addMessage('Beautify failed: '+(data.error||'unknown'),'ai');}
-  }catch(e){hideLoading();addMessage('Beautify error: '+e.message,'ai');}
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const video=document.getElementById('camera');
+    video.srcObject=stream;
+    video.style.display='block';
+    video.onclick=()=>{
+      const canvas=document.getElementById('canvas');
+      canvas.width=video.videoWidth;
+      canvas.height=video.videoHeight;
+      canvas.getContext('2d').drawImage(video,0,0);
+      currentImage=canvas.toDataURL('image/jpeg');
+      stream.getTracks().forEach(t=>t.stop());
+      video.style.display='none';
+      chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Photo captured - what to do?</div>`;
+      chatEl.scrollTop=chatEl.scrollHeight;
+    };
+  }catch(e){alert('Camera error: '+e.message);}
 }
 
-// Mic 🎤 sw-KE en-KE
-function toggleMic(){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){alert('Mic not supported in this browser - Use Chrome');return;}
-  if(isRecording){recognition.stop();return;}
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang='sw-KE';recognition.continuous=false;recognition.interimResults=false;
-  recognition.onstart=()=>{isRecording=true;document.getElementById('micBtn').textContent='🔴';document.getElementById('micBtn').style.background='#ef4444';};
-  recognition.onend=()=>{isRecording=false;document.getElementById('micBtn').textContent='🎤';document.getElementById('micBtn').style.background='#2d1b4e';};
-  recognition.onresult=(e)=>{const transcript=e.results[0][0].transcript;messageInput.value=transcript;sendMessage();};
-  recognition.onerror=(e)=>{console.log('Mic error',e);isRecording=false;document.getElementById('micBtn').textContent='🎤';};
-  recognition.start();
-  // Fallback to en-KE after
-  setTimeout(()=>{if(isRecording){recognition.lang='en-KE';}},100);
+function startMic(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition){alert('Mic not supported');return;}
+  const rec=new SpeechRecognition();
+  rec.lang='en-KE';
+  rec.onresult=e=>{msgEl.value=e.results[0][0].transcript;};
+  rec.start();
 }
 
-// Init
-renderChats();if(currentChat.length>0){renderCurrent();}
-
-// Auto-focus
-messageInput.focus();
+renderHistory();
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>
