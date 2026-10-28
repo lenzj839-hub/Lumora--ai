@@ -130,18 +130,23 @@ If user asks image creation, say you will create but actual image is generated v
 Owner: John Theuri lenz.itz Kiambu Kenya. No lies about Ngai, China Square, Carrefour, Ruaka.
 `;
 
+  // Fix history - ensure no empty content for Groq
+  const cleanHistory = (history||[]).filter(h=>h && h.text && h.text.trim().length>0).slice(-4).map(h=>({role: h.role==='user'?'user':'assistant', content: String(h.text).slice(0,500)}));
   const messages = [
     {role:"system", content: systemPrompt},
-    ...history.slice(-6).map(h=>({role:h.role==='user'?'user':'assistant', content:h.text})),
-    {role:"user", content: message}
+    ...cleanHistory,
+    {role:"user", content: String(message||'Hello').slice(0,1000)}
   ];
 
-  // Vision handling
+  // Vision handling - fixed format for Groq llama-4-scout
   if(imageBase64){
-    messages[messages.length-1].content = [
-      {type:"text", text: message},
-      {type:"image_url", image_url:{url: imageBase64}}
-    ];
+    messages[messages.length-1] = {
+      role:"user",
+      content: [
+        {type:"text", text: String(message||'What is in this image?')},
+        {type:"image_url", image_url:{url: imageBase64}}
+      ]
+    };
   }
 
   try{
