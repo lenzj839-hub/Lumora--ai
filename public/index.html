@@ -1,379 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10091d">
-  <title>Axenova AI</title>
-  <link rel="manifest" href="manifest.json">
-
-  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
-
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: #0e0818;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    header {
-      padding: 17px;
-      background: #160d23;
-      border-bottom: 1px solid #352344;
-      position: sticky;
-      top: 0;
-    }
-
-    header h2 { margin: 0; }
-
-    header p {
-      margin: 5px 0 0;
-      color: #c9b8d8;
-      font-size: 13px;
-    }
-
-    #chat {
-      max-width: 850px;
-      margin: auto;
-      padding: 18px 12px 140px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .message {
-      padding: 13px 15px;
-      max-width: 90%;
-      border-radius: 17px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      line-height: 1.5;
-    }
-
-    .user {
-      align-self: flex-end;
-      background: linear-gradient(120deg, #8539e8, #d83fb4);
-    }
-
-    .ai {
-      align-self: flex-start;
-      background: #251436;
-    }
-
-    /* Markdown layout, like ChatGPT */
-    .ai .md { white-space: normal; }
-    .ai .md > *:first-child { margin-top: 0; }
-    .ai .md > *:last-child { margin-bottom: 0; }
-    .ai .md h1, .ai .md h2, .ai .md h3, .ai .md h4 {
-      margin: 16px 0 8px;
-      line-height: 1.3;
-    }
-    .ai .md h1 { font-size: 21px; }
-    .ai .md h2 { font-size: 19px; border-bottom: 1px solid #514060; padding-bottom: 6px; }
-    .ai .md h3 { font-size: 17px; }
-    .ai .md p { margin: 8px 0; }
-    .ai .md ul, .ai .md ol { margin: 8px 0; padding-left: 22px; }
-    .ai .md li { margin: 5px 0; }
-    .ai .md a { color: #dfbfff; overflow-wrap: anywhere; }
-    .ai .md strong { color: #ffffff; }
-    .ai .md blockquote {
-      margin: 10px 0;
-      padding: 8px 12px;
-      border-left: 3px solid #8539e8;
-      background: #1a0e29;
-      border-radius: 0 8px 8px 0;
-    }
-    .ai .md code {
-      background: #10091d;
-      color: #f0d6ff;
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 13.5px;
-      overflow-wrap: anywhere;
-    }
-    .ai .md pre {
-      background: #10091d;
-      border: 1px solid #493458;
-      border-radius: 12px;
-      padding: 12px;
-      overflow-x: auto;
-      white-space: pre;
-      margin: 10px 0;
-    }
-    .ai .md pre code {
-      background: transparent;
-      padding: 0;
-      font-size: 13.5px;
-      line-height: 1.5;
-    }
-    .ai .md table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0;
-      font-size: 14px;
-      display: block;
-      overflow-x: auto;
-    }
-    .ai .md th, .ai .md td {
-      border: 1px solid #514060;
-      padding: 8px 10px;
-      text-align: left;
-      white-space: nowrap;
-    }
-    .ai .md th { background: #1a0e29; }
-    .ai .md hr { border: 0; border-top: 1px solid #514060; margin: 14px 0; }
-
-    .sources {
-      margin-top: 12px;
-      border-top: 1px solid #514060;
-      padding-top: 8px;
-    }
-
-    .sources a {
-      display: block;
-      color: #dfbfff;
-      margin: 7px 0;
-    }
-
-    .generated-image {
-      display: block;
-      max-width: 100%;
-      width: 100%;
-      margin-top: 12px;
-      border-radius: 12px;
-    }
-
-    .composer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #1a0e29;
-      padding: 12px;
-      padding-bottom: max(12px, env(safe-area-inset-bottom));
-      border-top: 1px solid #352344;
-    }
-
-    .composer-inner {
-      display: flex;
-      gap: 9px;
-      max-width: 850px;
-      margin: auto;
-    }
-
-    textarea {
-      flex: 1;
-      min-width: 0;
-      min-height: 52px;
-      max-height: 130px;
-      resize: vertical;
-      padding: 14px;
-      border: 1px solid #493458;
-      border-radius: 16px;
-      background: #10091d;
-      color: white;
-      font-size: 16px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 50%;
-      width: 52px;
-      min-width: 52px;
-      height: 52px;
-      background: linear-gradient(120deg, #8539e8, #d83fb4);
-      color: white;
-      font-size: 21px;
-      cursor: pointer;
-    }
-
-    button:disabled { opacity: 0.5; }
-
-    .small {
-      text-align: center;
-      color: #bba9ca;
-      font-size: 11px;
-      margin-top: 7px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Axenova AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0a1a;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;height:100dvh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #2a2140;background:#140e24;position:sticky;top:0;z-index:10}
+header .logo{font-size:20px;font-weight:800}
+header .sub{font-size:12px;color:#b8aee0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .spacer{flex:1}
+.iconbtn{background:#241a3d;border:1px solid #372a5c;color:#fff;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:280px;background:#170f2b;border-right:1px solid #2a2140;padding:16px;transform:translateX(-100%);transition:.25s;z-index:50;overflow:auto}
+#sidebar.open{transform:none}
+#sidebar h3{font-size:14px;color:#b8aee0;margin-bottom:10px}
+#sidebar button{width:100%;text-align:left;background:#241a3d;border:1px solid #372a5c;color:#fff;padding:10px;border-radius:10px;margin-bottom:8px;cursor:pointer}
+#chat{flex:1;overflow:auto;padding:16px 14px 10px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:92%;padding:13px 14px;border-radius:16px;line-height:1.55;font-size:15px;white-space:normal;word-wrap:break-word}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,#d946a8,#8b5cf6);border-bottom-right-radius:6px}
+.msg.bot{align-self:flex-start;background:#221838;border:1px solid #32245a;border-bottom-left-radius:6px;width:92%}
+.msg.bot p{margin:6px 0}
+.msg.bot ul{margin:6px 0 6px 18px}
+.msg.bot a{color:#c084fc;word-break:break-all}
+.msg.bot code{background:#0006;padding:2px 5px;border-radius:5px}
+.msg.bot pre{background:#0006;padding:10px;border-radius:10px;overflow:auto;white-space:pre-wrap}
+.msg.bot b,.msg.bot strong{color:#fff}
+.sources{margin-top:12px;border-top:1px solid #372a5c;padding-top:8px;font-size:13px}
+.sources b{color:#e9d5ff}
+.sources a{display:block;color:#c084fc;text-decoration:none;margin-top:6px}
+.copybtn{margin-top:8px;background:transparent;border:1px solid #372a5c;color:#b8aee0;border-radius:20px;padding:4px 10px;font-size:12px;cursor:pointer}
+.thinking{color:#b8aee0;font-size:14px}
+#composer{padding:10px 12px 14px;background:#140e24;border-top:1px solid #2a2140}
+#inputBox{display:flex;gap:8px;align-items:flex-end;background:#221838;border:1px solid #372a5c;border-radius:18px;padding:8px 8px 8px 12px}
+#msgInput{flex:1;background:transparent;border:0;outline:0;color:#fff;font-size:15px;resize:none;max-height:120px;font-family:inherit}
+#msgInput::placeholder{color:#8b7fb8}
+.roundbtn{width:42px;height:42px;border-radius:50%;border:0;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex:none}
+#sendBtn{background:linear-gradient(135deg,#d946a8,#8b5cf6);color:#fff}
+#micBtn.recording{background:#ef4444;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.6}}
+#preview{display:none;margin-bottom:8px;position:relative;width:110px}
+#preview img{width:110px;border-radius:12px}
+#preview span{position:absolute;top:-6px;right:-6px;background:#ef4444;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+input[type=file]{display:none}
+img.gen{max-width:100%;border-radius:14px;margin-top:8px}
+</style>
 </head>
-
 <body>
-  <header>
-    <h2>✨ Axenova AI</h2>
-    <p>Your assistant for questions, web search and images</p>
-  </header>
 
-  <main id="chat" aria-live="polite">
-    <div class="message ai">
-      Hi! I'm Axenova AI. What can I help you with today?
-    </div>
-  </main>
+<div id="sidebar">
+  <h3>Pages / History</h3>
+  <button onclick="newChat()">+ New Chat</button>
+  <div id="historyList"></div>
+  <br><button onclick="toggleSidebar()">Close</button>
+</div>
 
-  <div class="composer">
-    <div class="composer-inner">
-      <textarea
-        id="input"
-        placeholder="Ask Lumora anything..."
-        aria-label="Your message"
-      ></textarea>
-
-      <button id="send" aria-label="Send">➤</button>
-    </div>
-    <div class="small">
-      For images, type: Generate an image of...
-    </div>
+<header>
+  <button class="iconbtn" onclick="toggleSidebar()">☰</button>
+  <div>
+    <div class="logo">Lumora AI</div>
+    <div class="sub">ChatGPT-like with self-search, camera, mic</div>
   </div>
+  <div class="spacer"></div>
+  <button class="iconbtn" onclick="document.getElementById('imgInput').click()">🖼️</button>
+  <button class="iconbtn" onclick="document.getElementById('camInput').click()">📷</button>
+</header>
 
-  <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
+<div id="chat"></div>
 
-    const history = [];
+<div id="composer">
+  <div id="preview"><img id="previewImg"><span onclick="clearImage()">×</span></div>
+  <div id="inputBox">
+    <button class="roundbtn" style="background:#241a3d;color:#fff" onclick="document.getElementById('imgInput').click()">🖼️</button>
+    <button class="roundbtn" style="background:#241a3d;color:#fff" onclick="document.getElementById('camInput').click()">📷</button>
+    <textarea id="msgInput" rows="1" placeholder="Ask Lumora...  (e.g., Create two students coming from school, From when is China Square, Edit this photo)"></textarea>
+    <button class="roundbtn" id="micBtn" style="background:#241a3d;color:#fff" onclick="toggleMic()">🎤</button>
+    <button class="roundbtn" id="sendBtn" onclick="sendMessage()">➤</button>
+  </div>
+</div>
 
-    function addMessage(role, text, extras = {}) {
-      const bubble = document.createElement("div");
-      bubble.className =
-        "message " + (role === "user" ? "user" : "ai");
+<input type="file" id="imgInput" accept="image/*" onchange="handleImage(this)">
+<input type="file" id="camInput" accept="image/*" capture="environment" onchange="handleImage(this)">
 
-      const textNode = document.createElement("div");
+<script>
+let history = JSON.parse(localStorage.getItem('lumora_history')||'[]');
+let currentImage = null;
+let recognizing = false;
+let recognition = null;
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('msgInput');
 
-      if (role === "ai" && window.marked && window.DOMPurify) {
-        textNode.className = "md";
-        textNode.innerHTML = DOMPurify.sanitize(marked.parse(text || ""));
-      } else {
-        textNode.textContent = text;
-      }
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); renderHistory(); }
+function newChat(){ chatEl.innerHTML=''; history=[]; localStorage.removeItem('lumora_history'); renderHistory(); addBot("Habari, mimi ni Lumora AI. Niulize chochote, kuhusu KCSE, news, bei, picha, chochote."); }
 
-      bubble.appendChild(textNode);
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  list.innerHTML = history.slice(-20).reverse().map((h,i)=>`<button onclick="loadHistory(${history.length-1-i})">${escapeHtml(h.slice(0,45))}...</button>`).join('') || '<p style="color:#8b7fb8;font-size:13px">No chats yet</p>';
+}
+function loadHistory(i){ toggleSidebar(); }
 
-      if (extras.image) {
-        const img = document.createElement("img");
-        img.className = "generated-image";
-        img.src = extras.image;
-        img.alt = "Image generated by Lumora AI";
-        bubble.appendChild(img);
-      }
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-      if (extras.sources?.length) {
-        const sourcesBox = document.createElement("div");
-        sourcesBox.className = "sources";
+// MARKDOWN RENDERER - hii ndio inaondoa **
+function renderMarkdown(text){
+  let t = escapeHtml(text);
+  t = t.replace(/```([\s\S]*?)```/g, (m,c)=>'<pre>'+c+'</pre>');
+  t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+  t = t.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  t = t.replace(/__([^_]+)__/g, '<b>$1</b>');
+  t = t.replace(/^### (.*)$/gm, '<p><b>$1</b></p>');
+  t = t.replace(/^## (.*)$/gm, '<p><b>$1</b></p>');
+  t = t.replace(/^# (.*)$/gm, '<p><b>$1</b></p>');
+  t = t.replace(/^\s*[-*] (.*)$/gm, '<li>$1</li>');
+  t = t.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+  t = t.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>');
+  t = t.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+  return '<p>'+t+'</p>';
+}
 
-        const heading = document.createElement("strong");
-        heading.textContent = "Sources";
-        sourcesBox.appendChild(heading);
+function addUser(text){
+  const d=document.createElement('div'); d.className='msg user'; d.textContent=text; chatEl.appendChild(d); chatEl.scrollTop=chatEl.scrollHeight;
+}
+function addBot(text, sources){
+  const d=document.createElement('div'); d.className='msg bot';
+  d.innerHTML = renderMarkdown(text);
+  if(sources && sources.length){
+    let s='<div class="sources"><b>🔍 Sources</b>';
+    sources.forEach(src=>{ s+=`<a href="${src.link}" target="_blank">• ${escapeHtml(src.title||src.link)}</a>`; });
+    s+='</div>';
+    d.innerHTML += s;
+  }
+  d.innerHTML += `<br><button class="copybtn" onclick="navigator.clipboard.writeText(this.parentElement.innerText);this.textContent='Copied ✓'">📋 Copy</button>`;
+  chatEl.appendChild(d); chatEl.scrollTop=chatEl.scrollHeight;
+  return d;
+}
 
-        extras.sources.forEach(source => {
-          const link = document.createElement("a");
-          link.href = source.link;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = source.title || source.link;
-          sourcesBox.appendChild(link);
-        });
+function handleImage(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{ currentImage=e.target.result; document.getElementById('previewImg').src=currentImage; document.getElementById('preview').style.display='block'; };
+  r.readAsDataURL(f);
+}
+function clearImage(){ currentImage=null; document.getElementById('preview').style.display='none'; }
 
-        bubble.appendChild(sourcesBox);
-      }
+function toggleMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ alert('Mic hai-supported kwa hii browser. Jaribu Chrome.'); return; }
+  if(recognizing){ recognition.stop(); return; }
+  recognition=new SR(); recognition.lang='en-KE'; recognition.interimResults=false;
+  recognition.onresult=e=>{ inputEl.value += e.results[0][0].transcript; };
+  recognition.onend=()=>{ recognizing=false; document.getElementById('micBtn').classList.remove('recording'); };
+  recognition.start(); recognizing=true; document.getElementById('micBtn').classList.add('recording');
+}
 
-      chat.appendChild(bubble);
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-      });
+inputEl.addEventListener('input', ()=>{ inputEl.style.height='auto'; inputEl.style.height=inputEl.scrollHeight+'px'; });
+inputEl.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
 
-      return bubble;
+async function sendMessage(){
+  const text=inputEl.value.trim();
+  if(!text && !currentImage) return;
+  const userText = text || 'Edit this photo';
+  addUser(userText);
+  history.push(userText); localStorage.setItem('lumora_history', JSON.stringify(history.slice(-30)));
+
+  // Image generation / edit request
+  const isImageReq = /create|generate|draw|edit this|make.*image|photo/i.test(userText) && (/image|photo|picture|draw|edit/i.test(userText) || currentImage);
+  inputEl.value=''; inputEl.style.height='auto';
+
+  const thinking=document.createElement('div'); thinking.className='msg bot thinking'; thinking.textContent='🔍 Searching online...'; chatEl.appendChild(thinking); chatEl.scrollTop=chatEl.scrollHeight;
+
+  try{
+    if(isImageReq){
+      const res=await fetch('/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:userText})});
+      const data=await res.json(); thinking.remove();
+      if(data.image){ const d=addBot('Hii hapa picha yako:'); d.innerHTML+=`<img class="gen" src="${data.image}">`; }
+      else addBot(data.error||'Image generation failed.');
+      return;
     }
 
-    async function sendMessage() {
-      const message = input.value.trim();
+    const hist=[];
+    document.querySelectorAll('.msg').forEach(m=>{});
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userText, history:[]})});
+    const data=await res.json(); thinking.remove();
+    if(data.error) addBot(data.error);
+    else addBot(data.reply, data.sources);
+    clearImage();
+  }catch(e){ thinking.remove(); addBot('Pole, mtandao umekata kidogo. Jaribu tena.'); }
+}
 
-      if (!message || send.disabled) return;
-
-      addMessage("user", message);
-      input.value = "";
-      send.disabled = true;
-
-      const waiting = addMessage("ai", "Thinking...");
-
-      try {
-        const wantsImage =
-          /\b(generate|create|make|draw)\b.*\b(image|picture|illustration|logo)\b/i
-            .test(message);
-
-        const endpoint = wantsImage
-          ? "/api/image"
-          : "/api/chat";
-
-        const body = wantsImage
-          ? { prompt: message }
-          : { message, history };
-
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
-
-        const data = await response.json();
-        waiting.remove();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Request failed.");
-        }
-
-        if (wantsImage) {
-          addMessage(
-            "ai",
-            data.image
-              ? "Here is your generated image!"
-              : data.error || "I couldn't generate that image.",
-            { image: data.image }
-          );
-        } else {
-          const reply = data.reply ||
-            data.error ||
-            "Please try asking again.";
-
-          addMessage("ai", reply, {
-            sources: data.sources || []
-          });
-
-          history.push(
-            { role: "user", content: message },
-            { role: "assistant", content: reply }
-          );
-
-          if (history.length > 10) {
-            history.splice(0, history.length - 10);
-          }
-        }
-      } catch (error) {
-        waiting.remove();
-        addMessage(
-          "ai",
-          "Sorry, something went wrong: " + error.message
-        );
-      } finally {
-        send.disabled = false;
-        input.focus();
-      }
-    }
-
-    send.addEventListener("click", sendMessage);
-
-    input.addEventListener("keydown", event => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-      }
-    });
-  </script>
+if(!chatEl.innerHTML) addBot("Habari, mimi ni Axenova AI. Niulize chochote, kuhusu KCSE, news, bei, picha, chochote.");
+renderHistory();
+</script>
 </body>
-  </html>
+</html>
