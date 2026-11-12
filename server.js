@@ -21,6 +21,8 @@ Rules:
 - If information is uncertain, explain what is missing.
 `;
 
+let lastSearchError = null;
+
 function getKenyaDateTime() {
   return new Intl.DateTimeFormat("en-GB", {
     timeZone: "Africa/Nairobi",
@@ -73,7 +75,10 @@ async function searchGoogle(query) {
   const key = process.env.GOOGLE_API_KEY;
   const cx = process.env.GOOGLE_CSE_ID;
 
-  if (!key || !cx) return [];
+  if (!key || !cx) {
+    lastSearchError = "Missing GOOGLE_API_KEY or GOOGLE_CSE_ID";
+    return [];
+  }
 
   const url = new URL(
     "https://www.googleapis.com/customsearch/v1"
@@ -88,9 +93,12 @@ async function searchGoogle(query) {
   const data = await response.json();
 
   if (!response.ok) {
+    lastSearchError = data.error || { status: response.status };
     console.error("Google Search error:", data.error);
     return [];
   }
+
+  lastSearchError = null;
 
   return (data.items || []).map(item => ({
     title: item.title,
@@ -100,10 +108,14 @@ async function searchGoogle(query) {
 }
 
 function shouldSearch(message) {
-  return /\b(where is|latest|current|today|news|price of|cost of|weather|who is|when is|school|hospital|near me|search the web|look up)\b/i.test(
-    message
-  );
+  return /latest|today|yesterday|news|breaking|current|recent|2025|2026|price|cost|how much|weather|who is|who won|when is|when will|where is|score|result|election|president|kenya|kcse|knec|school|hospital|near me|search|look up|what happened|update|stock|exchange rate|football|match|transfer|iphone|samsung|release|launch/i.test(message);
 }
+
+app.get("/api/test-search", async (req, res) => {
+  const q = String(req.query.q || "KCSE 2026 timetable KNEC");
+  const results = await searchGoogle(q);
+  res.json({ query: q, count: results.length, lastSearchError, results });
+});
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -187,7 +199,6 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-// Generate images using an image-generation API.
 app.post("/api/image", async (req, res) => {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
