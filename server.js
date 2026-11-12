@@ -1,4 +1,3 @@
-
 const express = require("express");
 const path = require("path");
 
@@ -9,7 +8,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 const SYSTEM_PROMPT = `
-You are Lumora AI, created by John Theuri.
+You are Axenova AI, created by John Theuri.
 
 Rules:
 - Answer the user's actual question.
@@ -21,6 +20,19 @@ Rules:
 - Use supplied search results and cite their links.
 - If information is uncertain, explain what is missing.
 `;
+
+function getKenyaDateTime() {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Nairobi",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).format(new Date()) + " EAT";
+}
 
 async function askAI(messages) {
   if (!process.env.GROQ_API_KEY) {
@@ -156,15 +168,17 @@ app.post("/api/chat", async (req, res) => {
         content: item.content.slice(0, 3000)
       }));
 
+    const kenyaNow = getKenyaDateTime();
+
     const reply = await askAI([
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: SYSTEM_PROMPT + `\n\nCRITICAL DATE RULE: The current date and time in Kenya is exactly: ${kenyaNow}. This is the ONLY correct date. Never guess, never invent a different weekday or date. If the user asks about today, date, day, or time, answer using ONLY this date: ${kenyaNow}.` },
       ...safeHistory,
       { role: "user", content: prompt }
     ]);
 
     res.json({ reply, sources });
   } catch (error) {
-    console.error("Lumora error:", error.message);
+    console.error("Axenova error:", error.message);
 
     res.status(500).json({
       error: error.message ||
@@ -224,7 +238,7 @@ app.post("/api/image", async (req, res) => {
         error: "The image service returned no image."
       });
     }
-
+    
     res.json({ image: `data:image/png;base64,${image}` });
   } catch (error) {
     console.error("Image error:", error.message);
@@ -235,5 +249,5 @@ app.post("/api/image", async (req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Lumora AI running on port ${PORT}`);
+  console.log(`Axenova AI running on port ${PORT}`);
 });
