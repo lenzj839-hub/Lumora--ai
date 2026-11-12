@@ -1,8 +1,8 @@
 
 {
-  "name": "lumora-ai",
+  "name": "Axenova",
   "version": "1.0.0",
-  "description": "Lumora AI assistant",
+  "description": "Axenova Ai assistant",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
