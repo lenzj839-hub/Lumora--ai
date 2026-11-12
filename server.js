@@ -71,40 +71,66 @@ async function askAI(messages) {
     "Sorry, please try asking again.";
 }
 
-async function searchGoogle(query) {
-  const key = process.env.GOOGLE_API_KEY;
-  const cx = process.env.GOOGLE_CSE_ID;
+function cleanText(s) {
+  return String(s || "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").trim();
+}
 
-  if (!key || !cx) {
-    lastSearchError = "Missing GOOGLE_API_KEY or GOOGLE_CSE_ID";
+function decodeDuckLink(href) {
+  try {
+    const u = new URL(href, "https://duckduckgo.com");
+    const target = u.searchParams.get("uddg");
+    return target ? decodeURIComponent(target) : href;
+  } catch { return href; }
+}
+
+async function searchDuckDuckGo(query) {
+  const url = "https://html.duckduckgo.com/html/?q=" + encodeURIComponent(query);
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36",
+      "Accept": "text/html"
+    }
+  });
+  if (!res.ok) throw new Error("DuckDuckGo status " + res.status);
+  const html = await res.text();
+  const results = [];
+  const re = /<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]{0,600}?<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(html)) && results.length < 5) {
+    const link = decodeDuckLink(m[1]);
+    if (link.includes("duckduckgo.com")) continue;
+    results.push({ title: cleanText(m[2]), link, snippet: cleanText(m[3]) });
+  }
+  return results;
+}
+
+async function searchBrave(query) {
+  const key = process.env.BRAVE_API_KEY;
+  if (!key) return [];
+  const res = await fetch("https://api.search.brave.com/res/v1/web/search?q=" + encodeURIComponent(query) + "&count=5", {
+    headers: { "Accept": "application/json", "X-Subscription-Token": key }
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error("Brave: " + JSON.stringify(data).slice(0, 200));
+  return (data.web?.results || []).map(r => ({ title: r.title, link: r.url, snippet: r.description || "" }));
+}
+
+async function searchWeb(query) {
+  try {
+    const brave = await searchBrave(query);
+    if (brave.length) { lastSearchError = null; return brave; }
+  } catch (e) { console.error("Brave error:", e.message); }
+
+  try {
+    const ddg = await searchDuckDuckGo(query);
+    if (ddg.length) { lastSearchError = null; return ddg; }
+    lastSearchError = "No results from DuckDuckGo";
+    return [];
+  } catch (e) {
+    lastSearchError = e.message;
+    console.error("Web Search error:", e.message);
     return [];
   }
-
-  const url = new URL(
-    "https://www.googleapis.com/customsearch/v1"
-  );
-
-  url.searchParams.set("key", key);
-  url.searchParams.set("cx", cx);
-  url.searchParams.set("q", query);
-  url.searchParams.set("num", "5");
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  if (!response.ok) {
-    lastSearchError = data.error || { status: response.status };
-    console.error("Google Search error:", data.error);
-    return [];
-  }
-
-  lastSearchError = null;
-
-  return (data.items || []).map(item => ({
-    title: item.title,
-    link: item.link,
-    snippet: item.snippet
-  }));
 }
 
 function shouldSearch(message) {
@@ -113,7 +139,7 @@ function shouldSearch(message) {
 
 app.get("/api/test-search", async (req, res) => {
   const q = String(req.query.q || "KCSE 2026 timetable KNEC");
-  const results = await searchGoogle(q);
+  const results = await searchWeb(q);
   res.json({ query: q, count: results.length, lastSearchError, results });
 });
 
@@ -121,10 +147,7 @@ app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
     app: "Lumora AI",
-    googleSearch: Boolean(
-      process.env.GOOGLE_API_KEY &&
-      process.env.GOOGLE_CSE_ID
-    ),
+    webSearch: true,
     imageGeneration: Boolean(process.env.OPENAI_API_KEY)
   });
 });
@@ -134,26 +157,22 @@ app.post("/api/chat", async (req, res) => {
     const message = String(req.body?.message || "").trim();
 
     if (!message) {
-      return res.status(400).json({
-        error: "Please enter a message."
-      });
+      return res.status(400).json({ error: "Please enter a message." });
     }
 
     if (message.length > 6000) {
-      return res.status(400).json({
-        error: "Your message is too long."
-      });
+      return res.status(400).json({ error: "Your message is too long." });
     }
 
     let sources = [];
     let prompt = message;
 
     if (shouldSearch(message)) {
-      sources = await searchGoogle(message);
+      sources = await searchWeb(message);
 
       if (sources.length) {
         prompt +=
-          "\n\nGoogle search results. Use these to answer accurately:\n" +
+          "\n\nWeb search results. Use these to answer accurately and mention the source dates if shown:\n" +
           sources.map((s, i) =>
             `${i + 1}. ${s.title}\n${s.snippet}\n${s.link}`
           ).join("\n\n");
@@ -164,9 +183,7 @@ app.post("/api/chat", async (req, res) => {
       }
     }
 
-    const history = Array.isArray(req.body?.history)
-      ? req.body.history
-      : [];
+    const history = Array.isArray(req.body?.history) ? req.body.history : [];
 
     const safeHistory = history
       .filter(item =>
@@ -191,7 +208,6 @@ app.post("/api/chat", async (req, res) => {
     res.json({ reply, sources });
   } catch (error) {
     console.error("Axenova error:", error.message);
-
     res.status(500).json({
       error: error.message ||
         "Lumora is temporarily unavailable. Try again."
@@ -205,15 +221,11 @@ app.post("/api/image", async (req, res) => {
     const prompt = String(req.body?.prompt || "").trim();
 
     if (!prompt) {
-      return res.status(400).json({
-        error: "Describe the image you want."
-      });
+      return res.status(400).json({ error: "Describe the image you want." });
     }
 
     if (!apiKey) {
-      return res.status(503).json({
-        error: "Image generation is not configured. Add OPENAI_API_KEY."
-      });
+      return res.status(503).json({ error: "Image generation is not configured. Add OPENAI_API_KEY." });
     }
 
     const response = await fetch(
@@ -237,25 +249,19 @@ app.post("/api/image", async (req, res) => {
 
     if (!response.ok) {
       console.error("Image API error:", data.error);
-      return res.status(502).json({
-        error: "Image generation failed. Check API access and billing."
-      });
+      return res.status(502).json({ error: "Image generation failed. Check API access and billing." });
     }
 
     const image = data.data?.[0]?.b64_json;
 
     if (!image) {
-      return res.status(502).json({
-        error: "The image service returned no image."
-      });
+      return res.status(502).json({ error: "The image service returned no image." });
     }
     
     res.json({ image: `data:image/png;base64,${image}` });
   } catch (error) {
     console.error("Image error:", error.message);
-    res.status(500).json({
-      error: "Unable to generate the image right now."
-    });
+    res.status(500).json({ error: "Unable to generate the image right now." });
   }
 });
 
