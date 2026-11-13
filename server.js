@@ -97,10 +97,15 @@ function decodeDuckLink(href) {
   } catch { return href; }
 }
 
+// *** HII TU NDIO NIMEWEKA: Timer, search isikae zaidi ya sekunde 6 ***
+async function fetchTimeout(url, options = {}, ms = 6000) {
+  return fetch(url, { ...options, signal: AbortSignal.timeout(ms) });
+}
+
 // ================= SEARCH ENGINE 1 - DIRECT LINK: DUCKDUCKGO LITE =================
 async function searchDuckDuckGo(query) {
   const url = SEARCH_ENGINE_URL_1 + encodeURIComponent(query);
-  const res = await fetch(url, {
+  const res = await fetchTimeout(url, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36",
       "Accept": "text/html"
@@ -116,32 +121,18 @@ async function searchDuckDuckGo(query) {
     if (link.includes("duckduckgo.com")) continue;
     results.push({ title: cleanText(m[2]), link, snippet: cleanText(m[3]) });
   }
-  // Kama lite haikupata, jaribu ile ya zamani ya html
-  if (!results.length) {
-    const url2 = "https://html.duckduckgo.com/html/?q=" + encodeURIComponent(query);
-    const res2 = await fetch(url2, { headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36", "Accept": "text/html" } });
-    if (!res2.ok) throw new Error("DuckDuckGo status " + res2.status);
-    const html2 = await res2.text();
-    const re2 = /<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]{0,600}?<a[^>]*class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
-    let m2;
-    while ((m2 = re2.exec(html2)) && results.length < 5) {
-      const link = decodeDuckLink(m2[1]);
-      if (link.includes("duckduckgo.com")) continue;
-      results.push({ title: cleanText(m2[2]), link, snippet: cleanText(m2[3]) });
-    }
-  }
   return results;
 }
 
 // ================= SEARCH ENGINE 2 - DIRECT LINK: BING =================
 async function searchBing(query) {
   const url = SEARCH_ENGINE_URL_2 + encodeURIComponent(query);
-  const res = await fetch(url, {
+  const res = await fetchTimeout(url, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36",
       "Accept": "text/html"
     }
-  });
+  }, 5000);
   if (!res.ok) throw new Error("Bing status " + res.status);
   const html = await res.text();
   const results = [];
@@ -157,7 +148,7 @@ async function searchBing(query) {
 // ================= FREE SEARCH 3 - WIKIPEDIA - NO KEY =================
 async function searchWikipedia(query) {
   const url = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" + encodeURIComponent(query) + "&utf8=&format=json&srlimit=5";
-  const res = await fetch(url, { headers: { "User-Agent": "AxenovaAI/1.0" } });
+  const res = await fetchTimeout(url, { headers: { "User-Agent": "AxenovaAI/1.0" } }, 5000);
   if (!res.ok) throw new Error("Wikipedia status " + res.status);
   const data = await res.json();
   return (data.query?.search || []).map(r => ({
