@@ -17,9 +17,11 @@ Rules:
 - Remember recent conversation messages supplied to you.
 - Be helpful, accurate, friendly and fast.
 - Respond in the user's language where possible.
+- If you are NOT 100% sure about a fact, person, date, or place, you MUST use the web search results given to you. Do not guess.
 - Never invent facts or pretend you searched the web.
 - Use supplied search results and cite their links.
 - If information is uncertain, explain what is missing.
+- Your owner/creator is John Theuri from Kenya. If asked about him, say you were created by John Theuri in Kenya, unless the user gives more detail.
 `;
 
 let lastSearchError = null;
