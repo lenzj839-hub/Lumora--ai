@@ -1,17 +1,160 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lumora AI</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0f0a1a;color:#fff;font-family:system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column}header{display:flex;gap:10px;align-items:center;padding:12px;border-bottom:1px solid #2a2140;background:#140e24}.logo{font-size:20px;font-weight:800}.sub{font-size:12px;color:#b8aee0}.sp{flex:1}.ib{background:#241a3d;border:1px solid #372a5c;color:#fff;width:36px;height:36px;border-radius:10px;font-size:18px}#chat{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}.msg{max-width:92%;padding:13px;border-radius:16px;line-height:1.55;font-size:15px;word-wrap:break-word}.user{align-self:flex-end;background:linear-gradient(135deg,#d946a8,#8b5cf6)}.bot{align-self:flex-start;background:#221838;border:1px solid #32245a;width:92%}.bot a{color:#c084fc;word-break:break-all}.bot ul{margin-left:18px}.src{margin-top:10px;border-top:1px solid #372a5c;padding-top:8px;font-size:13px}.src a{display:block;margin-top:5px;color:#c084fc;text-decoration:none}#box{padding:10px;background:#140e24;border-top:1px solid #2a2140}#in{display:flex;gap:8px;background:#221838;border:1px solid #372a5c;border-radius:18px;padding:8px}textarea{flex:1;background:transparent;border:0;outline:0;color:#fff;font-size:15px;resize:none;font-family:inherit}button{border:0;cursor:pointer}.rb{width:42px;height:42px;border-radius:50%;font-size:18px;background:#241a3d;color:#fff}#send{background:linear-gradient(135deg,#d946a8,#8b5cf6);color:#fff}.rec{background:#ef4444!important}#pv{display:none;margin-bottom:8px}#pv img{width:100px;border-radius:10px}input[type=file]{display:none}</style></head><body>
-<header><button class="ib" onclick="alert('History: '+(JSON.parse(localStorage.getItem('h')||'[]').length)+' chats')">☰</button><div><div class="logo">Lumora AI</div><div class="sub">ChatGPT-like with self-search, camera, mic</div></div><div class="sp"></div><button class="ib" onclick="document.getElementById('f1').click()">🖼️</button><button class="ib" onclick="document.getElementById('f2').click()">📷</button></header>
-<div id="chat"></div>
-<div id="box"><div id="pv"><img id="pvi"></div><div id="in"><button class="rb" onclick="document.getElementById('f1').click()">🖼️</button><button class="rb" onclick="document.getElementById('f2').click()">📷</button><textarea id="t" rows="1" placeholder="Ask Lumora..."></textarea><button class="rb" id="mic" onclick="mic()">🎤</button><button class="rb" id="send" onclick="send()">➤</button></div></div>
-<input type="file" id="f1" accept="image/*" onchange="img(this)"><input type="file" id="f2" accept="image/*" capture="environment" onchange="img(this)">
+<!DOCTYPE html>
+<html lang="en">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axenova AI - By John Theuri</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#8a2be2">
+<meta name="description" content="Axenova AI - Answers everything except porn, ChatGPT-like, self-search internet, camera, mic, by John Theuri Kiambu">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100vh}
+.sidebar{width:260px;background:#17171f;border-right:1px solid #222;padding:12px;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column}
+.header{padding:16px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
+.header h1{background:linear-gradient(90deg,#8a2be2,#ff6b9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:20px}
+.chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:80%;padding:12px 16px;border-radius:18px;line-height:1.5;white-space:pre-wrap}
+.user{align-self:flex-end;background:linear-gradient(135deg,#8a2be2,#c751ff)}
+.ai{align-self:flex-start;background:#1e1e2a;border:1px solid #2a2a3a}
+.inputBar{padding:12px;border-top:1px solid #222;display:flex;gap:8px;align-items:center}
+.inputBar input{flex:1;background:#1e1e2a;border:1px solid #333;border-radius:24px;padding:12px 18px;color:#fff;outline:none}
+.inputBar button{background:linear-gradient(135deg,#8a2be2,#ff6b9d);border:none;border-radius:50%;width:44px;height:44px;color:#fff;cursor:pointer;font-size:18px}
+.iconBtn{background:#1e1e2a;border:1px solid #333;border-radius:50%;width:42px;height:42px;color:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+<h3>Axenova AI</h3>
+<p style="font-size:12px;color:#888;margin:8px 0">By John Theuri lenz.itz<br>Answers everything except porn</p>
+<div id="history"></div>
+</div>
+<div class="main">
+<div class="header">
+<div style="display:flex;gap:12px;align-items:center">
+<button onclick="document.getElementById('sidebar').style.display=document.getElementById('sidebar').style.display==='none'?'block':'none'" style="background:none;border:none;color:#fff;font-size:22px">☰</button>
+<h1>Axenova AI</h1>
+<span style="font-size:12px;color:#888">Answers everything except porn, ChatGPT-like, internet, camera, mic</span>
+</div>
+<div>
+<button class="iconBtn" onclick="document.getElementById('fileInput').click()">🖼️</button>
+<button class="iconBtn" onclick="startCamera()">📷</button>
+</div>
+</div>
+<div class="chat" id="chat">
+<div class="bubble ai">Hey there I'm Axenova, what do you want us to create today? 🚀 I answer everything except pornographic questions!</div>
+</div>
+<div class="inputBar">
+<input type="file" id="fileInput" accept="image/*" hidden onchange="handleImage(this)">
+<button class="iconBtn" onclick="document.getElementById('fileInput').click()" title="Upload">🖼️</button>
+<button class="iconBtn" onclick="startCamera()" title="Camera">📷</button>
+<button class="iconBtn" onclick="startMic()" title="Mic">🎤</button>
+<input id="msg" placeholder="Ask Axenova... (e.g., Create two students, Where is China Square, What does Kalenjin call God, Edit this photo)" onkeypress="if(event.key==='Enter')send()">
+<button onclick="send()">➤</button>
+</div>
+</div>
+<video id="camera" autoplay playsinline style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:99"></video>
+<canvas id="canvas" style="display:none"></canvas>
 <script>
-const chat=document.getElementById('chat'),ta=document.getElementById('t');let curImg=null,rec=null,on=false;
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
-function md(x){let t=esc(x);t=t.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');t=t.replace(/^\s*[-*] (.*)$/gm,'<li>$1</li>');t=t.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank">$1</a>');return t.replace(/\n/g,'<br>')}
-function add(c,html){const d=document.createElement('div');d.className='msg '+c;d.innerHTML=html;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;return d}
-function bot(text,src){let h=md(text);if(src&&src.length){h+='<div class="src"><b>🔍 Sources</b>';src.forEach(s=>h+=`<a href="${s.link}" target="_blank">• ${esc(s.title||s.link)}</a>`);h+='</div>'}add('bot',h)}
-function img(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{curImg=e.target.result;document.getElementById('pvi').src=curImg;document.getElementById('pv').style.display='block'};r.readAsDataURL(f)}
-function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Mic: jaribu Chrome');return}if(on){rec.stop();return}rec=new SR();rec.lang='en-KE';rec.onresult=e=>ta.value+=e.results[0][0].transcript;rec.onend=()=>{on=false;document.getElementById('mic').classList.remove('rec')};rec.start();on=true;document.getElementById('mic').classList.add('rec')}
-ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
-async function send(){const v=ta.value.trim();if(!v)return;add('user',esc(v));let h=JSON.parse(localStorage.getItem('h')||'[]');h.push(v);localStorage.setItem('h',JSON.stringify(h.slice(-20)));ta.value='';const th=add('bot','🔍 Searching online...');try{const isImg=/create|generate|draw|edit|image|photo|picture/i.test(v);if(isImg&&/image|photo|picture|draw|create|edit/i.test(v)){const r=await fetch('/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:v})});const d=await r.json();th.remove();if(d.image)bot('Hii hapa: <br><img style="max-width:100%;border-radius:12px" src="'+d.image+'">');else bot(d.error||'Image failed.');return}const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:v,history:[]})});const d=await r.json();th.remove();bot(d.error||d.reply,d.sources)}catch(e){th.remove();bot('Pole, jaribu tena.')}}
-bot("Habari, mimi ni Lumora AI. Niulize chochote, KCSE, news, bei, picha.");
-</script></body></html>
+let historyChats = JSON.parse(localStorage.getItem('axenova_history')||'[]');
+let currentImage = null;
+const chatEl = document.getElementById('chat');
+const msgEl = document.getElementById('msg');
+function renderHistory(){
+  const h=document.getElementById('history');
+  h.innerHTML=historyChats.slice().reverse().map((c,i)=>`<div style="padding:8px;border-radius:8px;background:#1e1e2a;margin:4px 0;cursor:pointer;font-size:13px" onclick="loadChat(${historyChats.length-1-i})">${c.title.slice(0,30)}</div>`).join('');
+}
+function loadChat(idx){
+  const c=historyChats[idx];
+  chatEl.innerHTML=c.messages.map(m=>`<div class="bubble ${m.role}">${m.text}</div>`).join('');
+}
+function saveHistory(){
+  if(historyChats.length>0){localStorage.setItem('axenova_history', JSON.stringify(historyChats));renderHistory();}
+}
+async function send(){
+  const text=msgEl.value.trim();
+  if(!text && !currentImage) return;
+  const userBubble=`<div class="bubble user">${text}${currentImage?'<br><img src="'+currentImage+'" style="max-width:200px;border-radius:12px;margin-top:8px">':''}</div>`;
+  chatEl.innerHTML+=userBubble;
+  msgEl.value='';
+  const payload={message:text, image:currentImage, history: historyChats.length>0 ? historyChats[historyChats.length-1].messages : []};
+  currentImage=null;
+  chatEl.scrollTop=chatEl.scrollHeight;
+  if(historyChats.length===0 || historyChats[historyChats.length-1].messages.length>10){
+    historyChats.push({title:text.slice(0,30), messages:[]});
+  }
+  historyChats[historyChats.length-1].messages.push({role:'user', text:text});
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    let reply=data.reply||data.response||"Hey I'm Axenova!";
+    if(data.image){reply+=`<br><img src="${data.image}" style="max-width:100%;border-radius:12px;margin-top:12px">`;}
+    chatEl.innerHTML+=`<div class="bubble ai">${reply}</div>`;
+    historyChats[historyChats.length-1].messages.push({role:'ai', text:reply});
+    saveHistory();
+  }catch(e){chatEl.innerHTML+=`<div class="bubble ai">Pole error: ${e.message}. Try again.</div>`;}
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+function handleImage(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    currentImage=e.target.result;
+    chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Image ready - what to do?</div>`;
+    chatEl.scrollTop=chatEl.scrollHeight;
+  };
+  reader.readAsDataURL(file);
+}
+async function startCamera(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const video=document.getElementById('camera');
+    video.srcObject=stream;
+    video.style.display='block';
+    video.onclick=()=>{
+      const canvas=document.getElementById('canvas');
+      canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+      canvas.getContext('2d').drawImage(video,0,0);
+      currentImage=canvas.toDataURL('image/jpeg');
+      stream.getTracks().forEach(t=>t.stop());
+      video.style.display='none';
+      chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Photo captured!</div>`;
+      chatEl.scrollTop=chatEl.scrollHeight;
+    };
+  }catch(e){alert('Camera error:'+e.message);}
+}
+function startMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Mic not supported');return;}
+  const rec=new SR();rec.lang='en-KE';
+  rec.onresult=e=>{msgEl.value=e.results[0][0].transcript;};
+  rec.start();
+}
+renderHistory();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
