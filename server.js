@@ -86,6 +86,7 @@ function decodeDuckLink(href) {
   } catch { return href; }
 }
 
+// ================= FREE SEARCH 1 - DUCKDUCKGO - NO KEY =================
 async function searchDuckDuckGo(query) {
   const url = "https://html.duckduckgo.com/html/?q=" + encodeURIComponent(query);
   const res = await fetch(url, {
@@ -107,6 +108,35 @@ async function searchDuckDuckGo(query) {
   return results;
 }
 
+// ================= FREE SEARCH 2 - DUCKDUCKGO INSTANT ANSWER - NO KEY =================
+async function searchDuckInstant(query) {
+  const url = "https://api.duckduckgo.com/?q=" + encodeURIComponent(query) + "&format=json&no_html=1&skip_disambig=1";
+  const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+  if (!res.ok) throw new Error("Duck Instant status " + res.status);
+  const data = await res.json();
+  const results = [];
+  if (data.AbstractText) {
+    results.push({ title: data.Heading || query, link: data.AbstractURL || "https://duckduckgo.com/?q=" + encodeURIComponent(query), snippet: data.AbstractText });
+  }
+  for (const t of (data.RelatedTopics || []).slice(0, 4)) {
+    if (t.Text && t.FirstURL) results.push({ title: cleanText(t.Text).slice(0, 80), link: t.FirstURL, snippet: cleanText(t.Text) });
+  }
+  return results;
+}
+
+// ================= FREE SEARCH 3 - WIKIPEDIA - NO KEY =================
+async function searchWikipedia(query) {
+  const url = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" + encodeURIComponent(query) + "&utf8=&format=json&srlimit=5";
+  const res = await fetch(url, { headers: { "User-Agent": "AxenovaAI/1.0" } });
+  if (!res.ok) throw new Error("Wikipedia status " + res.status);
+  const data = await res.json();
+  return (data.query?.search || []).map(r => ({
+    title: r.title,
+    link: "https://en.wikipedia.org/wiki/" + encodeURIComponent(r.title.replace(/ /g, "_")),
+    snippet: cleanText(r.snippet)
+  }));
+}
+
 async function searchBrave(query) {
   const key = process.env.BRAVE_API_KEY;
   if (!key) return [];
@@ -118,6 +148,7 @@ async function searchBrave(query) {
   return (data.web?.results || []).map(r => ({ title: r.title, link: r.url, snippet: r.description || "" }));
 }
 
+// Hii inajaribu zote za FREE moja baada ya nyingine, hadi moja ipe jibu
 async function searchWeb(query) {
   try {
     const brave = await searchBrave(query);
@@ -127,7 +158,17 @@ async function searchWeb(query) {
   try {
     const ddg = await searchDuckDuckGo(query);
     if (ddg.length) { lastSearchError = null; return ddg; }
-    lastSearchError = "No results from DuckDuckGo";
+  } catch (e) { console.error("DuckDuckGo error:", e.message); lastSearchError = e.message; }
+
+  try {
+    const instant = await searchDuckInstant(query);
+    if (instant.length) { lastSearchError = null; return instant; }
+  } catch (e) { console.error("Duck Instant error:", e.message); }
+
+  try {
+    const wiki = await searchWikipedia(query);
+    if (wiki.length) { lastSearchError = null; return wiki; }
+    lastSearchError = "No results from free search engines";
     return [];
   } catch (e) {
     lastSearchError = e.message;
@@ -137,7 +178,10 @@ async function searchWeb(query) {
 }
 
 function shouldSearch(message) {
-  return /latest|today|yesterday|news|breaking|current|recent|2025|2026|price|cost|how much|weather|who is|who won|when is|when will|where is|score|result|election|president|kenya|kcse|knec|school|hospital|near me|search|look up|what happened|update|stock|exchange rate|football|match|transfer|iphone|samsung|release|launch/i.test(message);
+  if (/^(hi|hey|hello|morning|thanks|thank you|ok|okay|sawa|poa)$/i.test(message.trim())) {
+    return false;
+  }
+  return /who|what|when|where|why|how|is|was|were|from|latest|today|yesterday|news|breaking|current|recent|2025|2026|price|cost|how much|weather|who is|who won|when is|when will|where is|score|result|election|president|kenya|kcse|knec|school|hospital|near me|search|look up|what happened|update|stock|exchange rate|football|match|transfer|iphone|samsung|release|launch|owner|creator|john theuri|axenova|lumora/i.test(message);
 }
 
 app.get("/api/test-search", async (req, res) => {
