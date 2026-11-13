@@ -177,11 +177,12 @@ async function searchWeb(query) {
   }
 }
 
+// *** HII NDIO NILIBADILISHA YA 1: Kila swali isearch ***
 function shouldSearch(message) {
   if (/^(hi|hey|hello|morning|thanks|thank you|ok|okay|sawa|poa)$/i.test(message.trim())) {
     return false;
   }
-  return /who|what|when|where|why|how|is|was|were|from|latest|today|yesterday|news|breaking|current|recent|2025|2026|price|cost|how much|weather|who is|who won|when is|when will|where is|score|result|election|president|kenya|kcse|knec|school|hospital|near me|search|look up|what happened|update|stock|exchange rate|football|match|transfer|iphone|samsung|release|launch|owner|creator|john theuri|axenova|lumora/i.test(message);
+  return true;
 }
 
 app.get("/api/test-search", async (req, res) => {
@@ -219,7 +220,7 @@ app.post("/api/chat", async (req, res) => {
 
       if (sources.length) {
         prompt +=
-          "\n\nWeb search results. Use these to answer accurately and mention the source dates if shown:\n" +
+          "\n\nWeb search results. You MUST answer ONLY from these results. Do not use your own memory. Do not invent citations like [1] [2] if there are no results. Mention the name, date and link from the results:\n" +
           sources.map((s, i) =>
             `${i + 1}. ${s.title}\n${s.snippet}\n${s.link}`
           ).join("\n\n");
