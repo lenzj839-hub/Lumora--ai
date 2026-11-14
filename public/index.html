@@ -20,6 +20,7 @@ body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100
 .chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0;width:100%}
 .bubble{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-size:15px}
 .bubble a{word-break:break-all;display:inline-block;max-width:100%}
+.bubble img{max-width:100%;border-radius:12px;margin-top:8px}
 .user{align-self:flex-end;background:linear-gradient(135deg,#8a2be2,#c751ff)}
 .ai{align-self:flex-start;background:#1e1e2a;border:1px solid #2a2a3a}
 .inputBar{padding:12px;border-top:1px solid #222;display:flex;gap:8px;align-items:center;width:100%;background:#0f0f14}
@@ -28,6 +29,7 @@ body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100
 .iconBtn{background:#1e1e2a!important;border:1px solid #333!important;border-radius:50%!important;width:42px!important;height:42px!important;color:#fff!important;cursor:pointer;flex-shrink:0;font-size:18px}
 .iconBtn.active{background:#8a2be2!important}
 .speakBtn{background:#2a2a3a;border:none;color:#fff;border-radius:12px;padding:6px 10px;margin-top:8px;cursor:pointer;font-size:12px}
+#imgPreview{display:none;padding:8px 12px;background:#1a1a26;border-top:1px solid #222;align-items:center;gap:10px}
 @media (max-width:700px){
 .sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:50;height:100vh;box-shadow:0 0 40px #000}
 .bubble{max-width:92%}
@@ -45,7 +47,9 @@ body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100
 <h3>Axenova AI</h3>
 <p style="font-size:12px;color:#888;margin:8px 0">By John Theuri lenz.itz<br>Answers everything except porn</p>
 <button onclick="newChat()" style="width:100%;background:linear-gradient(135deg,#8a2be2,#ff6b9d);border:none;color:#fff;padding:10px;border-radius:10px;cursor:pointer;margin:10px 0;font-weight:bold">+ New Chat</button>
-<div id="history"></div>
+<button onclick="downloadChat()" style="width:100%;background:#1e1e2a;border:1px solid #333;color:#fff;padding:10px;border-radius:10px;cursor:pointer;margin-bottom:10px">⬇️ Download Chat</button>
+<button onclick="clearAllHistory()" style="width:100%;background:#2a1a1a;border:1px solid #553333;color:#ff8888;padding:10px;border-radius:10px;cursor:pointer">🗑️ Clear All History</button>
+<div id="history" style="margin-top:12px"></div>
 </div>
 <div class="main">
 <div class="header">
@@ -56,19 +60,25 @@ body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100
 </div>
 <div style="display:flex;gap:6px">
 <button class="iconBtn" id="voiceToggleBtn" onclick="toggleVoice()" title="Girl Voice">🔊</button>
+<button class="iconBtn" onclick="clearChat()" title="Clear Chat">🗑️</button>
 <button class="iconBtn" onclick="document.getElementById('fileInput').click()">🖼️</button>
 <button class="iconBtn" onclick="startCamera()">📷</button>
 </div>
 </div>
 <div class="chat" id="chat">
-<div class="bubble ai">Hey there I'm Axenova, what do you want us to create today? 🚀 I answer everything except pornographic questions!<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button></div>
+<div class="bubble ai">Hey there I'm Axenova, what do you want us to create today? 🚀 I answer everything except pornographic questions! Send me an image and ask me about it - I can see it now.<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button> <button class="speakBtn" onclick="copyText(this)">📋 Copy</button></div>
+</div>
+<div id="imgPreview">
+<img id="previewImg" src="" style="width:60px;height:60px;object-fit:cover;border-radius:10px">
+<span style="font-size:13px;flex:1">Image attached - now type your question below 👇</span>
+<button onclick="removeImage()" style="background:#ff4444;border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer">✕</button>
 </div>
 <div class="inputBar">
 <input type="file" id="fileInput" accept="image/*" hidden onchange="handleImage(this)">
 <button class="iconBtn" onclick="document.getElementById('fileInput').click()" title="Upload">🖼️</button>
 <button class="iconBtn" onclick="startCamera()" title="Camera">📷</button>
 <button class="iconBtn" onclick="startMic()" title="Mic">🎤</button>
-<input id="msg" placeholder="Ask Axenova..." onkeypress="if(event.key==='Enter')send()">
+<input id="msg" placeholder="Ask Axenova... e.g. What can you see?" onkeypress="if(event.key==='Enter')send()">
 <button onclick="send()">➤</button>
 </div>
 </div>
@@ -78,10 +88,9 @@ body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100
 <script>
 let historyChats=JSON.parse(localStorage.getItem('axenova_history')||'[]');
 let currentImage=null;
+let lastImage=null;
 let voiceOn=false;
-let voiceQueue=[];
-let voicePlaying=false;
-let voiceStopped=false;
+let voiceQueue=[]; let voicePlaying=false; let voiceStopped=false;
 const chatEl=document.getElementById('chat');
 const msgEl=document.getElementById('msg');
 const voiceAudio=document.getElementById('voiceAudio');
@@ -89,46 +98,54 @@ if(window.innerWidth<700){document.getElementById('sidebar').style.display='none
 function openSidebar(){document.getElementById('sidebar').style.display='block';document.getElementById('sidebarOverlay').style.display='block';}
 function closeSidebar(){if(window.innerWidth<700){document.getElementById('sidebar').style.display='none';document.getElementById('sidebarOverlay').style.display='none';}}
 function toggleSidebar(){var s=document.getElementById('sidebar');if(s.style.display==='block'){closeSidebar();}else{openSidebar();}}
-function newChat(){chatEl.innerHTML='<div class="bubble ai">New chat started! What do you want us to create today? 🚀<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button></div>';closeSidebar();}
-// ===== NEW VOICE - WORKS IN APPSGEYSER APK (Google Audio, Girl Voice) =====
+function newChat(){clearChat();closeSidebar();}
+function clearChat(){chatEl.innerHTML='<div class="bubble ai">New chat started! What do you want us to create today? 🚀<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button></div>';removeImage();}
+function clearAllHistory(){if(confirm('Delete all history?')){historyChats=[];localStorage.removeItem('axenova_history');renderHistory();clearChat();}}
+function downloadChat(){var txt=chatEl.innerText;var b=new Blob([txt],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Axenova-Chat.txt';a.click();}
+function copyText(btn){var txt=btn.parentElement.innerText.replace(/🔊 Read aloud|⏹️ Stop|📋 Copy/g,'');navigator.clipboard.writeText(txt).then(()=>{btn.textContent='✅ Copied!';setTimeout(()=>btn.textContent='📋 Copy',1500);});}
+// ===== IMAGE FIX - IMAGE STAYS UNTIL YOU SEND =====
+function showPreview(){if(currentImage){document.getElementById('imgPreview').style.display='flex';document.getElementById('previewImg').src=currentImage;}else{document.getElementById('imgPreview').style.display='none';}}
+function removeImage(){currentImage=null;showPreview();}
+function handleImage(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{currentImage=e.target.result;lastImage=currentImage;showPreview();msgEl.placeholder='Now ask about this image...';msgEl.focus();};reader.readAsDataURL(file);}
+// ===== VOICE - GOOGLE AUDIO, WORKS IN APK =====
 function detectLang(txt){var sw=/\b(ni|ya|wa|kwa|na|hii|hiyo|nini|habari|asante|sawa|ndiyo|hapana|mimi|wewe|yeye|sisi|nyinyi|wale|hapa|pale|leo|kesho|jana|rafiki|mwanamke|mwanaume|mtoto|shule|nyumba|chakula|maji|upendo)\b/i;return sw.test(txt)?'sw':'en';}
-function speakText(txt){
-  var clean=txt.replace(/🔊 Read aloud/g,'').replace(/⏹️ Stop/g,'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
-  if(!clean) return;
-  var lang=detectLang(clean);
-  // Split into ~150 char chunks so Google TTS accepts it
-  var sentences=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[clean];
-  var chunks=[]; var cur='';
-  sentences.forEach(function(s){ if((cur+s).length>150){ if(cur) chunks.push(cur); cur=s; } else { cur+=s; } });
-  if(cur) chunks.push(cur);
-  voiceStopped=false;
-  voiceQueue=chunks.map(function(c){ return {text:c, lang:lang}; });
-  playNextVoice();
-}
-function playNextVoice(){
-  if(voiceStopped || voiceQueue.length===0){ voicePlaying=false; return; }
-  voicePlaying=true;
-  var item=voiceQueue.shift();
-  // Google Translate TTS - girl voice, works in WebView/APK
-  var url='https://translate.google.com/translate_tts?ie=UTF-8&q='+encodeURIComponent(item.text)+'&tl='+item.lang+'&client=tw-ob';
-  voiceAudio.src=url;
-  voiceAudio.play().catch(function(){ setTimeout(playNextVoice, 500); });
-}
-voiceAudio.onended=function(){ if(!voiceStopped) playNextVoice(); };
-voiceAudio.onerror=function(){ if(!voiceStopped) playNextVoice(); };
-function stopVoice(){ voiceStopped=true; voiceQueue=[]; voiceAudio.pause(); voiceAudio.src=''; voicePlaying=false; }
-function toggleVoice(){
-  voiceOn=!voiceOn;
-  document.getElementById('voiceToggleBtn').classList.toggle('active', voiceOn);
-  if(voiceOn){ speakText('Hi, I am Axenova. Girl voice is now on. I will read all my messages for you.'); }
-  else { stopVoice(); }
-}
+function speakText(txt){var clean=txt.replace(/🔊 Read aloud/g,'').replace(/⏹️ Stop/g,'').replace(/📋 Copy/g,'').replace(/✅ Copied!/g,'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();if(!clean)return;var lang=detectLang(clean);var sentences=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[clean];var chunks=[];var cur='';sentences.forEach(function(s){if((cur+s).length>150){if(cur)chunks.push(cur);cur=s;}else{cur+=s;}});if(cur)chunks.push(cur);voiceStopped=false;voiceQueue=chunks.map(function(c){return{text:c,lang:lang};});playNextVoice();}
+function playNextVoice(){if(voiceStopped||voiceQueue.length===0){voicePlaying=false;return;}voicePlaying=true;var item=voiceQueue.shift();voiceAudio.src='https://translate.google.com/translate_tts?ie=UTF-8&q='+encodeURIComponent(item.text)+'&tl='+item.lang+'&client=tw-ob';voiceAudio.play().catch(function(){setTimeout(playNextVoice,500);});}
+voiceAudio.onended=function(){if(!voiceStopped)playNextVoice();};
+voiceAudio.onerror=function(){if(!voiceStopped)playNextVoice();};
+function stopVoice(){voiceStopped=true;voiceQueue=[];voiceAudio.pause();voiceAudio.src='';voicePlaying=false;}
+function toggleVoice(){voiceOn=!voiceOn;document.getElementById('voiceToggleBtn').classList.toggle('active',voiceOn);if(voiceOn){speakText('Hi, I am Axenova. Girl voice is now on.');}else{stopVoice();}}
 function renderHistory(){const h=document.getElementById('history');if(!historyChats.length){h.innerHTML='<p style="font-size:12px;color:#666">No history yet</p>';return;}h.innerHTML=historyChats.slice().reverse().map((c,i)=>`<div style="padding:8px;border-radius:8px;background:#1e1e2a;margin:4px 0;cursor:pointer;font-size:13px" onclick="loadChat(${historyChats.length-1-i})">${(c.title||'Chat').slice(0,30)}</div>`).join('');}
-function loadChat(idx){closeSidebar();const c=historyChats[idx];if(!c)return;chatEl.innerHTML=c.messages.map(m=>`<div class="bubble ${m.role}">${m.text}${m.role==='ai'?'<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button>':''}</div>`).join('');chatEl.scrollTop=chatEl.scrollHeight;}
+function loadChat(idx){closeSidebar();const c=historyChats[idx];if(!c)return;chatEl.innerHTML=c.messages.map(m=>`<div class="bubble ${m.role}">${m.text}${m.role==='ai'?'<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button> <button class="speakBtn" onclick="copyText(this)">📋 Copy</button>':''}</div>`).join('');chatEl.scrollTop=chatEl.scrollHeight;}
 function saveHistory(){if(historyChats.length>0){localStorage.setItem('axenova_history',JSON.stringify(historyChats));renderHistory();}}
-async function send(){const text=msgEl.value.trim();if(!text&&!currentImage)return;chatEl.innerHTML+=`<div class="bubble user">${text}${currentImage?'<br><img src="'+currentImage+'" style="max-width:200px;border-radius:12px;margin-top:8px">':''}</div>`;msgEl.value='';const payload={message:text,image:currentImage,history:historyChats.length>0?historyChats[historyChats.length-1].messages:[]};currentImage=null;chatEl.scrollTop=chatEl.scrollHeight;if(historyChats.length===0||historyChats[historyChats.length-1].messages.length>10){historyChats.push({title:text.slice(0,30),messages:[]});}historyChats[historyChats.length-1].messages.push({role:'user',text:text});try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();let reply=data.reply||data.response||"Hey I'm Axenova!";if(data.image){reply+=`<br><img src="${data.image}" style="max-width:100%;border-radius:12px;margin-top:12px">`;}chatEl.innerHTML+=`<div class="bubble ai">${reply}<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button></div>`;historyChats[historyChats.length-1].messages.push({role:'ai',text:reply});saveHistory();if(voiceOn)speakText(reply);}catch(e){chatEl.innerHTML+=`<div class="bubble ai">Pole error: ${e.message}. Try again.</div>`;}chatEl.scrollTop=chatEl.scrollHeight;}
-function handleImage(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{currentImage=e.target.result;chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Image ready - what to do?</div>`;chatEl.scrollTop=chatEl.scrollHeight;};reader.readAsDataURL(file);}
-async function startCamera(){try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});const video=document.getElementById('camera');video.srcObject=stream;video.style.display='block';video.onclick=()=>{const canvas=document.getElementById('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);currentImage=canvas.toDataURL('image/jpeg');stream.getTracks().forEach(t=>t.stop());video.style.display='none';chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Photo captured!</div>`;chatEl.scrollTop=chatEl.scrollHeight;};}catch(e){alert('Camera error:'+e.message);}}
+async function send(){
+  const text=msgEl.value.trim();
+  // FIX: Use current image, or last image if user just typed after uploading
+  let imgToSend=currentImage||lastImage;
+  if(!text&&!imgToSend)return;
+  // If user typed text but no new image, still send last image so AI can see it
+  // But only send image if user just uploaded it (within this chat turn) - we keep lastImage
+  chatEl.innerHTML+=`<div class="bubble user">${text}${imgToSend?'<br><img src="'+imgToSend+'" style="max-width:200px;border-radius:12px;margin-top:8px">':''}</div>`;
+  msgEl.value=''; msgEl.placeholder='Ask Axenova...';
+  const payload={message:text||'What can you see in this image? Describe it in detail.',image:imgToSend,history:historyChats.length>0?historyChats[historyChats.length-1].messages:[]};
+  // Clear current, but keep lastImage for 1 more turn in case AI asks follow-up - actually clear after send, user can re-upload
+  currentImage=null; showPreview();
+  chatEl.scrollTop=chatEl.scrollHeight;
+  if(historyChats.length===0||historyChats[historyChats.length-1].messages.length>10){historyChats.push({title:(text||'Image').slice(0,30),messages:[]});}
+  historyChats[historyChats.length-1].messages.push({role:'user',text:text});
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await res.json();
+    let reply=data.reply||data.response||"Hey I'm Axenova!";
+    if(data.image){reply+=`<br><img src="${data.image}" style="max-width:100%;border-radius:12px;margin-top:12px">`;}
+    chatEl.innerHTML+=`<div class="bubble ai">${reply}<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button> <button class="speakBtn" onclick="copyText(this)">📋 Copy</button></div>`;
+    historyChats[historyChats.length-1].messages.push({role:'ai',text:reply});
+    saveHistory();
+    if(voiceOn)speakText(reply);
+  }catch(e){chatEl.innerHTML+=`<div class="bubble ai">Pole error: ${e.message}. Try again.</div>`;}
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+async function startCamera(){try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});const video=document.getElementById('camera');video.srcObject=stream;video.style.display='block';video.onclick=()=>{const canvas=document.getElementById('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);currentImage=canvas.toDataURL('image/jpeg');lastImage=currentImage;stream.getTracks().forEach(t=>t.stop());video.style.display='none';showPreview();msgEl.placeholder='Now ask about this photo...';msgEl.focus();};}catch(e){alert('Camera error:'+e.message);}}
 function startMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Mic not supported');return;}const rec=new SR();rec.lang='en-KE';rec.onresult=e=>{msgEl.value=e.results[0][0].transcript;};rec.start();}
 renderHistory();
 </script>
