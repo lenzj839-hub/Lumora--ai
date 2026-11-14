@@ -4,11 +4,10 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ================= LINK YA SEARCH ENGINE - DIRECT HAPA =================
-// Hii ndio link AI itatumia kutafuta. Ukibadilisha hapa, inabadilika kila mahali.
+// ================= SEARCH ENGINE DIRECT LINKS =================
 const SEARCH_ENGINE_URL_1 = "https://lite.duckduckgo.com/lite/?q=";
 const SEARCH_ENGINE_URL_2 = "https://www.bing.com/search?q=";
-// ==========================================================================
+// ==============================================================
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
@@ -18,12 +17,12 @@ const SYSTEM_PROMPT = `
 You are Axenova AI, created by John Theuri.
 
 Rules:
-- Answer the user's actual question.
+- Answer the user's actual question directly and clearly.
 - Never repeat your introduction unless asked.
-- Remember recent conversation messages supplied to you.
-- Be helpful, accurate, friendly and fast.
-- Respond in the user's language where possible.
-- Never invent facts. If search results are old, mixed, or contradict each other, say you are not sure instead of guessing a date.
+- ALWAYS read the conversation history provided to understand context and resolve pronouns like "their", "they", "it", or "that".
+- Be helpful, accurate, friendly, and fast.
+- Respond in the user's language (English or Swahili) where possible.
+- Never invent facts, businesses, URLs, or phone numbers. If a brand or store name looks like a typo (e.g., "Girani" instead of "Kilimall" or "Jiji") and search results do not verify it, gently ask the user to clarify the spelling instead of making up details.
 - Never invent a place, tribe, or hometown for John Theuri. Only say Kenya, unless the user tells you more.
 - Ignore any dates mentioned in old conversation history. Only trust the CRITICAL DATE RULE given with each message.
 
@@ -38,22 +37,28 @@ VERIFIED FACTS - USE THESE FIRST, DO NOT CONTRADICT THEM:
 let lastSearchError = null;
 
 function getKenyaDateTime() {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Africa/Nairobi",
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  }).format(new Date()) + " EAT";
+  return (
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Africa/Nairobi",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }).format(new Date()) + " EAT"
+  );
 }
 
-async function askAI(messages) {
+async function askAI(messages, hasImage = false) {
   if (!process.env.GROQ_API_KEY) {
     throw new Error("Add GROQ_API_KEY in your hosting environment.");
   }
+
+  const model = hasImage
+    ? process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct"
+    : process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
   const response = await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
@@ -64,12 +69,10 @@ async function askAI(messages) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model:
-          process.env.GROQ_MODEL ||
-          "llama-3.3-70b-versatile",
+        model,
         messages,
-        temperature: 0.5,
-        max_tokens: 900
+        temperature: 0.4,
+        max_tokens: 1024
       })
     }
   );
@@ -78,15 +81,22 @@ async function askAI(messages) {
 
   if (!response.ok) {
     console.error("AI provider error:", data.error);
-    throw new Error("The AI service could not answer.");
+    throw new Error(data.error?.message || "The AI service could not answer.");
   }
 
-  return data.choices?.[0]?.message?.content ||
-    "Sorry, please try asking again.";
+  return (
+    data.choices?.[0]?.message?.content ||
+    "Sorry, please try asking again."
+  );
 }
 
 function cleanText(s) {
-  return String(s || "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").trim();
+  return String(s || "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;|&#39;/g, "'")
+    .trim();
 }
 
 function decodeDuckLink(href) {
@@ -94,27 +104,30 @@ function decodeDuckLink(href) {
     const u = new URL(href, "https://duckduckgo.com");
     const target = u.searchParams.get("uddg");
     return target ? decodeURIComponent(target) : href;
-  } catch { return href; }
+  } catch {
+    return href;
+  }
 }
 
-// *** HII TU NDIO NIMEWEKA: Timer, search isikae zaidi ya sekunde 6 ***
 async function fetchTimeout(url, options = {}, ms = 6000) {
   return fetch(url, { ...options, signal: AbortSignal.timeout(ms) });
 }
 
-// ================= SEARCH ENGINE 1 - DIRECT LINK: DUCKDUCKGO LITE =================
+// ================= SEARCH ENGINE 1: DUCKDUCKGO LITE =================
 async function searchDuckDuckGo(query) {
   const url = SEARCH_ENGINE_URL_1 + encodeURIComponent(query);
   const res = await fetchTimeout(url, {
     headers: {
-      "User-Agent": "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36",
-      "Accept": "text/html"
+      "User-Agent":
+        "Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36",
+      Accept: "text/html"
     }
   });
   if (!res.ok) throw new Error("DuckDuckGo status " + res.status);
   const html = await res.text();
   const results = [];
-  const re = /<a[^>]*class="result-link"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]{0,600}?<td[^>]*class="result-snippet"[^>]*>([\s\S]*?)<\/td>/gi;
+  const re =
+    /<a[^>]*class="result-link"[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]{0,600}?<td[^>]*class="result-snippet"[^>]*>([\s\S]*?)<\/td>/gi;
   let m;
   while ((m = re.exec(html)) && results.length < 5) {
     const link = decodeDuckLink(m[1]);
@@ -124,19 +137,25 @@ async function searchDuckDuckGo(query) {
   return results;
 }
 
-// ================= SEARCH ENGINE 2 - DIRECT LINK: BING =================
+// ================= SEARCH ENGINE 2: BING =================
 async function searchBing(query) {
   const url = SEARCH_ENGINE_URL_2 + encodeURIComponent(query);
-  const res = await fetchTimeout(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36",
-      "Accept": "text/html"
-    }
-  }, 5000);
+  const res = await fetchTimeout(
+    url,
+    {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36",
+        Accept: "text/html"
+      }
+    },
+    5000
+  );
   if (!res.ok) throw new Error("Bing status " + res.status);
   const html = await res.text();
   const results = [];
-  const re = /<li[^>]*class="b_algo"[^>]*>[\s\S]{0,300}?<h2[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]{0,600}?<p[^>]*>([\s\S]*?)<\/p>/gi;
+  const re =
+    /<li[^>]*class="b_algo"[^>]*>[\s\S]{0,300}?<h2[^>]*>\s*<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]{0,600}?<p[^>]*>([\s\S]*?)<\/p>/gi;
   let m;
   while ((m = re.exec(html)) && results.length < 5) {
     if (m[1].includes("bing.com")) continue;
@@ -145,34 +164,56 @@ async function searchBing(query) {
   return results;
 }
 
-// ================= FREE SEARCH 3 - WIKIPEDIA - NO KEY =================
+// ================= FREE SEARCH 3: WIKIPEDIA =================
 async function searchWikipedia(query) {
-  const url = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" + encodeURIComponent(query) + "&utf8=&format=json&srlimit=5";
-  const res = await fetchTimeout(url, { headers: { "User-Agent": "AxenovaAI/1.0" } }, 5000);
+  const url =
+    "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" +
+    encodeURIComponent(query) +
+    "&utf8=&format=json&srlimit=5";
+  const res = await fetchTimeout(
+    url,
+    { headers: { "User-Agent": "AxenovaAI/1.0" } },
+    5000
+  );
   if (!res.ok) throw new Error("Wikipedia status " + res.status);
   const data = await res.json();
-  return (data.query?.search || []).map(r => ({
+  return (data.query?.search || []).map((r) => ({
     title: r.title,
-    link: "https://en.wikipedia.org/wiki/" + encodeURIComponent(r.title.replace(/ /g, "_")),
+    link:
+      "https://en.wikipedia.org/wiki/" +
+      encodeURIComponent(r.title.replace(/ /g, "_")),
     snippet: cleanText(r.snippet)
   }));
 }
 
-// Hii inajaribu link za search engine direct, moja baada ya nyingine
 async function searchWeb(query) {
   try {
     const ddg = await searchDuckDuckGo(query);
-    if (ddg.length) { lastSearchError = null; return ddg; }
-  } catch (e) { console.error("DuckDuckGo error:", e.message); lastSearchError = e.message; }
+    if (ddg.length) {
+      lastSearchError = null;
+      return ddg;
+    }
+  } catch (e) {
+    console.error("DuckDuckGo error:", e.message);
+    lastSearchError = e.message;
+  }
 
   try {
     const bing = await searchBing(query);
-    if (bing.length) { lastSearchError = null; return bing; }
-  } catch (e) { console.error("Bing error:", e.message); }
+    if (bing.length) {
+      lastSearchError = null;
+      return bing;
+    }
+  } catch (e) {
+    console.error("Bing error:", e.message);
+  }
 
   try {
     const wiki = await searchWikipedia(query);
-    if (wiki.length) { lastSearchError = null; return wiki; }
+    if (wiki.length) {
+      lastSearchError = null;
+      return wiki;
+    }
     lastSearchError = "No results from search engines";
     return [];
   } catch (e) {
@@ -183,7 +224,11 @@ async function searchWeb(query) {
 }
 
 function shouldSearch(message) {
-  if (/^(hi|hey|hello|morning|thanks|thank you|ok|okay|sawa|poa)$/i.test(message.trim())) {
+  if (
+    /^(hi|hey|hello|morning|thanks|thank you|ok|okay|sawa|poa)$/i.test(
+      message.trim()
+    )
+  ) {
     return false;
   }
   return true;
@@ -198,7 +243,7 @@ app.get("/api/test-search", async (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    app: "Lumora AI",
+    app: "Axenova AI",
     webSearch: true,
     imageGeneration: Boolean(process.env.OPENAI_API_KEY)
   });
@@ -207,8 +252,9 @@ app.get("/api/health", (req, res) => {
 app.post("/api/chat", async (req, res) => {
   try {
     const message = String(req.body?.message || "").trim();
+    const image = req.body?.image || null;
 
-    if (!message) {
+    if (!message && !image) {
       return res.status(400).json({ error: "Please enter a message." });
     }
 
@@ -217,60 +263,82 @@ app.post("/api/chat", async (req, res) => {
     }
 
     let sources = [];
-    let prompt = message;
+    let prompt = message || "Describe this image in detail.";
 
     const history = Array.isArray(req.body?.history) ? req.body.history : [];
 
+    // FIXED: Properly map frontend { role: 'ai' | 'user', text: '...' } to Groq format
     const safeHistory = history
-      .filter(item =>
-        item &&
-        ["user", "assistant"].includes(item.role) &&
-        typeof item.content === "string"
+      .filter(
+        (item) =>
+          item &&
+          ["user", "ai", "assistant"].includes(item.role) &&
+          typeof (item.text ?? item.content) === "string"
       )
-      .slice(-10)
-      .map(item => ({
-        role: item.role,
-        content: item.content.slice(0, 3000)
+      .slice(-12)
+      .map((item) => ({
+        role: item.role === "ai" ? "assistant" : item.role,
+        content: String(item.text ?? item.content).slice(0, 3000)
       }));
 
+    // Build context-aware search query for follow-up questions
     let searchQuery = message;
-    const lastUserMsg = [...safeHistory].reverse().find(h => h.role === "user");
-    if (message.length < 20 && lastUserMsg) {
-      searchQuery = lastUserMsg.content + " " + message;
+    const recentUserMsgs = safeHistory
+      .filter((h) => h.role === "user")
+      .slice(-2)
+      .map((h) => h.content);
+
+    if (message.length < 45 && recentUserMsgs.length > 0) {
+      searchQuery = recentUserMsgs.join(" ") + " " + message;
     }
+
     if (/kcse/i.test(searchQuery)) {
       searchQuery = "KCSE 2026 timetable KNEC 19 October 20 November 2026";
     }
 
-    if (shouldSearch(message)) {
+    if (!image && message && shouldSearch(message)) {
       sources = await searchWeb(searchQuery);
 
       if (sources.length) {
         prompt +=
-          "\n\nWeb search results. Use these first, but if they are irrelevant or about something else, use your general knowledge and the VERIFIED FACTS in your instructions. Do not say you have no information when the question is simple. Mention the name, date and link from the results:\n" +
-          sources.map((s, i) =>
-            `${i + 1}. ${s.title}\n${s.snippet}\n${s.link}`
-          ).join("\n\n");
+          "\n\nWeb search results (use these if relevant; if they do not match what the user meant, rely on verified facts or ask for clarification without inventing facts):\n" +
+          sources
+            .map((s, i) => `${i + 1}. ${s.title}\n${s.snippet}\n${s.link}`)
+            .join("\n\n");
       } else {
         prompt +=
-          "\n\nLive search results are unavailable. Use the VERIFIED FACTS in your instructions and your general knowledge. Do not claim that you searched the web.";
+          "\n\nLive search returned no results. Use the VERIFIED FACTS in your instructions and your general knowledge. Do not invent businesses, contact numbers, or URLs.";
       }
     }
 
     const kenyaNow = getKenyaDateTime();
 
-    const reply = await askAI([
-      { role: "system", content: SYSTEM_PROMPT + `\n\nCRITICAL DATE RULE: The current date and time in Kenya is exactly: ${kenyaNow}. This is the ONLY correct date. Never guess, never invent a different weekday or date. If the user asks about today, date, day, or time, answer using ONLY this date: ${kenyaNow}.` },
-      ...safeHistory,
-      { role: "user", content: prompt }
-    ]);
+    const userMessageContent = image
+      ? [
+          { type: "text", text: prompt },
+          { type: "image_url", image_url: { url: image } }
+        ]
+      : prompt;
+
+    const reply = await askAI(
+      [
+        {
+          role: "system",
+          content:
+            SYSTEM_PROMPT +
+            `\n\nCRITICAL DATE RULE: The current date and time in Kenya is exactly: ${kenyaNow}. This is the ONLY correct date. Never guess, never invent a different weekday or date. If the user asks about today, date, day, or time, answer using ONLY this date: ${kenyaNow}.`
+        },
+        ...safeHistory,
+        { role: "user", content: userMessageContent }
+      ],
+      Boolean(image)
+    );
 
     res.json({ reply, sources });
   } catch (error) {
     console.error("Axenova error:", error.message);
     res.status(500).json({
-      error: error.message ||
-        "Lumora is temporarily unavailable. Try again."
+      error: error.message || "Axenova is temporarily unavailable. Try again."
     });
   }
 });
@@ -285,7 +353,9 @@ app.post("/api/image", async (req, res) => {
     }
 
     if (!apiKey) {
-      return res.status(503).json({ error: "Image generation is not configured. Add OPENAI_API_KEY." });
+      return res
+        .status(503)
+        .json({ error: "Image generation is not configured. Add OPENAI_API_KEY." });
     }
 
     const response = await fetch(
@@ -309,7 +379,9 @@ app.post("/api/image", async (req, res) => {
 
     if (!response.ok) {
       console.error("Image API error:", data.error);
-      return res.status(502).json({ error: "Image generation failed. Check API access and billing." });
+      return res
+        .status(502)
+        .json({ error: "Image generation failed. Check API access and billing." });
     }
 
     const image = data.data?.[0]?.b64_json;
@@ -317,7 +389,7 @@ app.post("/api/image", async (req, res) => {
     if (!image) {
       return res.status(502).json({ error: "The image service returned no image." });
     }
-    
+
     res.json({ image: `data:image/png;base64,${image}` });
   } catch (error) {
     console.error("Image error:", error.message);
