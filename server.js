@@ -26,10 +26,19 @@ if (process.env.FRONTEND_ORIGIN) {
 
 app.use(express.static(path.join(__dirname, "public")));
 
-const dbPath = process.env.DB_PATH || "/var/data/axenova.db";
+/* DATABASE
+   Uses a local writable folder by default.
+   For a Render persistent disk, set DB_PATH=/var/data/axenova.db
+*/
+
+const dbPath = process.env.DB_PATH || path.join(__dirname, "axenova.db");
 
 if (dbPath !== ":memory:") {
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const dbDirectory = path.dirname(dbPath);
+
+  if (!fs.existsSync(dbDirectory)) {
+    fs.mkdirSync(dbDirectory, { recursive: true });
+  }
 }
 
 const db = new Database(dbPath);
@@ -184,7 +193,9 @@ function authenticate(req, res, next) {
     req.user = user;
     next();
   } catch {
-    return res.status(401).json({ error: "Session expired. Please sign in again." });
+    return res.status(401).json({
+      error: "Session expired. Please sign in again."
+    });
   }
 }
 
@@ -211,7 +222,9 @@ app.post("/api/auth/register", authLimiter, asyncRoute(async (req, res) => {
   const password = req.body.password;
 
   if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: "Enter a valid name and email." });
+    return res.status(400).json({
+      error: "Enter a valid name and email."
+    });
   }
 
   if (typeof password !== "string" || password.length < 8) {
@@ -225,7 +238,9 @@ app.post("/api/auth/register", authLimiter, asyncRoute(async (req, res) => {
   ).get(email);
 
   if (existing) {
-    return res.status(409).json({ error: "This email is already registered." });
+    return res.status(409).json({
+      error: "This email is already registered."
+    });
   }
 
   const hashedPassword = await bcrypt.hash(password, 12);
@@ -243,10 +258,7 @@ app.post("/api/auth/register", authLimiter, asyncRoute(async (req, res) => {
 
   setAuthCookie(res, makeToken(user));
 
-  res.status(201).json({
-    ok: true,
-    user
-  });
+  res.status(201).json({ ok: true, user });
 }));
 
 /* LOGIN */
@@ -261,7 +273,9 @@ app.post("/api/auth/login", authLimiter, asyncRoute(async (req, res) => {
 
   if (!user || typeof password !== "string" ||
       !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: "Incorrect email or password." });
+    return res.status(401).json({
+      error: "Incorrect email or password."
+    });
   }
 
   const publicUser = {
@@ -272,10 +286,7 @@ app.post("/api/auth/login", authLimiter, asyncRoute(async (req, res) => {
 
   setAuthCookie(res, makeToken(publicUser));
 
-  res.json({
-    ok: true,
-    user: publicUser
-  });
+  res.json({ ok: true, user: publicUser });
 }));
 
 /* CURRENT USER */
@@ -320,7 +331,9 @@ app.post("/api/conversations", authenticate, (req, res) => {
   const conversations = req.body.conversations;
 
   if (!Array.isArray(conversations) || conversations.length > 100) {
-    return res.status(400).json({ error: "Invalid conversations." });
+    return res.status(400).json({
+      error: "Invalid conversations."
+    });
   }
 
   const save = db.prepare(`
@@ -397,7 +410,9 @@ app.post("/api/chat", chatLimiter, asyncRoute(async (req, res) => {
   const history = normalizeHistory(req.body.history);
 
   if (!message && !image) {
-    return res.status(400).json({ error: "Enter a message or attach an image." });
+    return res.status(400).json({
+      error: "Enter a message or attach an image."
+    });
   }
 
   const apiKey = requireEnv("GROQ_API_KEY");
@@ -425,7 +440,10 @@ app.post("/api/chat", chatLimiter, asyncRoute(async (req, res) => {
   if (message) {
     userContent.push({ type: "text", text: message });
   } else {
-    userContent.push({ type: "text", text: "Please analyse this image." });
+    userContent.push({
+      type: "text",
+      text: "Please analyse this image."
+    });
   }
 
   if (image) {
@@ -442,7 +460,8 @@ app.post("/api/chat", chatLimiter, asyncRoute(async (req, res) => {
   ];
 
   const model = image
-    ? (process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct")
+    ? (process.env.GROQ_VISION_MODEL ||
+       "meta-llama/llama-4-scout-17b-16e-instruct")
     : (process.env.GROQ_MODEL || "llama-3.3-70b-versatile");
 
   const response = await fetchWithTimeout(
@@ -476,7 +495,9 @@ app.post("/api/chat", chatLimiter, asyncRoute(async (req, res) => {
 
   res.json({
     ok: true,
-    reply: typeof reply === "string" ? reply : "I could not generate a response."
+    reply: typeof reply === "string"
+      ? reply
+      : "I could not generate a response."
   });
 }));
 
@@ -486,7 +507,9 @@ app.post("/api/image", chatLimiter, asyncRoute(async (req, res) => {
   const prompt = cleanText(req.body.prompt, 3000);
 
   if (!prompt) {
-    return res.status(400).json({ error: "Describe the image first." });
+    return res.status(400).json({
+      error: "Describe the image first."
+    });
   }
 
   const apiKey = requireEnv("OPENAI_API_KEY");
@@ -530,7 +553,9 @@ app.post("/api/image", chatLimiter, asyncRoute(async (req, res) => {
     return res.json({ ok: true, image: item.url });
   }
 
-  res.status(500).json({ error: "No image was returned." });
+  res.status(500).json({
+    error: "No image was returned."
+  });
 }));
 
 /* TEST SEARCH */
@@ -539,22 +564,23 @@ app.get("/api/test-search", asyncRoute(async (req, res) => {
   const query = cleanText(req.query.q, 300);
 
   if (!query) {
-    return res.status(400).json({ error: "Provide a search query." });
+    return res.status(400).json({
+      error: "Provide a search query."
+    });
   }
 
   const results = await googleSearch(query);
 
-  res.json({
-    ok: true,
-    results
-  });
+  res.json({ ok: true, results });
 }));
 
 /* UNKNOWN API ROUTES */
 
 app.use("/api", (req, res) => {
-  res.status(404).json({ error: "API endpoint not found." });
-});
+  res.status(404).json({
+    error: "API endpoint not found."
+  });
+}));
 
 /* FRONTEND FALLBACK - EXPRESS 5 */
 
