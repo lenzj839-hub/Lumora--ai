@@ -135,17 +135,7 @@ button{cursor:pointer}
   </header>
   <section class="chat" id="chat">
    <div class="chat-inner" id="chatInner">
-    <div class="welcome" id="welcome">
-     <div class="welcome-logo">A</div>
-     <h2>Meet your new <span class="gradient-text">thinking partner.</span></h2>
-     <p>Ask questions, explore ideas, understand images, write code, or plan your next big project. What shall we work on?</p>
-     <div class="prompts">
-      <button class="prompt" onclick="usePrompt('Help me build a modern website step by step')"><strong>⌘ Build something</strong>Help me create a modern website</button>
-      <button class="prompt" onclick="usePrompt('Explain a difficult topic in simple terms')"><strong>✧ Learn something</strong>Explain a difficult topic simply</button>
-      <button class="prompt" onclick="usePrompt('Give me a practical business idea I can start in Kenya')"><strong> Grow an idea</strong>Explore a practical business idea</button>
-      <button class="prompt" onclick="usePrompt('Write clean, well-explained code for my project')"><strong>〈/〉 Code with me</strong>Write and explain code</button>
-     </div>
-    </div>
+    <!-- Welcome screen injected dynamically -->
    </div>
   </section>
   <div class="composer-wrap">
@@ -168,12 +158,12 @@ button{cursor:pointer}
 </div>
 <video id="camera" autoplay playsinline></video>
 <div class="camera-actions" id="cameraActions"><button onclick="capturePhoto()">Capture photo</button><button onclick="stopCamera()">Cancel</button></div>
-<audio id="voiceAudio"></audio>
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 const $=id=>document.getElementById(id);
-const chatInner=$('chatInner'),msg=$('msg'),audio=$('voiceAudio');
+const chatInner=$('chatInner'),msg=$('msg');
 let conversations=loadSaved(),currentMessages=[],activeConversation=null,currentImage=null,stream=null,voiceOn=false,busy=false;
+
 function loadSaved(){try{return JSON.parse(localStorage.getItem('axenova_history')||'[]')}catch{return []}}
 function persist(){if(currentMessages.length){if(!activeConversation){activeConversation={title:(currentMessages.find(m=>m.role==='user')?.text||'New conversation').slice(0,42),messages:[]};conversations.push(activeConversation)}activeConversation.messages=currentMessages.slice();activeConversation.title=(currentMessages.find(m=>m.role==='user')?.text||activeConversation.title||'New conversation').slice(0,42)}try{localStorage.setItem('axenova_history',JSON.stringify(conversations.slice(-35)))}catch(e){console.warn('History storage is full',e)}renderHistory()}
 function renderHistory(){
@@ -187,16 +177,39 @@ function renderHistory(){
 function openSidebar(){$('sidebar').classList.add('open');$('overlay').classList.add('show')}
 function closeSidebar(){$('sidebar').classList.remove('open');$('overlay').classList.remove('show')}
 function toggleSidebar(){$('sidebar').classList.contains('open')?closeSidebar():openSidebar()}
-function newChat(){if(currentMessages.length)saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';chatInner.appendChild(makeWelcome());removeImage();closeSidebar()}
-function makeWelcome(){const d=document.createElement('div');d.className='welcome';d.innerHTML='<div class="welcome-logo">A</div><h2>Meet your new <span class="gradient-text">thinking partner.</span></h2><p>Ask questions, explore ideas, understand images, write code, or plan your next big project. What shall we work on?</p><div class="prompts"><button class="prompt" onclick="usePrompt(\\'Help me build a modern website step by step\\')"><strong>⌘ Build something</strong>Help me create a modern website</button><button class="prompt" onclick="usePrompt(\\'Explain a difficult topic in simple terms\\')"><strong>✧ Learn something</strong>Explain a difficult topic simply</button><button class="prompt" onclick="usePrompt(\\'Give me a practical business idea I can start in Kenya\\')"><strong>↗ Grow an idea</strong>Explore a practical business idea</button><button class="prompt" onclick="usePrompt(\\'Write clean, well-explained code for my project\\')"><strong>〈/〉 Code with me</strong>Write and explain code</button></div>';return d}
+
+function makeWelcome(){
+ const d=document.createElement('div');d.className='welcome';d.id='welcome';
+ d.innerHTML=`
+  <div class="welcome-logo">A</div>
+  <h2>Meet your new <span class="gradient-text">thinking partner.</span></h2>
+  <p>Ask questions, explore ideas, understand images, write code, or plan your next big project. What shall we work on?</p>
+  <div class="prompts">
+   <button class="prompt" onclick="usePrompt('Help me build a modern website step by step')"><strong>⌘ Build something</strong>Help me create a modern website</button>
+   <button class="prompt" onclick="usePrompt('Explain a difficult topic in simple terms')"><strong>✧ Learn something</strong>Explain a difficult topic simply</button>
+   <button class="prompt" onclick="usePrompt('Give me a practical business idea I can start in Kenya')"><strong>↗ Grow an idea</strong>Explore a practical business idea</button>
+   <button class="prompt" onclick="usePrompt('Write clean, well-explained code for my project')"><strong>〈/〉 Code with me</strong>Write and explain code</button>
+  </div>
+ `;
+ return d;
+}
+
+function initWelcome(){
+ if(!chatInner.querySelector('#welcome') && !currentMessages.length){
+  chatInner.appendChild(makeWelcome());
+ }
+}
+
+function newChat(){if(currentMessages.length)saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';initWelcome();removeImage();closeSidebar()}
 function usePrompt(t){msg.value=t;msg.focus();send()}
 function scrollBottom(){$('chat').scrollTop=$('chat').scrollHeight}
+
 function addMessage(role,text,imageData){
+ const welcome=$('welcome');if(welcome)welcome.remove();
  const row=document.createElement('div');row.className='message '+role;
  const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=role==='ai'?'A':'Y';
  const content=document.createElement('div');content.className='message-content';
  const bubble=document.createElement('div');bubble.className='bubble';
- // Render model output as text, not raw HTML, to prevent injected scripts/markup.
  bubble.textContent=text||'';
  if(imageData){const im=document.createElement('img');im.src=imageData;im.alt='Attached image';bubble.appendChild(im)}
  content.appendChild(bubble);
@@ -208,20 +221,22 @@ function addMessage(role,text,imageData){
  }
  row.append(avatar,content);chatInner.appendChild(row);scrollBottom();return row;
 }
+
 function saveCurrent(){if(!currentMessages.length)return;persist()}
 function loadConversation(i){const c=conversations[i];if(!c)return;activeConversation=c;currentMessages=c.messages.slice();chatInner.innerHTML='';currentMessages.forEach(m=>addMessage(m.role,m.text,m.image));closeSidebar()}
-function clearChat(){if(!currentMessages.length)return;if(!confirm('Clear this conversation?'))return;saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';chatInner.appendChild(makeWelcome());removeImage()}
-function downloadChat(){if(!currentMessages.length){alert('There is no conversation to download yet.');return}const body=currentMessages.map(m=>(m.role==='user'?'You':'Axenova')+': '+m.text).join('\\n\\n');const a=document.createElement('a');const u=URL.createObjectURL(new Blob([body],{type:'text/plain'}));a.href=u;a.download='Axenova-conversation.txt';a.click();URL.revokeObjectURL(u)}
+function clearChat(){if(!currentMessages.length)return;if(!confirm('Clear this conversation?'))return;saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';initWelcome();removeImage()}
+function downloadChat(){if(!currentMessages.length){alert('There is no conversation to download yet.');return}const body=currentMessages.map(m=>(m.role==='user'?'You':'Axenova')+': '+m.text).join('\n\n');const a=document.createElement('a');const u=URL.createObjectURL(new Blob([body],{type:'text/plain'}));a.href=u;a.download='Axenova-conversation.txt';a.click();URL.revokeObjectURL(u)}
 function setBusy(v){busy=v;$('sendBtn').disabled=v;$('sendBtn').textContent=v?'…':'➤'}
 function showTyping(){const r=document.createElement('div');r.className='message ai';r.id='typing';r.innerHTML='<div class="avatar">A</div><div class="message-content"><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div></div>';chatInner.appendChild(r);scrollBottom()}
 function removeTyping(){$('typing')?.remove()}
+
 function handleFile(file){if(!file)return;if(!file.type.startsWith('image/')){alert('Please choose an image file.');return}if(file.size>8*1024*1024){alert('Please choose an image smaller than 8 MB.');return}const reader=new FileReader();reader.onload=e=>{currentImage=e.target.result;$('previewImg').src=currentImage;$('preview').style.display='flex';msg.focus()};reader.readAsDataURL(file)}
 $('fileInput').addEventListener('change',e=>{handleFile(e.target.files[0]);e.target.value=''});
 function removeImage(){currentImage=null;$('preview').style.display='none';$('previewImg').removeAttribute('src')}
+
 async function send(){
  const text=msg.value.trim(),image=currentImage;if((!text&&!image)||busy)return;
  const displayText=text||'What can you see in this image? Describe it.';
- const welcome=$('welcome');if(welcome)welcome.remove();
  addMessage('user',displayText,image);currentMessages.push({role:'user',text:displayText,image:image||null});
  msg.value='';removeImage();setBusy(true);showTyping();
  try{
@@ -235,15 +250,56 @@ async function send(){
  }catch(e){removeTyping();addMessage('ai','Sorry — '+e.message+' Please check your connection and try again.');}
  finally{setBusy(false);msg.focus()}
 }
+
 msg.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
-function detectLang(t){return /\\b(habari|asante|sawa|ndiyo|hapana|mimi|wewe|yeye|hapa|pale|leo|kesho|jana|rafiki|shule|nyumba|chakula|maji)\\b/i.test(t)?'sw':'en'}
-function speakText(t){if(!t)return;stopVoice();const chunks=t.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[t];let i=0;const play=()=>{if(i>=chunks.length)return;audio.src='https://translate.google.com/translate_tts?ie=UTF-8&q='+encodeURIComponent(chunks[i++].slice(0,180))+'&tl='+detectLang(t)+'&client=tw-ob';audio.play().catch(()=>{})};audio.onended=play;play()}
-function stopVoice(){audio.pause();audio.removeAttribute('src');audio.load()}
-function toggleVoice(){voiceOn=!voiceOn;$('voiceBtn').style.background=voiceOn?'#754bd955':'';if(voiceOn)speakText('Hello, I am Axenova. Voice replies are on.');else stopVoice()}
-function startMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Speech recognition is not supported by this browser.');return}const rec=new SR();rec.lang='en-KE';rec.onresult=e=>{msg.value=e.results[0][0].transcript;msg.focus()};rec.onerror=()=>alert('Microphone recognition failed. Check microphone permission.');rec.start()}
-async function startCamera(){try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});$('camera').srcObject=stream;$('camera').style.display='block';$('cameraActions').style.display='flex'}catch(e){alert('Camera unavailable: '+e.message)}}
+
+// Reliable Native Browser Speech Synthesis
+function speakText(t){
+ if(!t || !('speechSynthesis' in window))return;
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(t);
+ utterance.rate=1.0;
+ utterance.pitch=1.0;
+ const voices=window.speechSynthesis.getVoices();
+ const voice=voices.find(v=>v.lang.startsWith('en'))||voices[0];
+ if(voice)utterance.voice=voice;
+ window.speechSynthesis.speak(utterance);
+}
+function stopVoice(){if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+function toggleVoice(){
+ voiceOn=!voiceOn;
+ $('voiceBtn').style.background=voiceOn?'#754bd955':'';
+ if(voiceOn)speakText('Hello, I am Axenova. Voice replies are on.');
+ else stopVoice();
+}
+
+function startMic(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){alert('Speech recognition is not supported by this browser.');return}
+ const rec=new SR();rec.lang='en-KE';
+ rec.onresult=e=>{msg.value=e.results[0][0].transcript;msg.focus()};
+ rec.onerror=()=>alert('Microphone recognition failed. Check microphone permission.');
+ rec.start();
+}
+
+async function startCamera(){
+ try{
+  if(!navigator.mediaDevices?.getUserMedia){throw new Error('Camera API not supported');}
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});
+  $('camera').srcObject=stream;$('camera').style.display='block';$('cameraActions').style.display='flex';
+ }catch(e){alert('Camera unavailable: '+e.message)}
+}
 function stopCamera(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('camera').style.display='none';$('cameraActions').style.display='none'}
-function capturePhoto(){const v=$('camera'),c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);currentImage=c.toDataURL('image/jpeg',.86);$('previewImg').src=currentImage;$('preview').style.display='flex';stopCamera();msg.focus()}
+function capturePhoto(){
+ const v=$('camera'),c=document.createElement('canvas');
+ c.width=v.videoWidth;c.height=v.videoHeight;
+ c.getContext('2d').drawImage(v,0,0);
+ currentImage=c.toDataURL('image/jpeg',.86);
+ $('previewImg').src=currentImage;$('preview').style.display='flex';
+ stopCamera();msg.focus();
+}
+
+initWelcome();
 renderHistory();
 </script>
 </body>
