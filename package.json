@@ -1,13 +1,14 @@
 
 {
-  "name": "Axenova",
+  "name": "axenova-ai",
   "version": "1.0.0",
-  "description": "Axenova Ai assistant",
+  "description": "Axenova AI by John Theuri",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
   }
 }
