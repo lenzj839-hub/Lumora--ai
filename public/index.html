@@ -8,7 +8,6 @@
 <title>Axenova AI — By John Theuri</title>
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<!-- Include marked.js for clean Markdown and Table rendering -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
 :root{
@@ -36,12 +35,13 @@ button{cursor:pointer}
 .side-bottom{border-top:1px solid var(--line);padding:15px 7px 0;color:var(--muted);font-size:12px;line-height:1.7}
 .main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
 .topbar{height:76px;flex:0 0 76px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--line);background:#0c0c18aa;backdrop-filter:blur(18px);z-index:5}
-.top-left,.top-actions{display:flex;align-items:center;gap:12px;min-width:0}
+.top-left,.top-actions{display:flex;align-items:center;gap:10px;min-width:0}
 .mobile-brand{display:none;font-weight:800;letter-spacing:-.4px}
 .status{display:flex;align-items:center;gap:7px;color:#a9a6bc;font-size:12px}
 .dot{width:7px;height:7px;border-radius:50%;background:#48d69a;box-shadow:0 0 12px #48d69a}
-.icon-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:13px;background:#ffffff08;color:#dedbed;display:grid;place-items:center;font-size:17px}
-.icon-btn:hover{background:#ffffff15}
+.icon-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:13px;background:#ffffff08;color:#dedbed;display:grid;place-items:center;transition:all .2s ease}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn:hover{background:#ffffff15;border-color:#a879ff66;color:white;transform:translateY(-1px)}
 .chat{flex:1;overflow-y:auto;padding:34px 22px 22px;scroll-behavior:smooth}
 .chat-inner{width:min(850px,100%);margin:0 auto;display:flex;flex-direction:column;gap:20px;min-height:100%}
 .welcome{margin:auto auto 35px;text-align:center;width:min(680px,100%);padding:34px 10px}
@@ -63,7 +63,6 @@ button{cursor:pointer}
 .bubble{display:inline-block;text-align:left;padding:14px 16px;border-radius:17px;background:#171727;border:1px solid var(--line);line-height:1.65;font-size:14px;overflow-wrap:anywhere;max-width:100%}
 .user .bubble{background:linear-gradient(130deg,#7655e9,#9a48d8);border:0;color:white;border-top-right-radius:5px;white-space:pre-wrap}
 .ai .bubble{border-top-left-radius:5px}
-/* Markdown styling inside AI bubbles */
 .bubble table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
 .bubble th,.bubble td{border:1px solid rgba(255,255,255,0.15);padding:8px 10px;text-align:left}
 .bubble th{background:rgba(255,255,255,0.05)}
@@ -72,10 +71,11 @@ button{cursor:pointer}
 .bubble pre code{background:transparent;padding:0}
 .bubble img{display:block;max-width:min(100%,420px);max-height:360px;object-fit:contain;border-radius:12px;margin-top:10px}
 .bubble a{color:#c7aaff;word-break:break-all}
-.msg-tools{display:flex;gap:7px;margin-top:7px;opacity:.75}
+.msg-tools{display:flex;gap:6px;margin-top:7px;opacity:.85;flex-wrap:wrap}
 .message.user .msg-tools{justify-content:flex-end}
-.tool{border:0;background:transparent;color:#aaa7bd;font-size:11px;padding:4px 6px;border-radius:6px}
-.tool:hover{background:#ffffff12;color:white}
+.tool{border:1px solid var(--line);background:#ffffff06;color:#c8c5d9;font-size:11px;padding:5px 9px;border-radius:8px;display:flex;align-items:center;gap:5px;transition:all .2s}
+.tool svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none}
+.tool:hover{background:#ffffff15;color:white;border-color:#a879ff55}
 .typing{display:flex;gap:5px;padding:6px 2px}
 .typing i{width:6px;height:6px;border-radius:50%;background:#b69aff;animation:pulse 1s infinite}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
@@ -89,12 +89,15 @@ button{cursor:pointer}
 .compose-row{display:flex;align-items:center;gap:8px}
 .compose-row input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:white;padding:12px 4px;font-size:14px}
 .compose-row input::placeholder{color:#77758e}
-.send{width:43px;height:43px;border:0;border-radius:15px;background:var(--grad);color:white;font-size:20px;box-shadow:0 6px 20px #984de944}
-.send:disabled{opacity:.45;cursor:default}
+.send{width:43px;height:43px;border:0;border-radius:15px;background:var(--grad);color:white;font-size:20px;box-shadow:0 6px 20px #984de944;display:grid;place-items:center;transition:transform .2s}
+.send svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.send:hover{transform:scale(1.05)}
+.send:disabled{opacity:.45;cursor:default;transform:none}
 .composer-foot{display:flex;justify-content:space-between;align-items:center;color:#77758e;font-size:10px;padding:3px 5px 0}
-.compose-tools{display:flex;gap:7px}
-.compose-tools button{border:0;background:transparent;color:#aaa7bd;padding:5px;font-size:17px}
-.compose-tools button:hover{color:white}
+.compose-tools{display:flex;gap:4px}
+.compose-tools button{border:0;background:transparent;color:#aaa7bd;padding:8px;border-radius:10px;display:grid;place-items:center;transition:all .2s}
+.compose-tools button svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.compose-tools button:hover{background:#ffffff12;color:white}
 #camera{display:none;position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:80;background:#000}
 .camera-actions{display:none;position:fixed;z-index:81;bottom:30px;left:0;right:0;justify-content:center;gap:15px}
 .camera-actions button{padding:13px 22px;border:0;border-radius:30px;background:var(--grad);color:white;font-weight:700}
@@ -132,33 +135,47 @@ button{cursor:pointer}
  <main class="main">
   <header class="topbar">
    <div class="top-left">
-    <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
+    <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open menu">
+     <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
     <div class="mobile-brand">Axenova <span class="gradient-text">AI</span></div>
     <div class="status"><span class="dot"></span> Assistant ready</div>
    </div>
    <div class="top-actions">
-    <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice replies">♫</button>
-    <button class="icon-btn" onclick="downloadChat()" title="Download conversation">↓</button>
-    <button class="icon-btn" onclick="clearChat()" title="Clear conversation">⌫</button>
+    <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice replies">
+     <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+    </button>
+    <button class="icon-btn" onclick="downloadChat()" title="Download conversation">
+     <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+    </button>
+    <button class="icon-btn" onclick="clearChat()" title="Clear conversation">
+     <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    </button>
    </div>
   </header>
   <section class="chat" id="chat">
-   <div class="chat-inner" id="chatInner">
-    <!-- Welcome screen injected dynamically -->
-   </div>
+   <div class="chat-inner" id="chatInner"></div>
   </section>
   <div class="composer-wrap">
    <div class="composer">
     <div class="preview" id="preview"><img id="previewImg" alt="Selected image"><span>Image ready to send</span><button onclick="removeImage()" aria-label="Remove image">×</button></div>
     <div class="compose-row">
      <div class="compose-tools">
-      <button onclick="document.getElementById('fileInput').click()" title="Attach image">▧</button>
-      <button onclick="startCamera()" title="Take a photo">◎</button>
-      <button onclick="startMic()" title="Speak">♩</button>
+      <button onclick="document.getElementById('fileInput').click()" title="Attach image">
+       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+      </button>
+      <button onclick="startCamera()" title="Take a photo">
+       <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      </button>
+      <button onclick="startMic()" title="Speak">
+       <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+      </button>
      </div>
      <input id="fileInput" type="file" accept="image/*" hidden>
      <input id="msg" placeholder="Message Axenova..." autocomplete="off">
-     <button class="send" id="sendBtn" onclick="send()" aria-label="Send">➤</button>
+     <button class="send" id="sendBtn" onclick="send()" aria-label="Send">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+     </button>
     </div>
     <div class="composer-foot"><span>Axenova can make mistakes. Check important information.</span><span>Powered by your AI engine</span></div>
    </div>
@@ -220,7 +237,6 @@ function addMessage(role,text,imageData){
  const content=document.createElement('div');content.className='message-content';
  const bubble=document.createElement('div');bubble.className='bubble';
  
- // FIXED: Use marked.parse() for AI responses so tables and markdown render correctly
  if(role==='ai'){
   bubble.innerHTML=text?marked.parse(text):'';
  }else{
@@ -229,11 +245,32 @@ function addMessage(role,text,imageData){
 
  if(imageData){const im=document.createElement('img');im.src=imageData;im.alt='Attached image';bubble.appendChild(im)}
  content.appendChild(bubble);
+ 
  if(role==='ai'){
   const tools=document.createElement('div');tools.className='msg-tools';
-  const read=document.createElement('button');read.className='tool';read.textContent='♫ Read aloud';read.onclick=()=>speakText(text);
-  const copy=document.createElement('button');copy.className='tool';copy.textContent='▢ Copy';copy.onclick=async()=>{try{await navigator.clipboard.writeText(text);copy.textContent='Copied ✓'}catch{copy.textContent='Copy unavailable'}};
-  tools.append(read,copy);content.appendChild(tools);
+  
+  // Play Aloud Button
+  const playBtn=document.createElement('button');playBtn.className='tool';
+  playBtn.innerHTML=`<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Play`;
+  playBtn.onclick=()=>playSpeech(text);
+
+  // Pause Aloud Button
+  const pauseBtn=document.createElement('button');pauseBtn.className='tool';
+  pauseBtn.innerHTML=`<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg> Pause`;
+  pauseBtn.onclick=()=>pauseSpeech();
+
+  // Stop Aloud Button
+  const stopBtn=document.createElement('button');stopBtn.className='tool';
+  stopBtn.innerHTML=`<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg> Stop`;
+  stopBtn.onclick=()=>stopSpeech();
+
+  // Copy Button
+  const copyBtn=document.createElement('button');copyBtn.className='tool';
+  copyBtn.innerHTML=`<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy`;
+  copyBtn.onclick=async()=>{try{await navigator.clipboard.writeText(text);copyBtn.textContent='Copied ✓'}catch{copyBtn.textContent='Unavailable'}};
+
+  tools.append(playBtn,pauseBtn,stopBtn,copyBtn);
+  content.appendChild(tools);
  }
  row.append(avatar,content);chatInner.appendChild(row);scrollBottom();return row;
 }
@@ -242,7 +279,7 @@ function saveCurrent(){if(!currentMessages.length)return;persist()}
 function loadConversation(i){const c=conversations[i];if(!c)return;activeConversation=c;currentMessages=c.messages.slice();chatInner.innerHTML='';currentMessages.forEach(m=>addMessage(m.role,m.text,m.image));closeSidebar()}
 function clearChat(){if(!currentMessages.length)return;if(!confirm('Clear this conversation?'))return;saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';initWelcome();removeImage()}
 function downloadChat(){if(!currentMessages.length){alert('There is no conversation to download yet.');return}const body=currentMessages.map(m=>(m.role==='user'?'You':'Axenova')+': '+m.text).join('\n\n');const a=document.createElement('a');const u=URL.createObjectURL(new Blob([body],{type:'text/plain'}));a.href=u;a.download='Axenova-conversation.txt';a.click();URL.revokeObjectURL(u)}
-function setBusy(v){busy=v;$('sendBtn').disabled=v;$('sendBtn').textContent=v?'…':'➤'}
+function setBusy(v){busy=v;$('sendBtn').disabled=v;}
 function showTyping(){const r=document.createElement('div');r.className='message ai';r.id='typing';r.innerHTML='<div class="avatar">A</div><div class="message-content"><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div></div>';chatInner.appendChild(r);scrollBottom()}
 function removeTyping(){$('typing')?.remove()}
 
@@ -262,31 +299,33 @@ async function send(){
   if(!res.ok)throw new Error(data.error||data.message||('Server error '+res.status));
   const reply=String(data.reply??data.response??'I could not generate a response. Please try again.');
   removeTyping();addMessage('ai',reply,data.image||null);currentMessages.push({role:'ai',text:reply,image:data.image||null});persist();
-  if(voiceOn)speakText(reply);
+  if(voiceOn)playSpeech(reply);
  }catch(e){removeTyping();addMessage('ai','Sorry — '+e.message+' Please check your connection and try again.');}
  finally{setBusy(false);msg.focus()}
 }
 
 msg.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
 
-// Reliable Native Browser Speech Synthesis
-function speakText(t){
+// Speech synthesis controllers (Play, Pause, Stop)
+function playSpeech(t){
  if(!t || !('speechSynthesis' in window))return;
+ if(window.speechSynthesis.paused){window.speechSynthesis.resume();return;}
  window.speechSynthesis.cancel();
  const utterance=new SpeechSynthesisUtterance(t);
- utterance.rate=1.0;
- utterance.pitch=1.0;
+ utterance.rate=1.0;utterance.pitch=1.0;
  const voices=window.speechSynthesis.getVoices();
  const voice=voices.find(v=>v.lang.startsWith('en'))||voices[0];
  if(voice)utterance.voice=voice;
  window.speechSynthesis.speak(utterance);
 }
-function stopVoice(){if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+function pauseSpeech(){if('speechSynthesis' in window && window.speechSynthesis.speaking)window.speechSynthesis.pause();}
+function stopSpeech(){if('speechSynthesis' in window)window.speechSynthesis.cancel();}
+
 function toggleVoice(){
  voiceOn=!voiceOn;
  $('voiceBtn').style.background=voiceOn?'#754bd955':'';
- if(voiceOn)speakText('Hello, I am Axenova. Voice replies are on.');
- else stopVoice();
+ if(voiceOn)playSpeech('Hello, I am Axenova. Voice replies are on.');
+ else stopSpeech();
 }
 
 function startMic(){
@@ -319,4 +358,4 @@ initWelcome();
 renderHistory();
 </script>
 </body>
-    </html>
+   </html>
