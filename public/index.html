@@ -91,4 +91,232 @@ button{cursor:pointer}
 .compose-row input::placeholder{color:#77758e}
 .send{width:43px;height:43px;border:0;border-radius:15px;background:var(--grad);color:white;font-size:20px;box-shadow:0 6px 20px #984de944}
 .send:disabled{opacity:.45;cursor:default}
-.composer-foot{display:flex;justify-content:space-between;align-items:center;color:#
+.composer-foot{display:flex;justify-content:space-between;align-items:center;color:#77758e;font-size:10px;padding:3px 5px 0}
+.compose-tools{display:flex;gap:7px}
+.compose-tools button{border:0;background:transparent;color:#aaa7bd;padding:5px;font-size:17px}
+.compose-tools button:hover{color:white}
+#camera{display:none;position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:80;background:#000}
+.camera-actions{display:none;position:fixed;z-index:81;bottom:30px;left:0;right:0;justify-content:center;gap:15px}
+.camera-actions button{padding:13px 22px;border:0;border-radius:30px;background:var(--grad);color:white;font-weight:700}
+.overlay{display:none}
+@media(max-width:760px){
+ .sidebar{position:fixed;left:0;top:0;bottom:0;width:min(290px,85vw);transform:translateX(-105%);transition:transform .25s ease;box-shadow:var(--shadow)}
+ .sidebar.open{transform:translateX(0)}
+ .overlay.show{display:block;position:fixed;inset:0;background:#0009;z-index:19}
+ .topbar{height:62px;flex-basis:62px;padding:0 14px}
+ .mobile-brand{display:block;font-size:17px}
+ .status{display:none}
+ .chat{padding:20px 13px 12px}
+ .message-content{max-width:88%}
+ .composer-wrap{padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
+ .composer{border-radius:19px;padding:8px 10px 8px 12px}
+ .prompts{grid-template-columns:1fr}
+ .welcome{padding:24px 4px;margin:auto auto 18px}
+ .welcome-logo{width:60px;height:60px;border-radius:19px}
+ .welcome h2{font-size:29px}
+ .composer-foot{font-size:9px}
+}
+@media(min-width:761px){.overlay{display:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+ <aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="logo">A</div><div><h1>Axenova AI</h1><small>Think beyond limits</small></div></div>
+  <button class="newchat" onclick="newChat()">＋ &nbsp; New conversation</button>
+  <div class="side-label">Your conversations</div>
+  <div class="history" id="history"></div>
+  <div class="side-bottom">✦ Created by <b style="color:#ddd">John Theuri</b><br>Axenova AI · Your ideas, accelerated</div>
+ </aside>
+ <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+ <main class="main">
+  <header class="topbar">
+   <div class="top-left">
+    <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
+    <div class="mobile-brand">Axenova <span class="gradient-text">AI</span></div>
+    <div class="status"><span class="dot"></span> Assistant ready</div>
+   </div>
+   <div class="top-actions">
+    <button class="icon-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice replies">♫</button>
+    <button class="icon-btn" onclick="downloadChat()" title="Download conversation">↓</button>
+    <button class="icon-btn" onclick="clearChat()" title="Clear conversation">⌫</button>
+   </div>
+  </header>
+  <section class="chat" id="chat">
+   <div class="chat-inner" id="chatInner">
+    <!-- Welcome screen injected dynamically -->
+   </div>
+  </section>
+  <div class="composer-wrap">
+   <div class="composer">
+    <div class="preview" id="preview"><img id="previewImg" alt="Selected image"><span>Image ready to send</span><button onclick="removeImage()" aria-label="Remove image">×</button></div>
+    <div class="compose-row">
+     <div class="compose-tools">
+      <button onclick="document.getElementById('fileInput').click()" title="Attach image">▧</button>
+      <button onclick="startCamera()" title="Take a photo">◎</button>
+      <button onclick="startMic()" title="Speak">♩</button>
+     </div>
+     <input id="fileInput" type="file" accept="image/*" hidden>
+     <input id="msg" placeholder="Message Axenova..." autocomplete="off">
+     <button class="send" id="sendBtn" onclick="send()" aria-label="Send">➤</button>
+    </div>
+    <div class="composer-foot"><span>Axenova can make mistakes. Check important information.</span><span>Powered by your AI engine</span></div>
+   </div>
+  </div>
+ </main>
+</div>
+<video id="camera" autoplay playsinline></video>
+<div class="camera-actions" id="cameraActions"><button onclick="capturePhoto()">Capture photo</button><button onclick="stopCamera()">Cancel</button></div>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
+const $=id=>document.getElementById(id);
+const chatInner=$('chatInner'),msg=$('msg');
+let conversations=loadSaved(),currentMessages=[],activeConversation=null,currentImage=null,stream=null,voiceOn=false,busy=false;
+
+function loadSaved(){try{return JSON.parse(localStorage.getItem('axenova_history')||'[]')}catch{return []}}
+function persist(){if(currentMessages.length){if(!activeConversation){activeConversation={title:(currentMessages.find(m=>m.role==='user')?.text||'New conversation').slice(0,42),messages:[]};conversations.push(activeConversation)}activeConversation.messages=currentMessages.slice();activeConversation.title=(currentMessages.find(m=>m.role==='user')?.text||activeConversation.title||'New conversation').slice(0,42)}try{localStorage.setItem('axenova_history',JSON.stringify(conversations.slice(-35)))}catch(e){console.warn('History storage is full',e)}renderHistory()}
+function renderHistory(){
+ $('history').innerHTML='';
+ conversations.slice().reverse().forEach((c,revIndex)=>{
+  const index=conversations.length-1-revIndex,b=document.createElement('button');
+  b.className='history-item';b.textContent='◷  '+(c.title||'New conversation');b.onclick=()=>loadConversation(index);$('history').appendChild(b);
+ });
+ if(!conversations.length)$('history').innerHTML='<div style="color:#77758e;font-size:12px;padding:8px">Your chats will appear here.</div>';
+}
+function openSidebar(){$('sidebar').classList.add('open');$('overlay').classList.add('show')}
+function closeSidebar(){$('sidebar').classList.remove('open');$('overlay').classList.remove('show')}
+function toggleSidebar(){$('sidebar').classList.contains('open')?closeSidebar():openSidebar()}
+
+function makeWelcome(){
+ const d=document.createElement('div');d.className='welcome';d.id='welcome';
+ d.innerHTML=`
+  <div class="welcome-logo">A</div>
+  <h2>Meet your new <span class="gradient-text">thinking partner.</span></h2>
+  <p>Ask questions, explore ideas, understand images, write code, or plan your next big project. What shall we work on?</p>
+  <div class="prompts">
+   <button class="prompt" onclick="usePrompt('Help me build a modern website step by step')"><strong>⌘ Build something</strong>Help me create a modern website</button>
+   <button class="prompt" onclick="usePrompt('Explain a difficult topic in simple terms')"><strong>✧ Learn something</strong>Explain a difficult topic simply</button>
+   <button class="prompt" onclick="usePrompt('Give me a practical business idea I can start in Kenya')"><strong>↗ Grow an idea</strong>Explore a practical business idea</button>
+   <button class="prompt" onclick="usePrompt('Write clean, well-explained code for my project')"><strong>〈/〉 Code with me</strong>Write and explain code</button>
+  </div>
+ `;
+ return d;
+}
+
+function initWelcome(){
+ if(!chatInner.querySelector('#welcome') && !currentMessages.length){
+  chatInner.appendChild(makeWelcome());
+ }
+}
+
+function newChat(){if(currentMessages.length)saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';initWelcome();removeImage();closeSidebar()}
+function usePrompt(t){msg.value=t;msg.focus();send()}
+function scrollBottom(){$('chat').scrollTop=$('chat').scrollHeight}
+
+function addMessage(role,text,imageData){
+ const welcome=$('welcome');if(welcome)welcome.remove();
+ const row=document.createElement('div');row.className='message '+role;
+ const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=role==='ai'?'A':'Y';
+ const content=document.createElement('div');content.className='message-content';
+ const bubble=document.createElement('div');bubble.className='bubble';
+ 
+ // FIXED: Use marked.parse() for AI responses so tables and markdown render correctly
+ if(role==='ai'){
+  bubble.innerHTML=text?marked.parse(text):'';
+ }else{
+  bubble.textContent=text||'';
+ }
+
+ if(imageData){const im=document.createElement('img');im.src=imageData;im.alt='Attached image';bubble.appendChild(im)}
+ content.appendChild(bubble);
+ if(role==='ai'){
+  const tools=document.createElement('div');tools.className='msg-tools';
+  const read=document.createElement('button');read.className='tool';read.textContent='♫ Read aloud';read.onclick=()=>speakText(text);
+  const copy=document.createElement('button');copy.className='tool';copy.textContent='▢ Copy';copy.onclick=async()=>{try{await navigator.clipboard.writeText(text);copy.textContent='Copied ✓'}catch{copy.textContent='Copy unavailable'}};
+  tools.append(read,copy);content.appendChild(tools);
+ }
+ row.append(avatar,content);chatInner.appendChild(row);scrollBottom();return row;
+}
+
+function saveCurrent(){if(!currentMessages.length)return;persist()}
+function loadConversation(i){const c=conversations[i];if(!c)return;activeConversation=c;currentMessages=c.messages.slice();chatInner.innerHTML='';currentMessages.forEach(m=>addMessage(m.role,m.text,m.image));closeSidebar()}
+function clearChat(){if(!currentMessages.length)return;if(!confirm('Clear this conversation?'))return;saveCurrent();activeConversation=null;currentMessages=[];chatInner.innerHTML='';initWelcome();removeImage()}
+function downloadChat(){if(!currentMessages.length){alert('There is no conversation to download yet.');return}const body=currentMessages.map(m=>(m.role==='user'?'You':'Axenova')+': '+m.text).join('\n\n');const a=document.createElement('a');const u=URL.createObjectURL(new Blob([body],{type:'text/plain'}));a.href=u;a.download='Axenova-conversation.txt';a.click();URL.revokeObjectURL(u)}
+function setBusy(v){busy=v;$('sendBtn').disabled=v;$('sendBtn').textContent=v?'…':'➤'}
+function showTyping(){const r=document.createElement('div');r.className='message ai';r.id='typing';r.innerHTML='<div class="avatar">A</div><div class="message-content"><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div></div>';chatInner.appendChild(r);scrollBottom()}
+function removeTyping(){$('typing')?.remove()}
+
+function handleFile(file){if(!file)return;if(!file.type.startsWith('image/')){alert('Please choose an image file.');return}if(file.size>8*1024*1024){alert('Please choose an image smaller than 8 MB.');return}const reader=new FileReader();reader.onload=e=>{currentImage=e.target.result;$('previewImg').src=currentImage;$('preview').style.display='flex';msg.focus()};reader.readAsDataURL(file)}
+$('fileInput').addEventListener('change',e=>{handleFile(e.target.files[0]);e.target.value=''});
+function removeImage(){currentImage=null;$('preview').style.display='none';$('previewImg').removeAttribute('src')}
+
+async function send(){
+ const text=msg.value.trim(),image=currentImage;if((!text&&!image)||busy)return;
+ const displayText=text||'What can you see in this image? Describe it.';
+ addMessage('user',displayText,image);currentMessages.push({role:'user',text:displayText,image:image||null});
+ msg.value='';removeImage();setBusy(true);showTyping();
+ try{
+  const payload={message:displayText,image:image||null,history:currentMessages.slice(-12,-1).map(m=>({role:m.role,text:m.text}))};
+  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const raw=await res.text();let data;try{data=JSON.parse(raw)}catch{throw new Error('The server returned an invalid response. Check that /api/chat is running.')}
+  if(!res.ok)throw new Error(data.error||data.message||('Server error '+res.status));
+  const reply=String(data.reply??data.response??'I could not generate a response. Please try again.');
+  removeTyping();addMessage('ai',reply,data.image||null);currentMessages.push({role:'ai',text:reply,image:data.image||null});persist();
+  if(voiceOn)speakText(reply);
+ }catch(e){removeTyping();addMessage('ai','Sorry — '+e.message+' Please check your connection and try again.');}
+ finally{setBusy(false);msg.focus()}
+}
+
+msg.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+
+// Reliable Native Browser Speech Synthesis
+function speakText(t){
+ if(!t || !('speechSynthesis' in window))return;
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(t);
+ utterance.rate=1.0;
+ utterance.pitch=1.0;
+ const voices=window.speechSynthesis.getVoices();
+ const voice=voices.find(v=>v.lang.startsWith('en'))||voices[0];
+ if(voice)utterance.voice=voice;
+ window.speechSynthesis.speak(utterance);
+}
+function stopVoice(){if('speechSynthesis' in window)window.speechSynthesis.cancel()}
+function toggleVoice(){
+ voiceOn=!voiceOn;
+ $('voiceBtn').style.background=voiceOn?'#754bd955':'';
+ if(voiceOn)speakText('Hello, I am Axenova. Voice replies are on.');
+ else stopVoice();
+}
+
+function startMic(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){alert('Speech recognition is not supported by this browser.');return}
+ const rec=new SR();rec.lang='en-KE';
+ rec.onresult=e=>{msg.value=e.results[0][0].transcript;msg.focus()};
+ rec.onerror=()=>alert('Microphone recognition failed. Check microphone permission.');
+ rec.start();
+}
+
+async function startCamera(){
+ try{
+  if(!navigator.mediaDevices?.getUserMedia){throw new Error('Camera API not supported');}
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});
+  $('camera').srcObject=stream;$('camera').style.display='block';$('cameraActions').style.display='flex';
+ }catch(e){alert('Camera unavailable: '+e.message)}
+}
+function stopCamera(){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('camera').style.display='none';$('cameraActions').style.display='none'}
+function capturePhoto(){
+ const v=$('camera'),c=document.createElement('canvas');
+ c.width=v.videoWidth;c.height=v.videoHeight;
+ c.getContext('2d').drawImage(v,0,0);
+ currentImage=c.toDataURL('image/jpeg',.86);
+ $('previewImg').src=currentImage;$('preview').style.display='flex';
+ stopCamera();msg.focus();
+}
+
+initWelcome();
+renderHistory();
+</script>
+</body>
+    </html>
