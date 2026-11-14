@@ -1,90 +1,90 @@
 
-"use strict";
-
 require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const Database = require("better-sqlite3");
+const rateLimit = require("express-rate-limit");
+const fs = require("fs");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
-// ---------------- CONFIGURATION ----------------
-
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-const GROQ_MODEL =
-  process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
-
-const GROQ_VISION_MODEL =
-  process.env.GROQ_VISION_MODEL ||
-  "meta-llama/llama-4-scout-17b-16e-instruct";
-
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_IMAGE_MODEL =
-  process.env.OPENAI_IMAGE_MODEL || "gpt-image-1";
-
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
-const REQUEST_TIMEOUT = 45000;
-
-// ---------------- MIDDLEWARE ----------------
-
 app.use(express.json({ limit: "15mb" }));
-app.use(express.urlencoded({ extended: true, limit: "15mb" }));
+
+if (process.env.FRONTEND_ORIGIN) {
+  app.use(cors({
+    origin: process.env.FRONTEND_ORIGIN,
+    credentials: true
+  }));
+}
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  next();
-});
+const dbPath = process.env.DB_PATH || "/var/data/axenova.db";
 
-// ---------------- RATE LIMITING ----------------
+if (dbPath !== ":memory:") {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+}
 
-const requestCounts = new Map();
+const db = new Database(dbPath);
 
-app.use("/api", (req, res, next) => {
-  const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-    req.socket.remoteAddress ||
-    "unknown";
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
 
-  const now = Date.now();
-  const windowMs = 60 * 1000;
-  const maxRequests = 40;
+db.exec(`
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
 
-  let record = requestCounts.get(ip);
+CREATE TABLE IF NOT EXISTS conversations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  conversation_id TEXT NOT NULL,
+  title TEXT,
+  messages TEXT NOT NULL,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, conversation_id),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+`);
 
-  if (!record || now - record.start > windowMs) {
-    record = { start: now, count: 0 };
+const systemPrompt = `
+You are Axenova AI, an intelligent assistant created by John Theuri.
+
+You are helpful, accurate, friendly and professional.
+You can explain topics, write code, help with business ideas,
+answer questions and assist with learning.
+
+Use clear language. Be honest when you do not know something.
+Never pretend that you have performed an action you have not performed.
+Support English and Kiswahili naturally.
+`;
+
+function asyncRoute(fn) {
+  return (req, res, next) =>
+    Promise.resolve(fn(req, res, next)).catch(next);
+}
+
+function requireEnv(name) {
+  if (!process.env[name]) {
+    throw new Error(name + " is not configured on the server.");
   }
+  return process.env[name];
+}
 
-  record.count++;
-  requestCounts.set(ip, record);
-
-  if (record.count > maxRequests) {
-    return res.status(429).json({
-      error: "Too many requests. Please wait a moment and try again."
-    });
-  }
-
-  next();
-});
-
-// ---------------- HELPERS ----------------
-
-async function fetchWithTimeout(url, options = {}) {
+async function fetchWithTimeout(url, options = {}, timeout = 45000) {
   const controller = new AbortController();
-
-  const timeout = setTimeout(
-    () => controller.abort(),
-    REQUEST_TIMEOUT
-  );
+  const timer = setTimeout(() => controller.abort(), timeout);
 
   try {
     return await fetch(url, {
@@ -92,531 +92,473 @@ async function fetchWithTimeout(url, options = {}) {
       signal: controller.signal
     });
   } finally {
-    clearTimeout(timeout);
+    clearTimeout(timer);
   }
 }
 
-function cleanText(value, maxLength = 12000) {
+function cleanText(value, max = 12000) {
   if (typeof value !== "string") return "";
-  return value.trim().slice(0, maxLength);
-}
-
-function getKenyaDateTime() {
-  return new Date().toLocaleString("en-KE", {
-    timeZone: "Africa/Nairobi",
-    dateStyle: "full",
-    timeStyle: "short"
-  });
+  return value.trim().slice(0, max);
 }
 
 function normalizeHistory(history) {
   if (!Array.isArray(history)) return [];
 
-  return history
-    .slice(-12)
-    .filter(item =>
-      item &&
-      typeof item.content === "string" &&
-      ["user", "assistant", "ai"].includes(item.role)
-    )
-    .map(item => ({
-      role:
-        item.role === "ai" ? "assistant" : item.role,
-      content: item.content.slice(0, 6000)
-    }));
+  return history.slice(-12).map(item => ({
+    role: item.role === "assistant" ? "assistant" : "user",
+    content: cleanText(item.content, 5000)
+  })).filter(item => item.content);
 }
 
 function validateImageData(image) {
-  if (!image || typeof image !== "string") {
-    return null;
+  if (!image) return null;
+
+  if (typeof image !== "string" || image.length > 14_000_000) {
+    throw new Error("Image is too large or invalid.");
   }
 
-  const match = image.match(
-    /^data:(image\/(?:jpeg|jpg|png|webp|gif));base64,([A-Za-z0-9+/=]+)$/
+  if (!/^data:image\/(jpeg|jpg|png|webp);base64,/i.test(image)) {
+    throw new Error("Unsupported image format.");
+  }
+
+  return image;
+}
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-7",
+  legacyHeaders: false
+});
+
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 20,
+  standardHeaders: "draft-7",
+  legacyHeaders: false
+});
+
+function makeToken(user) {
+  return jwt.sign(
+    { id: user.id, email: user.email },
+    requireEnv("JWT_SECRET"),
+    { expiresIn: "7d" }
+  );
+}
+
+function setAuthCookie(res, token) {
+  res.cookie("axenova_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/"
+  });
+}
+
+function getToken(req) {
+  const cookie = req.headers.cookie || "";
+  const match = cookie.match(/(?:^|;\s*)axenova_token=([^;]+)/);
+
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function authenticate(req, res, next) {
+  try {
+    const token = getToken(req);
+
+    if (!token) {
+      return res.status(401).json({ error: "Please sign in first." });
+    }
+
+    const decoded = jwt.verify(token, requireEnv("JWT_SECRET"));
+
+    const user = db.prepare(
+      "SELECT id, name, email FROM users WHERE id = ?"
+    ).get(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({ error: "Account not found." });
+    }
+
+    req.user = user;
+    next();
+  } catch {
+    return res.status(401).json({ error: "Session expired. Please sign in again." });
+  }
+}
+
+/* HEALTH */
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    app: "Axenova AI",
+    groqConfigured: !!process.env.GROQ_API_KEY,
+    googleSearchConfigured: !!(
+      process.env.GOOGLE_API_KEY && process.env.GOOGLE_CSE_ID
+    ),
+    imageGenerationConfigured: !!process.env.OPENAI_API_KEY,
+    database: "connected"
+  });
+});
+
+/* REGISTER */
+
+app.post("/api/auth/register", authLimiter, asyncRoute(async (req, res) => {
+  const name = cleanText(req.body.name, 80);
+  const email = cleanText(req.body.email, 180).toLowerCase();
+  const password = req.body.password;
+
+  if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: "Enter a valid name and email." });
+  }
+
+  if (typeof password !== "string" || password.length < 8) {
+    return res.status(400).json({
+      error: "Password must contain at least 8 characters."
+    });
+  }
+
+  const existing = db.prepare(
+    "SELECT id FROM users WHERE email = ?"
+  ).get(email);
+
+  if (existing) {
+    return res.status(409).json({ error: "This email is already registered." });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+
+  const result = db.prepare(`
+    INSERT INTO users (name, email, password)
+    VALUES (?, ?, ?)
+  `).run(name, email, hashedPassword);
+
+  const user = {
+    id: Number(result.lastInsertRowid),
+    name,
+    email
+  };
+
+  setAuthCookie(res, makeToken(user));
+
+  res.status(201).json({
+    ok: true,
+    user
+  });
+}));
+
+/* LOGIN */
+
+app.post("/api/auth/login", authLimiter, asyncRoute(async (req, res) => {
+  const email = cleanText(req.body.email, 180).toLowerCase();
+  const password = req.body.password;
+
+  const user = db.prepare(
+    "SELECT * FROM users WHERE email = ?"
+  ).get(email);
+
+  if (!user || typeof password !== "string" ||
+      !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ error: "Incorrect email or password." });
+  }
+
+  const publicUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email
+  };
+
+  setAuthCookie(res, makeToken(publicUser));
+
+  res.json({
+    ok: true,
+    user: publicUser
+  });
+}));
+
+/* CURRENT USER */
+
+app.get("/api/auth/me", authenticate, (req, res) => {
+  res.json({ ok: true, user: req.user });
+});
+
+/* LOGOUT */
+
+app.post("/api/auth/logout", (req, res) => {
+  res.clearCookie("axenova_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/"
+  });
+
+  res.json({ ok: true });
+});
+
+/* SAVE CONVERSATIONS */
+
+app.get("/api/conversations", authenticate, (req, res) => {
+  const rows = db.prepare(`
+    SELECT conversation_id, title, messages
+    FROM conversations
+    WHERE user_id = ?
+    ORDER BY updated_at DESC
+  `).all(req.user.id);
+
+  const conversations = rows.map(row => ({
+    id: row.conversation_id,
+    title: row.title,
+    messages: JSON.parse(row.messages)
+  }));
+
+  res.json({ ok: true, conversations });
+});
+
+app.post("/api/conversations", authenticate, (req, res) => {
+  const conversations = req.body.conversations;
+
+  if (!Array.isArray(conversations) || conversations.length > 100) {
+    return res.status(400).json({ error: "Invalid conversations." });
+  }
+
+  const save = db.prepare(`
+    INSERT INTO conversations
+      (user_id, conversation_id, title, messages, updated_at)
+    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(user_id, conversation_id)
+    DO UPDATE SET
+      title = excluded.title,
+      messages = excluded.messages,
+      updated_at = CURRENT_TIMESTAMP
+  `);
+
+  const transaction = db.transaction(items => {
+    for (const chat of items) {
+      if (!chat || typeof chat.id !== "string" ||
+          !Array.isArray(chat.messages) || chat.messages.length > 300) {
+        continue;
+      }
+
+      const messages = chat.messages.slice(-300).map(message => ({
+        role: message.role === "assistant" ? "assistant" : "user",
+        content: cleanText(message.content, 12000)
+      }));
+
+      save.run(
+        req.user.id,
+        chat.id.slice(0, 100),
+        cleanText(chat.title, 100),
+        JSON.stringify(messages)
+      );
+    }
+  });
+
+  transaction(conversations);
+
+  res.json({ ok: true });
+});
+
+/* GOOGLE SEARCH */
+
+async function googleSearch(query) {
+  if (!process.env.GOOGLE_API_KEY || !process.env.GOOGLE_CSE_ID) {
+    return "";
+  }
+
+  const params = new URLSearchParams({
+    key: process.env.GOOGLE_API_KEY,
+    cx: process.env.GOOGLE_CSE_ID,
+    q: query,
+    num: "5"
+  });
+
+  const response = await fetchWithTimeout(
+    "https://www.googleapis.com/customsearch/v1?" + params
   );
 
-  if (!match) return null;
-
-  const mime = match[1] === "image/jpg"
-    ? "image/jpeg"
-    : match[1];
-
-  const base64 = match[2];
-
-  const estimatedSize = Math.floor(base64.length * 0.75);
-
-  if (estimatedSize > MAX_IMAGE_SIZE) {
-    return null;
+  if (!response.ok) {
+    throw new Error("Google Search request failed.");
   }
 
-  return `data:${mime};base64,${base64}`;
+  const data = await response.json();
+
+  return (data.items || []).map(item =>
+    `Title: ${item.title}\nLink: ${item.link}\nSnippet: ${item.snippet}`
+  ).join("\n\n");
 }
 
-async function readResponse(response) {
-  const text = await response.text();
+/* CHAT */
 
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { raw: text };
-  }
-}
+app.post("/api/chat", chatLimiter, asyncRoute(async (req, res) => {
+  const message = cleanText(req.body.message, 12000);
+  const image = validateImageData(req.body.image);
+  const history = normalizeHistory(req.body.history);
 
-// ---------------- AXENOVA IDENTITY ----------------
-
-const SYSTEM_PROMPT = `
-You are AXENOVA AI, an intelligent assistant created by John Theuri.
-
-IDENTITY:
-- Your name is Axenova AI.
-- Your creator is John Theuri.
-- Be professional, friendly, helpful and occasionally funny.
-- Communicate naturally and clearly.
-- Be respectful and safe.
-
-CAPABILITIES:
-- Answer questions.
-- Explain school subjects and difficult concepts.
-- Help with mathematics, science, programming and technology.
-- Write, debug and explain code.
-- Help with business ideas and planning.
-- Understand images when an image is supplied.
-- Use supplied search results to answer questions about current information.
-
-IMPORTANT:
-- Never pretend you searched the internet if no search was performed.
-- Never invent facts, sources, links or search results.
-- If you are unsure, say so.
-- Give complete code when the user asks for complete code.
-- Explain technical instructions in beginner-friendly steps.
-- Use the current Kenya date and time when relevant.
-
-CURRENT KENYA DATE AND TIME:
-${getKenyaDateTime()}
-`;
-
-// ---------------- GROQ AI ----------------
-
-async function askGroq(messages, useVision = false) {
-  if (!GROQ_API_KEY) {
-    throw new Error("GROQ_API_KEY is not configured.");
+  if (!message && !image) {
+    return res.status(400).json({ error: "Enter a message or attach an image." });
   }
 
-  const model = useVision ? GROQ_VISION_MODEL : GROQ_MODEL;
+  const apiKey = requireEnv("GROQ_API_KEY");
+
+  let searchContext = "";
+
+  const wantsSearch = /\b(search|latest|current|today|news|weather|price|2026|look up|find online)\b/i.test(message);
+
+  if (wantsSearch && !image) {
+    try {
+      searchContext = await googleSearch(message);
+    } catch (error) {
+      console.error("Search error:", error.message);
+    }
+  }
+
+  const system = systemPrompt + (
+    searchContext
+      ? "\n\nUse these web search results when answering. Be clear about uncertainty:\n" + searchContext
+      : ""
+  );
+
+  const userContent = [];
+
+  if (message) {
+    userContent.push({ type: "text", text: message });
+  } else {
+    userContent.push({ type: "text", text: "Please analyse this image." });
+  }
+
+  if (image) {
+    userContent.push({
+      type: "image_url",
+      image_url: { url: image }
+    });
+  }
+
+  const messages = [
+    { role: "system", content: system },
+    ...history,
+    { role: "user", content: image ? userContent : message }
+  ];
+
+  const model = image
+    ? (process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct")
+    : (process.env.GROQ_MODEL || "llama-3.3-70b-versatile");
 
   const response = await fetchWithTimeout(
     "https://api.groq.com/openai/v1/chat/completions",
     {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Authorization": "Bearer " + apiKey,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model,
         messages,
         temperature: 0.7,
-        max_tokens: 4096
+        max_tokens: 1800
       })
-    }
+    },
+    60000
   );
 
-  const data = await readResponse(response);
+  const data = await response.json();
 
   if (!response.ok) {
     console.error("Groq error:", data);
-
-    throw new Error(
-      data.error?.message ||
-      "The AI service could not complete your request."
-    );
+    return res.status(response.status).json({
+      error: data.error?.message || "AI service request failed."
+    });
   }
 
-  const answer = data.choices?.[0]?.message?.content;
+  const reply = data.choices?.[0]?.message?.content;
 
-  if (!answer) {
-    throw new Error("The AI returned an empty response.");
-  }
-
-  return answer;
-}
-
-// ---------------- GOOGLE SEARCH ----------------
-
-async function googleSearch(query) {
-  if (!GOOGLE_API_KEY || !GOOGLE_CSE_ID) {
-    return [];
-  }
-
-  const url = new URL(
-    "https://www.googleapis.com/customsearch/v1"
-  );
-
-  url.searchParams.set("key", GOOGLE_API_KEY);
-  url.searchParams.set("cx", GOOGLE_CSE_ID);
-  url.searchParams.set("q", query);
-  url.searchParams.set("num", "5");
-
-  const response = await fetchWithTimeout(url.toString());
-
-  const data = await readResponse(response);
-
-  if (!response.ok) {
-    console.error("Google Search error:", data);
-    return [];
-  }
-
-  return (data.items || []).map(item => ({
-    title: item.title || "",
-    link: item.link || "",
-    snippet: item.snippet || ""
-  }));
-}
-
-// ---------------- DUCKDUCKGO FALLBACK ----------------
-
-async function duckDuckGoSearch(query) {
-  const url = new URL(
-    "https://api.duckduckgo.com/"
-  );
-
-  url.searchParams.set("q", query);
-  url.searchParams.set("format", "json");
-  url.searchParams.set("no_html", "1");
-  url.searchParams.set("skip_disambig", "1");
-
-  try {
-    const response = await fetchWithTimeout(url.toString());
-
-    if (!response.ok) return [];
-
-    const data = await response.json();
-    const results = [];
-
-    if (data.AbstractText) {
-      results.push({
-        title: data.Heading || "Overview",
-        link: data.AbstractURL || "",
-        snippet: data.AbstractText
-      });
-    }
-
-    for (const item of data.RelatedTopics || []) {
-      if (item.Text && item.FirstURL) {
-        results.push({
-          title: item.Text.slice(0, 100),
-          link: item.FirstURL,
-          snippet: item.Text
-        });
-      }
-
-      if (item.Topics) {
-        for (const sub of item.Topics) {
-          if (sub.Text && sub.FirstURL) {
-            results.push({
-              title: sub.Text.slice(0, 100),
-              link: sub.FirstURL,
-              snippet: sub.Text
-            });
-          }
-        }
-      }
-
-      if (results.length >= 5) break;
-    }
-
-    return results.slice(0, 5);
-  } catch (error) {
-    console.error("DuckDuckGo search error:", error.message);
-    return [];
-  }
-}
-
-// ---------------- SEARCH ROUTER ----------------
-
-async function performSearch(query) {
-  let results = await googleSearch(query);
-
-  if (results.length === 0) {
-    results = await duckDuckGoSearch(query);
-  }
-
-  return results;
-}
-
-function shouldSearch(message) {
-  const text = message.toLowerCase();
-
-  const keywords = [
-    "latest",
-    "today",
-    "currently",
-    "current",
-    "news",
-    "weather",
-    "price",
-    "prices",
-    "2026",
-    "2027",
-    "this week",
-    "this month",
-    "recent",
-    "search the web",
-    "search online",
-    "look up",
-    "who is",
-    "what happened",
-    "where can i buy",
-    "website",
-    "official website"
-  ];
-
-  return keywords.some(word => text.includes(word));
-}
-
-// ---------------- HEALTH CHECK ----------------
-
-app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    app: "Axenova AI",
-    creator: "John Theuri",
-    status: "online",
-    services: {
-      groq: Boolean(GROQ_API_KEY),
-      googleSearch: Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID),
-      imageGeneration: Boolean(OPENAI_API_KEY)
-    },
-    time: getKenyaDateTime()
+    reply: typeof reply === "string" ? reply : "I could not generate a response."
   });
-});
+}));
 
-// ---------------- SEARCH TEST ----------------
+/* IMAGE GENERATION */
 
-app.get("/api/test-search", async (req, res) => {
-  try {
-    const query = cleanText(req.query.q, 300);
+app.post("/api/image", chatLimiter, asyncRoute(async (req, res) => {
+  const prompt = cleanText(req.body.prompt, 3000);
 
-    if (!query) {
-      return res.status(400).json({
-        error: "Please provide a search query using ?q="
-      });
-    }
-
-    const results = await performSearch(query);
-
-    res.json({
-      ok: true,
-      query,
-      count: results.length,
-      results
-    });
-  } catch (error) {
-    console.error("Search test error:", error);
-
-    res.status(500).json({
-      error: error.message || "Search failed."
-    });
+  if (!prompt) {
+    return res.status(400).json({ error: "Describe the image first." });
   }
-});
 
-// ---------------- CHAT API ----------------
+  const apiKey = requireEnv("OPENAI_API_KEY");
 
-app.post("/api/chat", async (req, res) => {
-  try {
-    const message = cleanText(req.body?.message, 12000);
-    const history = normalizeHistory(req.body?.history);
-    const image = validateImageData(req.body?.image);
-
-    if (!message && !image) {
-      return res.status(400).json({
-        error: "Please enter a message or upload an image."
-      });
-    }
-
-    if (req.body?.image && !image) {
-      return res.status(400).json({
-        error: "Invalid image or image is too large. Use JPEG, PNG, WEBP or GIF."
-      });
-    }
-
-    let searchResults = [];
-
-    if (message && shouldSearch(message)) {
-      searchResults = await performSearch(message);
-    }
-
-    const messages = [
-      {
-        role: "system",
-        content: SYSTEM_PROMPT
+  const response = await fetchWithTimeout(
+    "https://api.openai.com/v1/images/generations",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + apiKey,
+        "Content-Type": "application/json"
       },
-      ...history
-    ];
+      body: JSON.stringify({
+        model: "gpt-image-1",
+        prompt,
+        size: "1024x1024"
+      })
+    },
+    120000
+  );
 
-    let userContent = message || "Please describe this image.";
+  const data = await response.json();
 
-    if (searchResults.length > 0) {
-      const searchText = searchResults
-        .map((item, index) =>
-          `${index + 1}. ${item.title}\n${item.snippet}\nURL: ${item.link}`
-        )
-        .join("\n\n");
-
-      userContent += `
-
-WEB SEARCH RESULTS:
-${searchText}
-
-Use these results when answering. Include relevant source links.
-Do not claim that information is verified beyond what the results support.
-`;
-    }
-
-    if (image) {
-      messages.push({
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: userContent
-          },
-          {
-            type: "image_url",
-            image_url: {
-              url: image
-            }
-          }
-        ]
-      });
-    } else {
-      messages.push({
-        role: "user",
-        content: userContent
-      });
-    }
-
-    const reply = await askGroq(messages, Boolean(image));
-
-    res.json({
-      ok: true,
-      reply,
-      searchResults
-    });
-
-  } catch (error) {
-    console.error("Chat API error:", error);
-
-    res.status(500).json({
-      error: error.message || "Something went wrong. Please try again."
+  if (!response.ok) {
+    console.error("OpenAI image error:", data);
+    return res.status(response.status).json({
+      error: data.error?.message || "Image generation failed."
     });
   }
-});
 
-// ---------------- IMAGE GENERATION API ----------------
+  const item = data.data?.[0];
 
-app.post("/api/image", async (req, res) => {
-  try {
-    if (!OPENAI_API_KEY) {
-      return res.status(503).json({
-        error: "Image generation is not configured. Add OPENAI_API_KEY to your environment variables."
-      });
-    }
-
-    const prompt = cleanText(req.body?.prompt, 4000);
-
-    if (!prompt) {
-      return res.status(400).json({
-        error: "Please enter an image description."
-      });
-    }
-
-    const response = await fetchWithTimeout(
-      "https://api.openai.com/v1/images/generations",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${OPENAI_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: OPENAI_IMAGE_MODEL,
-          prompt,
-          size: "1024x1024",
-          n: 1
-        })
-      }
-    );
-
-    const data = await readResponse(response);
-
-    if (!response.ok) {
-      console.error("OpenAI image error:", data);
-
-      throw new Error(
-        data.error?.message ||
-        "Image generation failed."
-      );
-    }
-
-    const imageData = data.data?.[0];
-
-    if (!imageData) {
-      throw new Error("No image was returned.");
-    }
-
-    res.json({
+  if (item?.b64_json) {
+    return res.json({
       ok: true,
-      image: imageData.b64_json
-        ? `data:image/png;base64,${imageData.b64_json}`
-        : imageData.url || null
-    });
-
-  } catch (error) {
-    console.error("Image API error:", error);
-
-    res.status(500).json({
-      error: error.message || "Could not generate the image."
+      image: "data:image/png;base64," + item.b64_json
     });
   }
-});
 
-// ---------------- UNKNOWN API ROUTES ----------------
+  if (item?.url) {
+    return res.json({ ok: true, image: item.url });
+  }
+
+  res.status(500).json({ error: "No image was returned." });
+}));
+
+/* TEST SEARCH */
+
+app.get("/api/test-search", asyncRoute(async (req, res) => {
+  const query = cleanText(req.query.q, 300);
+
+  if (!query) {
+    return res.status(400).json({ error: "Provide a search query." });
+  }
+
+  const results = await googleSearch(query);
+
+  res.json({
+    ok: true,
+    results
+  });
+}));
+
+/* UNKNOWN API ROUTES */
 
 app.use("/api", (req, res) => {
-  res.status(404).json({
-    error: "API endpoint not found."
-  });
+  res.status(404).json({ error: "API endpoint not found." });
 });
 
-// ---------------- ERROR HANDLER ----------------
+/* FRONTEND FALLBACK - EXPRESS 5 */
 
-app.use((err, req, res, next) => {
-  console.error("Server error:", err);
-
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  const status = err.status || 500;
-
-  res.status(status).json({
-    error:
-      status === 413
-        ? "Request is too large."
-        : "An unexpected server error occurred."
-  });
-});
-
-// ---------------- FRONTEND FALLBACK ----------------
-
-app.get("*", (req, res, next) => {
-  if (req.path.startsWith("/api/")) {
-    return res.status(404).json({
-      error: "API endpoint not found."
-    });
-  }
-
+app.get("/{*splat}", (req, res, next) => {
   res.sendFile(
     path.join(__dirname, "public", "index.html"),
     error => {
@@ -625,24 +567,18 @@ app.get("*", (req, res, next) => {
   );
 });
 
-// ---------------- START SERVER ----------------
+/* ERROR HANDLER */
+
+app.use((error, req, res, next) => {
+  console.error("Server error:", error);
+
+  if (res.headersSent) return next(error);
+
+  res.status(error.status || 500).json({
+    error: error.message || "Internal server error."
+  });
+});
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("----------------------------------");
-  console.log("       AXENOVA AI ONLINE");
-  console.log("----------------------------------");
-  console.log(`Port: ${PORT}`);
-  console.log("Creator: John Theuri");
-  console.log(`Groq: ${GROQ_API_KEY ? "Configured" : "Missing"}`);
-  console.log(
-    `Google Search: ${
-      GOOGLE_API_KEY && GOOGLE_CSE_ID ? "Configured" : "Missing"
-    }`
-  );
-  console.log(
-    `Image Generation: ${
-      OPENAI_API_KEY ? "Configured" : "Missing"
-    }`
-  );
-  console.log("----------------------------------");
+  console.log("Axenova AI running on port " + PORT);
 });
