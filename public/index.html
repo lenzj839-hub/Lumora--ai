@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#080910">
+<meta name="theme-color" content="#000000">
 <meta name="description" content="Axenova AI — your intelligent creative assistant.">
 <title>Axenova AI — By John Theuri</title>
 
@@ -17,54 +17,64 @@
 
 <style>
 :root {
-  --bg:#080910;
-  --panel:#10121d;
-  --panel2:#171a27;
-  --line:rgba(255,255,255,.09);
-  --text:#f4f5fa;
-  --muted:#9296aa;
-  --accent:#9c7bff;
-  --accent2:#5e9dff;
-  --radius:20px;
+  --bg:#000000;
+  --panel:#171717;
+  --panel2:#242424;
+  --line:#303030;
+  --text:#f5f5f5;
+  --muted:#999999;
+  --green:#147a50;
+  --green2:#269568;
 }
 * {box-sizing:border-box}
-html,body {margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+html,body {
+  margin:0;width:100%;height:100%;
+  background:#000;color:var(--text);
+  font-family:'DM Sans',sans-serif;
+}
 body {overflow:hidden}
 button,input,textarea {font:inherit}
 button {cursor:pointer;color:inherit}
-.app {height:100dvh;display:flex;overflow:hidden;background:
-radial-gradient(ellipse at 60% -20%,rgba(106,79,210,.16),transparent 50%),
-var(--bg)}
+.app {height:100dvh;display:flex;overflow:hidden;background:#000}
+
 .sidebar {
-  width:270px;flex-shrink:0;background:rgba(13,15,24,.96);
-  border-right:1px solid var(--line);display:flex;flex-direction:column;
-  padding:22px 16px;z-index:5;transition:.25s;
+  width:270px;flex-shrink:0;background:#090909;
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:22px 16px;
+  z-index:5;transition:.25s;
 }
 .brand {display:flex;align-items:center;gap:12px;padding:4px 8px 25px}
 .logo {
   width:42px;height:42px;border-radius:14px;
   background:linear-gradient(135deg,#b69aff,#557dff);
-  display:grid;place-items:center;font-size:22px;font-weight:800;
-  color:#080910;box-shadow:0 0 28px #8e70ff40;
+  display:grid;place-items:center;font-size:22px;
+  font-weight:800;color:#080910;
 }
-.brand-name {font-family:'Space Grotesk';font-size:19px;font-weight:700;letter-spacing:-.6px}
+.brand-name {font-family:'Space Grotesk';font-size:19px;font-weight:700}
 .brand-sub {font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}
+
 .new-chat {
-  width:100%;padding:13px;border:1px solid #9c7bff55;
-  border-radius:14px;background:#9c7bff13;text-align:left;
+  width:100%;padding:13px;border:1px solid #444;
+  border-radius:13px;background:#171717;text-align:left;
   font-weight:700;margin-bottom:24px;
 }
-.new-chat:hover {background:#9c7bff27}
+.new-chat:hover {background:#242424}
+
 .side-label {font-size:10px;color:var(--muted);letter-spacing:1.8px;padding:0 9px;margin-bottom:10px}
 .history {flex:1;overflow-y:auto}
 .history-item {
-  padding:11px 12px;border-radius:11px;font-size:13px;color:#c6c8d5;
-  cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  margin-bottom:4px;
+  padding:11px 12px;border-radius:11px;font-size:13px;
+  color:#c6c6c6;cursor:pointer;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;
 }
-.history-item:hover,.history-item.active {background:var(--panel2);color:white}
+.history-item:hover,.history-item.active {background:#222;color:white}
+
 .sidebar-bottom {border-top:1px solid var(--line);padding-top:15px}
-.profile {display:flex;align-items:center;gap:11px;padding:9px}
+.profile {
+  display:flex;align-items:center;gap:11px;padding:9px;
+  cursor:pointer;border-radius:12px;
+}
+.profile:hover {background:#202020}
 .avatar {
   width:35px;height:35px;border-radius:50%;
   background:linear-gradient(135deg,#9878ff,#4c8dff);
@@ -72,132 +82,256 @@ var(--bg)}
 }
 .profile-name {font-size:13px;font-weight:700}
 .profile-caption {font-size:11px;color:var(--muted);margin-top:3px}
-.main {flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+
+.main {flex:1;min-width:0;display:flex;flex-direction:column;position:relative;background:#000}
 .topbar {
-  height:67px;flex-shrink:0;border-bottom:1px solid var(--line);
-  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
-  background:#080910b8;backdrop-filter:blur(18px);z-index:3;
+  height:67px;flex-shrink:0;border-bottom:1px solid #252525;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;background:#000;z-index:3;
 }
 .top-left {display:flex;align-items:center;gap:13px}
 .top-title {font-family:'Space Grotesk';font-weight:700;font-size:15px}
 .status {font-size:11px;color:#8edbb0;display:flex;align-items:center;gap:6px}
-.dot {width:7px;height:7px;background:#57d69a;border-radius:50%;box-shadow:0 0 10px #57d69a}
-.top-actions {display:flex;gap:8px}
+.dot {width:7px;height:7px;background:#57d69a;border-radius:50%}
+.top-actions {display:flex;gap:8px;align-items:center}
 .icon-btn {
-  border:1px solid var(--line);background:var(--panel);
+  border:1px solid #333;background:#171717;
   width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
 }
-.icon-btn:hover {background:var(--panel2)}
-.icon-btn svg,.action svg {width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn:hover {background:#292929}
+.icon-btn svg,.action svg {
+  width:19px;height:19px;stroke:currentColor;fill:none;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
 #menuBtn {display:none}
+
+.account-button {
+  padding:9px 13px;border:1px solid #383838;
+  background:#171717;border-radius:20px;font-size:12px;
+}
+.account-button:hover {background:#292929}
+
 .chat-scroll {flex:1;overflow-y:auto;scroll-behavior:smooth}
 .chat-content {width:min(850px,100%);margin:auto;padding:35px 25px 25px}
-.welcome {min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+
+.welcome {
+  min-height:62vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+}
 .orb {
   width:94px;height:94px;border-radius:30px;
   background:linear-gradient(135deg,#b69aff,#577fff);
   display:grid;place-items:center;color:#090a12;font-size:44px;
-  box-shadow:0 0 65px #9270ff40, inset 0 0 20px #ffffff55;
+  box-shadow:0 0 55px #9270ff30;
   animation:float 4s ease-in-out infinite;
 }
 @keyframes float {50%{transform:translateY(-9px)}}
-.welcome h1 {font-family:'Space Grotesk';font-size:clamp(29px,5vw,44px);letter-spacing:-1.5px;margin:28px 0 10px}
-.gradient {background:linear-gradient(90deg,#c5aaff,#7ea8ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.welcome p {max-width:480px;color:var(--muted);font-size:14px;line-height:1.7;margin:0}
-.suggestions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:min(590px,100%);margin-top:32px}
-.suggestion {
-  text-align:left;padding:15px;border:1px solid var(--line);
-  border-radius:15px;background:#11131e;color:#dfe0ec;font-size:12px;
-  line-height:1.5;transition:.2s;
+.welcome h1 {
+  font-family:'Space Grotesk';font-size:clamp(29px,5vw,44px);
+  letter-spacing:-1.5px;margin:28px 0 10px;
 }
-.suggestion:hover {border-color:#9c7bff88;background:#9c7bff10;transform:translateY(-2px)}
+.gradient {
+  background:linear-gradient(90deg,#c5aaff,#7ea8ff);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.welcome p {max-width:480px;color:#999;font-size:14px;line-height:1.7;margin:0}
+.suggestions {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;width:min(590px,100%);margin-top:32px;
+}
+.suggestion {
+  text-align:left;padding:15px;border:1px solid #303030;
+  border-radius:15px;background:#111;color:#ddd;font-size:12px;line-height:1.5;
+}
+.suggestion:hover {border-color:#777;background:#1a1a1a}
 .suggestion strong {display:block;font-size:13px;margin-bottom:5px;color:white}
+
 .messages {display:flex;flex-direction:column;gap:25px}
-.message {display:flex;gap:12px;align-items:flex-start;max-width:100%;animation:appear .2s ease}
-@keyframes appear {from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.message {display:flex;gap:12px;align-items:flex-start;max-width:100%}
 .message.user {flex-direction:row-reverse}
 .message-avatar {
   flex-shrink:0;width:32px;height:32px;border-radius:11px;
   background:linear-gradient(135deg,#9878ff,#5889ff);
   display:grid;place-items:center;color:#090a12;font-weight:800;font-size:13px;
 }
-.message.user .message-avatar {background:#272b3a;color:white}
+.message.user .message-avatar {background:#176b4c;color:white}
 .message-body {min-width:0;max-width:min(680px,calc(100% - 45px))}
 .message.user .message-body {
-  background:#1a1c2b;border:1px solid var(--line);
-  padding:12px 15px;border-radius:17px 5px 17px 17px;
+  background:#147a50;color:white;border:1px solid #269568;
+  padding:13px 17px;border-radius:19px 6px 19px 19px;
+  line-height:1.65;font-size:14px;box-shadow:0 5px 18px #0002;
 }
-.message.ai .message-body {padding:4px 0;line-height:1.75;font-size:14px}
+.message.ai .message-body {
+  background:#252a33;color:#e5e7eb;border:1px solid #383e49;
+  padding:14px 17px;border-radius:6px 19px 19px 19px;
+  line-height:1.8;font-size:14px;box-shadow:0 5px 18px #0002;
+}
 .message-text {overflow-wrap:anywhere}
 .message-text p {margin:0 0 12px}
 .message-text p:last-child {margin-bottom:0}
-.message-text pre {overflow-x:auto;background:#10121c;border:1px solid var(--line);padding:14px;border-radius:12px}
-.message-text code {background:#25283a;padding:2px 5px;border-radius:5px}
+.message-text pre {
+  overflow-x:auto;background:#171b23;border:1px solid #444;
+  padding:14px;border-radius:12px;
+}
+.message-text code {background:#383e49;padding:2px 5px;border-radius:5px}
 .message-text pre code {background:none;padding:0}
 .message-text a {color:#a994ff}
 .message-text ul,.message-text ol {padding-left:23px}
-.message-image {display:block;width:100%;max-width:560px;max-height:480px;object-fit:contain;border-radius:15px;margin:10px 0;border:1px solid var(--line)}
+.message-image {
+  display:block;width:100%;max-width:560px;max-height:480px;
+  object-fit:contain;border-radius:15px;margin:10px 0;
+}
 .message-tools {display:flex;gap:8px;margin-top:10px}
-.small-action {border:1px solid var(--line);background:transparent;border-radius:8px;padding:6px 9px;color:var(--muted);font-size:11px}
-.small-action:hover {color:white;background:var(--panel2)}
+.small-action {
+  border:1px solid #555;background:transparent;border-radius:8px;
+  padding:6px 9px;color:#bbb;font-size:11px;
+}
+.small-action:hover {color:white;background:#333}
+
 .typing {display:flex;gap:5px;padding:10px 0}
-.typing span {width:6px;height:6px;background:#a38aff;border-radius:50%;animation:bounce .9s infinite}
+.typing span {
+  width:6px;height:6px;background:#aaa;border-radius:50%;
+  animation:bounce .9s infinite;
+}
 .typing span:nth-child(2){animation-delay:.15s}
 .typing span:nth-child(3){animation-delay:.3s}
 @keyframes bounce {50%{transform:translateY(-5px);opacity:.5}}
-.composer-area {padding:12px 22px 20px;background:linear-gradient(transparent,#080910 25%)}
+
+.composer-area {padding:12px 22px 20px;background:#000}
 .composer-wrap {width:min(850px,100%);margin:auto}
 .composer {
-  background:#151725;border:1px solid #ffffff18;border-radius:21px;
-  padding:12px;box-shadow:0 12px 45px #0005;
+  background:#202127;border:1px solid #41434b;
+  border-radius:28px;padding:12px 14px;
+  box-shadow:0 8px 35px #0005;transition:.2s;
 }
-.composer:focus-within {border-color:#9c7bff88;box-shadow:0 0 0 3px #9c7bff12}
+.composer:focus-within {border-color:#777b89}
 .composer textarea {
-  width:100%;resize:none;max-height:150px;min-height:35px;
+  width:100%;resize:none;max-height:150px;min-height:38px;
   border:0;outline:0;background:transparent;color:white;
-  font-size:14px;padding:8px 9px;line-height:1.5;
+  font-size:15px;padding:9px 7px;line-height:1.55;
 }
-.composer textarea::placeholder {color:#777c91}
-.composer-bottom {display:flex;align-items:center;justify-content:space-between;gap:8px}
-.composer-actions {display:flex;gap:6px;align-items:center}
+.composer textarea::placeholder {color:#a0a3ad}
+.composer-bottom {display:flex;align-items:center;justify-content:space-between;gap:10px}
+.composer-actions {display:flex;gap:5px;align-items:center}
 .action {
-  width:37px;height:37px;border:1px solid transparent;border-radius:11px;
-  background:transparent;color:#aeb2c4;display:grid;place-items:center;
+  width:39px;height:39px;border:0;border-radius:50%;
+  background:transparent;color:#c5c7d0;display:grid;place-items:center;
 }
-.action:hover {background:#272a3b;color:white}
-.action.active {background:#9c7bff25;color:#c4aeff;border-color:#9c7bff77}
+.action:hover {background:#363941;color:white}
+.action.active {background:#176b4c;color:white}
 .send-btn {
-  width:39px;height:39px;border:0;border-radius:12px;
-  background:linear-gradient(135deg,#b59aff,#668eff);
-  color:#080910;display:grid;place-items:center;
+  width:40px;height:40px;border:0;border-radius:50%;
+  background:white;color:#17191e;display:grid;place-items:center;
 }
+.send-btn:hover {background:#d9f5e8}
 .send-btn:disabled {opacity:.4;cursor:not-allowed}
-.send-btn svg {width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.send-btn svg {
+  width:20px;height:20px;stroke:currentColor;fill:none;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
 .disclaimer {text-align:center;color:#656a7e;font-size:10px;margin-top:11px}
-.preview {display:none;align-items:center;gap:10px;padding:7px 10px;margin:4px 0 10px;background:#202336;border-radius:12px}
+
+.preview {
+  display:none;align-items:center;gap:10px;padding:7px 10px;
+  margin:4px 0 10px;background:#303030;border-radius:12px;
+}
 .preview img {width:48px;height:48px;object-fit:cover;border-radius:8px}
-.preview span {font-size:12px;color:#c7c9d6;flex:1}
+.preview span {font-size:12px;color:#ddd;flex:1}
 .preview button {background:none;border:0;color:#ff9292;font-size:19px}
 .mode-note {display:none;font-size:11px;color:#c1aaff;padding:3px 9px 8px}
+
 .camera-modal {
-  display:none;position:fixed;inset:0;background:#000d;z-index:20;
+  display:none;position:fixed;inset:0;background:#000e;z-index:20;
   align-items:center;justify-content:center;padding:18px;
 }
-.camera-box {width:min(600px,100%);background:#121522;border:1px solid var(--line);border-radius:20px;padding:15px}
-.camera-box video {width:100%;max-height:65vh;background:#000;border-radius:13px;object-fit:contain}
+.camera-box {
+  width:min(600px,100%);background:#151515;
+  border:1px solid #444;border-radius:20px;padding:15px;
+}
+.camera-box video {
+  width:100%;max-height:65vh;background:#000;
+  border-radius:13px;object-fit:contain;
+}
 .camera-buttons {display:flex;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap}
-.camera-buttons button {padding:11px 15px;border:1px solid var(--line);background:#222638;border-radius:11px}
-.toast {position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#25283a;border:1px solid var(--line);padding:10px 15px;border-radius:12px;font-size:12px;z-index:30;display:none}
+.camera-buttons button {
+  padding:11px 15px;border:1px solid #444;background:#292929;border-radius:11px;
+}
+.toast {
+  position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+  background:#292929;border:1px solid #444;padding:10px 15px;
+  border-radius:12px;font-size:12px;z-index:30;display:none;
+}
+
+/* ACCOUNT MENU */
+.account-menu {
+  display:none;position:absolute;right:20px;top:58px;
+  width:230px;background:#171717;border:1px solid #393939;
+  border-radius:15px;padding:10px;z-index:15;box-shadow:0 15px 40px #0009;
+}
+.account-menu button {
+  width:100%;text-align:left;padding:11px;border:0;
+  background:transparent;border-radius:9px;font-size:13px;
+}
+.account-menu button:hover {background:#303030}
+.account-email {padding:10px;font-size:11px;color:#aaa;overflow-wrap:anywhere}
+
+/* LOGIN / REGISTER */
+.auth-overlay {
+  display:none;position:fixed;inset:0;background:#000e;
+  z-index:50;align-items:center;justify-content:center;padding:18px;
+}
+.auth-card {
+  width:min(420px,100%);background:#111;
+  border:1px solid #333;border-radius:22px;padding:27px;
+  box-shadow:0 20px 80px #000b;position:relative;
+}
+.auth-close {
+  position:absolute;right:15px;top:13px;border:0;
+  background:transparent;color:#aaa;font-size:24px;
+}
+.auth-logo {
+  width:53px;height:53px;border-radius:17px;
+  background:linear-gradient(135deg,#b69aff,#557dff);
+  color:#080910;display:grid;place-items:center;
+  font-size:26px;font-weight:800;margin-bottom:20px;
+}
+.auth-card h2 {font-family:'Space Grotesk';font-size:25px;margin:0 0 8px}
+.auth-subtitle {font-size:13px;color:#999;margin-bottom:23px;line-height:1.6}
+.auth-card label {display:block;font-size:12px;color:#ccc;margin:13px 0 7px}
+.auth-card input {
+  width:100%;padding:13px;border:1px solid #393939;
+  background:#202020;color:white;border-radius:11px;outline:none;
+}
+.auth-card input:focus {border-color:#888}
+.auth-submit {
+  width:100%;padding:14px;border:0;border-radius:12px;
+  background:white;color:#111;font-weight:800;margin-top:20px;
+}
+.auth-submit:disabled {opacity:.5}
+.auth-switch {font-size:12px;text-align:center;color:#aaa;margin-top:18px}
+.auth-switch button {border:0;background:none;color:#fff;text-decoration:underline}
+.auth-error {font-size:12px;color:#ff8b8b;margin-top:10px;min-height:16px}
+.auth-note {font-size:10px;color:#777;line-height:1.5;margin-top:15px}
+
 @media(max-width:760px) {
-  .sidebar {position:fixed;left:-285px;top:0;bottom:0;width:270px;box-shadow:20px 0 60px #0008}
+  .sidebar {
+    position:fixed;left:-285px;top:0;bottom:0;width:270px;
+    box-shadow:20px 0 60px #0008;
+  }
   .sidebar.open {left:0}
   #menuBtn {display:grid}
   .topbar {padding:0 13px;height:59px}
   .chat-content {padding:24px 15px}
-  .composer-area {padding:8px 11px 12px}
+  .composer-area {padding:8px 10px 12px}
   .welcome {min-height:60vh}
   .suggestions {gap:8px;margin-top:24px}
   .suggestion {padding:12px}
+  .message {gap:9px}
+  .message-body {max-width:calc(100% - 40px)}
+  .message.user .message-body,.message.ai .message-body {
+    padding:12px 14px;font-size:14px;
+  }
+  .composer {border-radius:25px;padding:10px 11px}
 }
 @media(max-width:390px) {
   .suggestions {grid-template-columns:1fr}
@@ -220,16 +354,15 @@ var(--bg)}
   </div>
 
   <button class="new-chat" onclick="newChat()">＋ &nbsp; New conversation</button>
-
   <div class="side-label">RECENT CONVERSATIONS</div>
   <div class="history" id="historyList"></div>
 
   <div class="sidebar-bottom">
-    <div class="profile">
-      <div class="avatar">J</div>
+    <div class="profile" onclick="openAccount()">
+      <div class="avatar" id="profileAvatar">J</div>
       <div>
-        <div class="profile-name">John Theuri</div>
-        <div class="profile-caption">Creator of Axenova AI</div>
+        <div class="profile-name" id="profileName">Guest user</div>
+        <div class="profile-caption" id="profileCaption">Sign in to sync chats</div>
       </div>
     </div>
   </div>
@@ -247,11 +380,19 @@ var(--bg)}
       </div>
     </div>
     <div class="top-actions">
+      <button class="account-button" id="accountButton" onclick="openAccount()">Sign in</button>
       <button class="icon-btn" onclick="newChat()" title="New chat">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
   </header>
+
+  <div class="account-menu" id="accountMenu">
+    <div class="account-email" id="accountEmail">Not signed in</div>
+    <button onclick="openAuth('login')">Sign in</button>
+    <button onclick="openAuth('register')">Create account</button>
+    <button onclick="logout()">Sign out</button>
+  </div>
 
   <section class="chat-scroll" id="chatScroll">
     <div class="chat-content">
@@ -262,24 +403,19 @@ var(--bg)}
 
         <div class="suggestions">
           <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple words.')">
-            <strong>✦ Learn something</strong>
-            Explain a difficult topic simply.
+            <strong>✦ Learn something</strong>Explain a difficult topic simply.
           </button>
           <button class="suggestion" onclick="useSuggestion('Help me build a modern website using HTML, CSS and JavaScript.')">
-            <strong>⌘ Build with code</strong>
-            Create a website or application.
+            <strong>⌘ Build with code</strong>Create a website or application.
           </button>
           <button class="suggestion" onclick="useSuggestion('Give me five creative business ideas I can start with little capital.')">
-            <strong>◈ Explore ideas</strong>
-            Discover business opportunities.
+            <strong>◈ Explore ideas</strong>Discover business opportunities.
           </button>
           <button class="suggestion" onclick="activateImageMode()">
-            <strong>✧ Create an image</strong>
-            Turn your imagination into art.
+            <strong>✧ Create an image</strong>Turn your imagination into art.
           </button>
         </div>
       </div>
-
       <div class="messages" id="messages"></div>
     </div>
   </section>
@@ -299,25 +435,25 @@ var(--bg)}
 
         <div class="composer-bottom">
           <div class="composer-actions">
-            <button class="action" onclick="document.getElementById('fileInput').click()" title="Attach image" aria-label="Attach image">
+            <button class="action" onclick="document.getElementById('fileInput').click()" title="Attach image">
               <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
             </button>
             <input type="file" id="fileInput" accept="image/*" hidden>
 
-            <button class="action" id="cameraBtn" onclick="openCamera()" title="Open camera" aria-label="Camera">
+            <button class="action" id="cameraBtn" onclick="openCamera()" title="Open camera">
               <svg viewBox="0 0 24 24"><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10H2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="3.5"/></svg>
             </button>
 
-            <button class="action" id="imageModeBtn" onclick="toggleImageMode()" title="Generate image" aria-label="Generate image">
+            <button class="action" id="imageModeBtn" onclick="toggleImageMode()" title="Generate image">
               <svg viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 15 .9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15Z"/></svg>
             </button>
 
-            <button class="action" id="micBtn" onclick="toggleMic()" title="Voice input" aria-label="Voice input">
+            <button class="action" id="micBtn" onclick="toggleMic()" title="Voice input">
               <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg>
             </button>
           </div>
 
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send message" aria-label="Send">
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send message">
             <svg viewBox="0 0 24 24"><path d="m5 12 14-7-5 14-3-6-6-1Z"/><path d="m11 13 8-8"/></svg>
           </button>
         </div>
@@ -326,6 +462,36 @@ var(--bg)}
     </div>
   </section>
 </main>
+</div>
+
+<!-- LOGIN AND REGISTER -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <button class="auth-close" onclick="closeAuth()">×</button>
+    <div class="auth-logo">A</div>
+    <h2 id="authTitle">Welcome back</h2>
+    <p class="auth-subtitle" id="authSubtitle">Sign in to access your Axenova account and saved conversations.</p>
+
+    <form id="authForm" onsubmit="submitAuth(event)">
+      <div id="nameField" style="display:none">
+        <label for="authName">Your name</label>
+        <input id="authName" type="text" autocomplete="name" placeholder="Enter your name">
+      </div>
+      <label for="authEmail">Email address</label>
+      <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+      <label for="authPassword">Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters">
+      <button class="auth-submit" id="authSubmit" type="submit">Sign in</button>
+      <div class="auth-error" id="authError"></div>
+    </form>
+
+    <div class="auth-switch" id="authSwitch">
+      Don't have an account? <button onclick="openAuth('register')">Create one</button>
+    </div>
+    <div class="auth-note">
+      Your account requires a secure backend. Do not reuse a password from another important account.
+    </div>
+  </div>
 </div>
 
 <div class="camera-modal" id="cameraModal">
@@ -352,15 +518,41 @@ let busy = false;
 let cameraStream = null;
 let recognition = null;
 let isRecording = false;
+let authMode = "login";
+let currentUser = null;
 
-const STORAGE_KEY = "axenova_conversations_v1";
+const STORAGE_KEY = "axenova_conversations_v2";
+
+/*
+  BACKEND CONTRACT:
+  POST /api/auth/register {name,email,password}
+  POST /api/auth/login {email,password}
+  GET  /api/auth/me
+  POST /api/auth/logout
+  GET  /api/conversations
+  POST /api/conversations {conversations:[...]}
+  
+  These routes must be implemented in server.js.
+  This frontend uses secure cookie sessions (credentials: include).
+*/
+
+async function apiFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    credentials:"include",
+    headers:{
+      ...(options.body ? {"Content-Type":"application/json"} : {}),
+      ...(options.headers || {})
+    }
+  });
+}
 
 function showToast(message) {
   const el = $("toast");
   el.textContent = message;
   el.style.display = "block";
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => el.style.display = "none", 2600);
+  showToast.timer = setTimeout(() => el.style.display = "none", 2800);
 }
 
 function toggleSidebar() {
@@ -377,7 +569,7 @@ function renderMarkdown(text) {
   }
   const div = document.createElement("div");
   div.textContent = text || "";
-  return div.innerHTML.replace(/\n/g, "<br>");
+  return div.innerHTML.replace(/\n/g,"<br>");
 }
 
 function addMessage(role, content, image = null) {
@@ -425,11 +617,11 @@ function addMessage(role, content, image = null) {
     speak.textContent = "Read aloud";
     speak.onclick = () => speakText(content);
 
-    tools.append(copy, speak);
+    tools.append(copy,speak);
     body.appendChild(tools);
   }
 
-  row.append(avatar, body);
+  row.append(avatar,body);
   $("messages").appendChild(row);
   scrollBottom();
   return row;
@@ -448,7 +640,7 @@ function showTyping() {
   dots.className = "typing";
   dots.innerHTML = "<span></span><span></span><span></span>";
 
-  row.append(avatar, dots);
+  row.append(avatar,dots);
   $("messages").appendChild(row);
   scrollBottom();
 }
@@ -457,34 +649,66 @@ function removeTyping() {
   $("typingIndicator")?.remove();
 }
 
+/* LOCAL CONVERSATION STORAGE */
 function saveConversation() {
-  if (!currentId) return;
+  if (!currentId || !messages.length) return;
 
   const existing = conversations.find(c => c.id === currentId);
   const firstUser = messages.find(m => m.role === "user");
 
   const conversation = {
-    id: currentId,
-    title: firstUser ? firstUser.content.slice(0, 48) : "New conversation",
-    messages: messages.map(m => ({
-      role: m.role,
-      content: m.content
-    })),
-    updated: Date.now()
+    id:currentId,
+    title:firstUser ? firstUser.content.slice(0,48) : "New conversation",
+    messages:messages.map(m => ({role:m.role,content:m.content})),
+    updated:Date.now()
   };
 
-  if (existing) Object.assign(existing, conversation);
+  if (existing) Object.assign(existing,conversation);
   else conversations.unshift(conversation);
 
-  conversations.sort((a,b) => b.updated - a.updated);
+  conversations.sort((a,b) => b.updated-a.updated);
 
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations.slice(0,30)));
-  } catch (e) {
-    showToast("Storage is full. Older chats may need clearing.");
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(conversations.slice(0,30)));
+  } catch(e) {
+    showToast("Storage is full. Some older chats may need clearing.");
   }
 
   renderHistory();
+
+  if (currentUser) syncConversations();
+}
+
+let syncTimer;
+function syncConversations() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try {
+      const response = await apiFetch("/api/conversations",{
+        method:"POST",
+        body:JSON.stringify({conversations})
+      });
+      if (!response.ok) console.warn("Cloud conversation sync is not available yet.");
+    } catch(e) {
+      console.warn("Cloud sync unavailable",e);
+    }
+  },800);
+}
+
+async function loadCloudConversations() {
+  try {
+    const response = await apiFetch("/api/conversations");
+    if (!response.ok) return;
+
+    const data = await response.json();
+    if (Array.isArray(data.conversations)) {
+      conversations = data.conversations;
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(conversations));
+      renderHistory();
+    }
+  } catch(e) {
+    console.warn("Could not load cloud conversations",e);
+  }
 }
 
 function renderHistory() {
@@ -510,7 +734,7 @@ function loadConversation(id) {
   $("messages").innerHTML = "";
   $("welcome").style.display = messages.length ? "none" : "flex";
 
-  messages.forEach(m => addMessage(m.role, m.content));
+  messages.forEach(m => addMessage(m.role,m.content));
   renderHistory();
   $("sidebar").classList.remove("open");
 }
@@ -535,7 +759,7 @@ function useSuggestion(text) {
 
 function setImageMode(value) {
   imageMode = value;
-  $("imageModeBtn").classList.toggle("active", imageMode);
+  $("imageModeBtn").classList.toggle("active",imageMode);
   $("modeNote").style.display = imageMode ? "block" : "none";
   $("messageInput").placeholder = imageMode
     ? "Describe the image you want to create..."
@@ -550,7 +774,6 @@ function toggleImageMode() {
 function activateImageMode() {
   setImageMode(true);
   $("messageInput").value = "";
-  $("messageInput").placeholder = "Describe the image you want to create...";
   $("messageInput").focus();
 }
 
@@ -561,12 +784,11 @@ function isImageRequest(text) {
 function autoResize() {
   const input = $("messageInput");
   input.style.height = "auto";
-  input.style.height = Math.min(input.scrollHeight, 150) + "px";
+  input.style.height = Math.min(input.scrollHeight,150)+"px";
 }
 
-$("messageInput").addEventListener("input", autoResize);
-
-$("messageInput").addEventListener("keydown", e => {
+$("messageInput").addEventListener("input",autoResize);
+$("messageInput").addEventListener("keydown",e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
@@ -574,15 +796,10 @@ $("messageInput").addEventListener("keydown", e => {
 });
 
 async function fileToDataURL(file) {
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Please select an image file.");
-  }
+  if (!file.type.startsWith("image/")) throw new Error("Please select an image file.");
+  if (file.size > 12*1024*1024) throw new Error("Please choose an image smaller than 12 MB.");
 
-  if (file.size > 12 * 1024 * 1024) {
-    throw new Error("Please choose an image smaller than 12 MB.");
-  }
-
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve,reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(new Error("Could not read this image."));
@@ -590,19 +807,17 @@ async function fileToDataURL(file) {
   });
 }
 
-$("fileInput").addEventListener("change", async e => {
+$("fileInput").addEventListener("change",async e => {
   const file = e.target.files[0];
   if (!file) return;
-
   try {
     attachedImage = await fileToDataURL(file);
     $("previewImage").src = attachedImage;
     $("previewName").textContent = file.name;
     $("preview").style.display = "flex";
-  } catch (err) {
+  } catch(err) {
     showToast(err.message);
   }
-
   e.target.value = "";
 });
 
@@ -612,26 +827,21 @@ function removeAttachment() {
   $("previewImage").src = "";
 }
 
+/* IMAGE GENERATION */
 async function generateImage(prompt) {
-  const response = await fetch("/api/image", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({prompt})
+  const response = await fetch("/api/image",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({prompt})
   });
 
   const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || "Image generation failed.");
-  }
-
-  if (!data.image) {
-    throw new Error("The image service returned no image.");
-  }
-
+  if (!response.ok) throw new Error(data.error || "Image generation failed.");
+  if (!data.image) throw new Error("The image service returned no image.");
   return data.image;
 }
 
+/* CHAT */
 async function sendMessage() {
   if (busy) return;
 
@@ -642,7 +852,6 @@ async function sendMessage() {
   if (!message && !imageForRequest) return;
 
   const wantsImage = !imageForRequest && (imageMode || isImageRequest(message));
-
   if (wantsImage && !message) {
     showToast("Describe the image you want first.");
     return;
@@ -652,16 +861,11 @@ async function sendMessage() {
 
   busy = true;
   $("sendBtn").disabled = true;
-
   input.value = "";
   autoResize();
 
-  addMessage("user", message || "Please examine this image.", imageForRequest);
-
-  messages.push({
-    role: "user",
-    content: message || "Please examine this image."
-  });
+  addMessage("user",message || "Please examine this image.",imageForRequest);
+  messages.push({role:"user",content:message || "Please examine this image."});
 
   removeAttachment();
   setImageMode(false);
@@ -670,54 +874,37 @@ async function sendMessage() {
   try {
     if (wantsImage) {
       const generatedImage = await generateImage(message);
-
       removeTyping();
-      addMessage("ai", "Here is your generated image.", generatedImage);
-
-      messages.push({
-        role: "assistant",
-        content: "Here is your generated image."
-      });
-
+      addMessage("ai","Here is your generated image.",generatedImage);
+      messages.push({role:"assistant",content:"Here is your generated image."});
     } else {
-      const history = messages.slice(0, -1).slice(-12);
+      const history = messages.slice(0,-1).slice(-12);
 
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-          message: message || "Describe this image.",
-          image: imageForRequest,
+      const response = await fetch("/api/chat",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          message:message || "Describe this image.",
+          image:imageForRequest,
           history
         })
       });
 
       const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.error || "The assistant request failed.");
-      }
+      if (!response.ok) throw new Error(data.error || "The assistant request failed.");
 
       const reply = data.reply || data.response || data.message;
-
-      if (!reply) {
-        throw new Error("The server returned an empty response.");
-      }
+      if (!reply) throw new Error("The server returned an empty response.");
 
       removeTyping();
-      addMessage("ai", reply);
-
-      messages.push({
-        role: "assistant",
-        content: reply
-      });
+      addMessage("ai",reply);
+      messages.push({role:"assistant",content:reply});
     }
 
     saveConversation();
-
-  } catch (error) {
+  } catch(error) {
     removeTyping();
-    addMessage("ai", "I couldn't complete that request.\n\n**Error:** " + error.message);
+    addMessage("ai","I couldn't complete that request.\n\n**Error:** "+error.message);
     showToast(error.message);
   } finally {
     busy = false;
@@ -729,19 +916,17 @@ async function sendMessage() {
 /* CAMERA */
 async function openCamera() {
   if (!navigator.mediaDevices?.getUserMedia) {
-    showToast("Camera access is not available. Try the upload button.");
+    showToast("Camera access is unavailable. Try the upload button.");
     return;
   }
 
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: {facingMode: "environment"},
-      audio: false
+      video:{facingMode:"environment"},audio:false
     });
-
     $("cameraVideo").srcObject = cameraStream;
     $("cameraModal").style.display = "flex";
-  } catch (e) {
+  } catch(e) {
     showToast("Camera permission denied or camera unavailable.");
   }
 }
@@ -756,9 +941,9 @@ function capturePhoto() {
   const canvas = document.createElement("canvas");
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  canvas.getContext("2d").drawImage(video, 0, 0);
+  canvas.getContext("2d").drawImage(video,0,0);
 
-  attachedImage = canvas.toDataURL("image/jpeg", .85);
+  attachedImage = canvas.toDataURL("image/jpeg",.85);
   $("previewImage").src = attachedImage;
   $("previewName").textContent = "Camera photo";
   $("preview").style.display = "flex";
@@ -779,7 +964,6 @@ function closeCamera() {
 /* VOICE INPUT */
 function toggleMic() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
   if (!SpeechRecognition) {
     showToast("Voice input is not supported in this browser.");
     return;
@@ -803,7 +987,7 @@ function toggleMic() {
 
   recognition.onresult = event => {
     let transcript = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
+    for (let i=event.resultIndex;i<event.results.length;i++) {
       transcript += event.results[i][0].transcript;
     }
     $("messageInput").value = transcript;
@@ -811,12 +995,10 @@ function toggleMic() {
   };
 
   recognition.onerror = () => showToast("Voice input failed. Try again.");
-
   recognition.onend = () => {
     isRecording = false;
     $("micBtn").classList.remove("active");
   };
-
   recognition.start();
 }
 
@@ -825,15 +1007,109 @@ function speakText(text) {
     showToast("Voice output is not supported.");
     return;
   }
-
   speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 1;
   speechSynthesis.speak(utterance);
 }
 
+/* ACCOUNT UI */
+function openAccount() {
+  $("accountMenu").style.display =
+    $("accountMenu").style.display === "block" ? "none" : "block";
+}
+
+function openAuth(mode) {
+  authMode = mode;
+  $("accountMenu").style.display = "none";
+  $("authOverlay").style.display = "flex";
+  $("authError").textContent = "";
+
+  const register = mode === "register";
+  $("authTitle").textContent = register ? "Create your account" : "Welcome back";
+  $("authSubtitle").textContent = register
+    ? "Create an Axenova account to keep your conversations."
+    : "Sign in to access your account and saved conversations.";
+  $("nameField").style.display = register ? "block" : "none";
+  $("authName").required = register;
+  $("authPassword").autocomplete = register ? "new-password" : "current-password";
+  $("authSubmit").textContent = register ? "Create account" : "Sign in";
+  $("authSwitch").innerHTML = register
+    ? 'Already have an account? <button type="button" onclick="openAuth(\\'login\\')">Sign in</button>'
+    : 'Don\\'t have an account? <button type="button" onclick="openAuth(\\'register\\')">Create one</button>';
+}
+
+function closeAuth() {
+  $("authOverlay").style.display = "none";
+  $("authError").textContent = "";
+}
+
+async function submitAuth(event) {
+  event.preventDefault();
+
+  const name = $("authName").value.trim();
+  const email = $("authEmail").value.trim();
+  const password = $("authPassword").value;
+  const register = authMode === "register";
+
+  $("authError").textContent = "";
+  $("authSubmit").disabled = true;
+  $("authSubmit").textContent = "Please wait...";
+
+  try {
+    const response = await apiFetch(register ? "/api/auth/register" : "/api/auth/login",{
+      method:"POST",
+      body:JSON.stringify(register ? {name,email,password} : {email,password})
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Authentication failed.");
+
+    currentUser = data.user || {name,email};
+    updateAccountUI();
+    closeAuth();
+    await loadCloudConversations();
+    showToast(register ? "Account created." : "Welcome back!");
+  } catch(error) {
+    $("authError").textContent = error.message;
+  } finally {
+    $("authSubmit").disabled = false;
+    $("authSubmit").textContent = register ? "Create account" : "Sign in";
+  }
+}
+
+function updateAccountUI() {
+  if (currentUser) {
+    const name = currentUser.name || currentUser.email || "Account";
+    $("profileName").textContent = name;
+    $("profileCaption").textContent = "Signed in";
+    $("profileAvatar").textContent = name.charAt(0).toUpperCase();
+    $("accountButton").textContent = "My account";
+    $("accountEmail").textContent = currentUser.email || name;
+  } else {
+    $("profileName").textContent = "Guest user";
+    $("profileCaption").textContent = "Sign in to sync chats";
+    $("profileAvatar").textContent = "G";
+    $("accountButton").textContent = "Sign in";
+    $("accountEmail").textContent = "Not signed in";
+  }
+}
+
+async function logout() {
+  $("accountMenu").style.display = "none";
+  try {
+    await apiFetch("/api/auth/logout",{method:"POST"});
+  } catch(e) {
+    console.warn("Logout request failed",e);
+  }
+
+  currentUser = null;
+  updateAccountUI();
+  showToast("You have signed out.");
+}
+
 /* INITIALIZE */
-function initialize() {
+async function initialize() {
   try {
     conversations = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
   } catch {
@@ -842,6 +1118,21 @@ function initialize() {
 
   renderHistory();
   currentId = Date.now().toString();
+  updateAccountUI();
+
+  try {
+    const response = await apiFetch("/api/auth/me");
+    if (response.ok) {
+      const data = await response.json();
+      if (data.user) {
+        currentUser = data.user;
+        updateAccountUI();
+        await loadCloudConversations();
+      }
+    }
+  } catch(e) {
+    console.warn("Account service is not connected yet.",e);
+  }
 }
 
 initialize();
