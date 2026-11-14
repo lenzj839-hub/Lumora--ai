@@ -8,357 +8,129 @@
 <meta name="theme-color" content="#8a2be2">
 <meta name="description" content="Axenova AI - Answers everything except porn, ChatGPT-like, self-search internet, camera, mic, by John Theuri Kiambu">
 <link rel="apple-touch-icon" href="/icon-192.png">
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
-}
-</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { overflow-x: hidden; max-width: 100vw; }
-  body {
-    background: #0f0f14;
-    color: #fff;
-    font-family: system-ui, -apple-system, sans-serif;
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-  }
-  .sidebar {
-    width: 260px;
-    flex-shrink: 0;
-    background: #17171f;
-    border-right: 1px solid #222;
-    padding: 12px;
-    overflow-y: auto;
-    position: relative;
-  }
-  .sidebar h3 { margin-top: 28px; }
-  .sidebar p { font-size: 12px; color: #888; margin: 8px 0; line-height: 1.5; }
-  .newChatBtn {
-    width: 100%;
-    background: linear-gradient(135deg, #8a2be2, #ff6b9d);
-    border: none; color: #fff; padding: 10px;
-    border-radius: 10px; cursor: pointer; margin: 10px 0; font-weight: bold;
-  }
-  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; width: 100%; }
-  .header {
-    padding: 16px; border-bottom: 1px solid #222;
-    display: flex; justify-content: space-between; align-items: center; min-width: 0;
-  }
-  .header h1 {
-    background: linear-gradient(90deg, #8a2be2, #ff6b9d);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    font-size: 20px; white-space: nowrap;
-  }
-  .header span { font-size: 12px; color: #888; }
-  .chat {
-    flex: 1; overflow-y: auto; padding: 20px;
-    display: flex; flex-direction: column; gap: 12px; min-width: 0; width: 100%;
-  }
-  .bubble {
-    max-width: 85%; padding: 12px 16px; border-radius: 18px;
-    line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;
-    word-break: break-word; font-size: 15px;
-  }
-  .bubble a { word-break: break-all; display: inline-block; max-width: 100%; color: #c084ff; }
-  .bubble table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
-  .bubble th, .bubble td { border: 1px solid #333; padding: 6px; text-align: left; }
-  .user { align-self: flex-end; background: linear-gradient(135deg, #8a2be2, #c751ff); }
-  .ai { align-self: flex-start; background: #1e1e2a; border: 1px solid #2a2a3a; }
-  .inputBar {
-    padding: 12px; border-top: 1px solid #222;
-    display: flex; gap: 8px; align-items: center; width: 100%; background: #0f0f14;
-  }
-  .inputBar input#msg {
-    flex: 1; background: #1e1e2a; border: 1px solid #333;
-    border-radius: 24px; padding: 12px 18px; color: #fff; outline: none; min-width: 0; font-size: 15px;
-  }
-  .inputBar button.sendBtn {
-    background: linear-gradient(135deg, #8a2be2, #ff6b9d);
-    border: none; border-radius: 50%; width: 44px; height: 44px;
-    color: #fff; cursor: pointer; font-size: 18px; flex-shrink: 0;
-  }
-  .iconBtn {
-    background: #1e1e2a !important; border: 1px solid #333 !important;
-    border-radius: 50% !important; width: 42px !important; height: 42px !important;
-    color: #fff !important; cursor: pointer; flex-shrink: 0; font-size: 18px;
-  }
-  .iconBtn.active { background: #8a2be2 !important; border-color: #8a2be2 !important; }
-  .speakBtn {
-    background: #2a2a3a; border: none; color: #fff;
-    border-radius: 12px; padding: 6px 10px; margin-top: 10px;
-    cursor: pointer; font-size: 12px;
-  }
-  .speakBtn:active { background: #8a2be2; }
-  @media (max-width: 700px) {
-    .sidebar { display: none; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; height: 100vh; box-shadow: 0 0 40px #000; }
-    .bubble { max-width: 92%; }
-    .chat { padding: 12px; }
-    .header { padding: 12px; }
-    .header h1 { font-size: 18px; }
-    .header span { display: none; }
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100vw}
+body{background:#0f0f14;color:#fff;font-family:system-ui;display:flex;height:100vh;width:100vw}
+.sidebar{width:260px;flex-shrink:0;background:#17171f;border-right:1px solid #222;padding:12px;overflow-y:auto;position:relative}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;width:100%}
+.header{padding:16px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;min-width:0}
+.header h1{background:linear-gradient(90deg,#8a2be2,#ff6b9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:20px;white-space:nowrap}
+.chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0;width:100%}
+.bubble{max-width:85%;padding:12px 16px;border-radius:18px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-size:15px}
+.bubble a{word-break:break-all;display:inline-block;max-width:100%}
+.user{align-self:flex-end;background:linear-gradient(135deg,#8a2be2,#c751ff)}
+.ai{align-self:flex-start;background:#1e1e2a;border:1px solid #2a2a3a}
+.inputBar{padding:12px;border-top:1px solid #222;display:flex;gap:8px;align-items:center;width:100%;background:#0f0f14}
+.inputBar input{flex:1;background:#1e1e2a;border:1px solid #333;border-radius:24px;padding:12px 18px;color:#fff;outline:none;min-width:0;font-size:15px}
+.inputBar button{background:linear-gradient(135deg,#8a2be2,#ff6b9d);border:none;border-radius:50%;width:44px;height:44px;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0}
+.iconBtn{background:#1e1e2a!important;border:1px solid #333!important;border-radius:50%!important;width:42px!important;height:42px!important;color:#fff!important;cursor:pointer;flex-shrink:0;font-size:18px}
+.iconBtn.active{background:#8a2be2!important}
+.speakBtn{background:#2a2a3a;border:none;color:#fff;border-radius:12px;padding:6px 10px;margin-top:8px;cursor:pointer;font-size:12px}
+@media (max-width:700px){
+.sidebar{display:none;position:fixed;left:0;top:0;bottom:0;z-index:50;height:100vh;box-shadow:0 0 40px #000}
+.bubble{max-width:92%}
+.chat{padding:12px}
+.header{padding:12px}
+.header h1{font-size:18px}
+.header span{display:none}
+}
 </style>
 </head>
 <body>
-
 <div id="sidebarOverlay" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:49"></div>
-
 <div class="sidebar" id="sidebar">
-  <button onclick="closeSidebar()" style="position:absolute;top:10px;right:10px;background:#2a2a3a;border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;z-index:51">✕</button>
-  <h3>Axenova AI</h3>
-  <p>By John Theuri lenz.itz<br>Answers everything except porn<br>Kiambu, Kenya</p>
-  <button class="newChatBtn" onclick="newChat()">+ New Chat</button>
-  <h4 style="font-size:13px;color:#aaa;margin:10px 0 6px">History</h4>
-  <div id="history"></div>
+<button onclick="closeSidebar()" style="position:absolute;top:10px;right:10px;background:#2a2a3a;border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;z-index:51">✕</button>
+<h3>Axenova AI</h3>
+<p style="font-size:12px;color:#888;margin:8px 0">By John Theuri lenz.itz<br>Answers everything except porn</p>
+<button onclick="newChat()" style="width:100%;background:linear-gradient(135deg,#8a2be2,#ff6b9d);border:none;color:#fff;padding:10px;border-radius:10px;cursor:pointer;margin:10px 0;font-weight:bold">+ New Chat</button>
+<div id="history"></div>
 </div>
-
 <div class="main">
-  <div class="header">
-    <div style="display:flex;gap:12px;align-items:center;min-width:0">
-      <button onclick="toggleSidebar()" style="background:none;border:none;color:#fff;font-size:22px;flex-shrink:0">☰</button>
-      <h1>Axenova AI</h1>
-      <span>Answers everything except porn, ChatGPT-like, internet, camera, mic</span>
-    </div>
-    <div style="display:flex;gap:6px">
-      <button class="iconBtn" id="voiceToggleBtn" onclick="toggleVoice()" title="Girl Voice - Tap to turn ON/OFF">🔊</button>
-      <button class="iconBtn" onclick="document.getElementById('fileInput').click()">🖼️</button>
-      <button class="iconBtn" onclick="startCamera()">📷</button>
-    </div>
-  </div>
-
-  <div class="chat" id="chat">
-    <div class="bubble ai">
-      Hey there I'm Axenova, what do you want us to create today? 🚀 I answer everything except pornographic questions!
-      <br>
-      <button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button>
-      <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button>
-    </div>
-  </div>
-
-  <div class="inputBar">
-    <input type="file" id="fileInput" accept="image/*" hidden onchange="handleImage(this)">
-    <button class="iconBtn" onclick="document.getElementById('fileInput').click()" title="Upload Image">🖼️</button>
-    <button class="iconBtn" onclick="startCamera()" title="Camera">📷</button>
-    <button class="iconBtn" onclick="startMic()" title="Mic - Speak">🎤</button>
-    <input id="msg" placeholder="Ask Axenova..." onkeypress="if(event.key==='Enter')send()">
-    <button class="sendBtn" onclick="send()">➤</button>
-  </div>
+<div class="header">
+<div style="display:flex;gap:12px;align-items:center;min-width:0">
+<button onclick="toggleSidebar()" style="background:none;border:none;color:#fff;font-size:22px;flex-shrink:0">☰</button>
+<h1>Axenova AI</h1>
+<span style="font-size:12px;color:#888">Answers everything except porn, ChatGPT-like, internet, camera, mic</span>
 </div>
-
+<div style="display:flex;gap:6px">
+<button class="iconBtn" id="voiceToggleBtn" onclick="toggleVoice()" title="Girl Voice">🔊</button>
+<button class="iconBtn" onclick="document.getElementById('fileInput').click()">🖼️</button>
+<button class="iconBtn" onclick="startCamera()">📷</button>
+</div>
+</div>
+<div class="chat" id="chat">
+<div class="bubble ai">Hey there I'm Axenova, what do you want us to create today? 🚀 I answer everything except pornographic questions!<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button></div>
+</div>
+<div class="inputBar">
+<input type="file" id="fileInput" accept="image/*" hidden onchange="handleImage(this)">
+<button class="iconBtn" onclick="document.getElementById('fileInput').click()" title="Upload">🖼️</button>
+<button class="iconBtn" onclick="startCamera()" title="Camera">📷</button>
+<button class="iconBtn" onclick="startMic()" title="Mic">🎤</button>
+<input id="msg" placeholder="Ask Axenova..." onkeypress="if(event.key==='Enter')send()">
+<button onclick="send()">➤</button>
+</div>
+</div>
 <video id="camera" autoplay playsinline style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:99"></video>
 <canvas id="canvas" style="display:none"></canvas>
-
+<audio id="voiceAudio" style="display:none"></audio>
 <script>
-let historyChats = JSON.parse(localStorage.getItem('axenova_history') || '[]');
-let currentImage = null;
-let voiceOn = false;
-const chatEl = document.getElementById('chat');
-const msgEl = document.getElementById('msg');
-
-if (window.innerWidth < 700) {
-  document.getElementById('sidebar').style.display = 'none';
+let historyChats=JSON.parse(localStorage.getItem('axenova_history')||'[]');
+let currentImage=null;
+let voiceOn=false;
+let voiceQueue=[];
+let voicePlaying=false;
+let voiceStopped=false;
+const chatEl=document.getElementById('chat');
+const msgEl=document.getElementById('msg');
+const voiceAudio=document.getElementById('voiceAudio');
+if(window.innerWidth<700){document.getElementById('sidebar').style.display='none';}
+function openSidebar(){document.getElementById('sidebar').style.display='block';document.getElementById('sidebarOverlay').style.display='block';}
+function closeSidebar(){if(window.innerWidth<700){document.getElementById('sidebar').style.display='none';document.getElementById('sidebarOverlay').style.display='none';}}
+function toggleSidebar(){var s=document.getElementById('sidebar');if(s.style.display==='block'){closeSidebar();}else{openSidebar();}}
+function newChat(){chatEl.innerHTML='<div class="bubble ai">New chat started! What do you want us to create today? 🚀<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button></div>';closeSidebar();}
+// ===== NEW VOICE - WORKS IN APPSGEYSER APK (Google Audio, Girl Voice) =====
+function detectLang(txt){var sw=/\b(ni|ya|wa|kwa|na|hii|hiyo|nini|habari|asante|sawa|ndiyo|hapana|mimi|wewe|yeye|sisi|nyinyi|wale|hapa|pale|leo|kesho|jana|rafiki|mwanamke|mwanaume|mtoto|shule|nyumba|chakula|maji|upendo)\b/i;return sw.test(txt)?'sw':'en';}
+function speakText(txt){
+  var clean=txt.replace(/🔊 Read aloud/g,'').replace(/⏹️ Stop/g,'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  if(!clean) return;
+  var lang=detectLang(clean);
+  // Split into ~150 char chunks so Google TTS accepts it
+  var sentences=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[clean];
+  var chunks=[]; var cur='';
+  sentences.forEach(function(s){ if((cur+s).length>150){ if(cur) chunks.push(cur); cur=s; } else { cur+=s; } });
+  if(cur) chunks.push(cur);
+  voiceStopped=false;
+  voiceQueue=chunks.map(function(c){ return {text:c, lang:lang}; });
+  playNextVoice();
 }
-
-// ---------- SIDEBAR ----------
-function openSidebar() {
-  document.getElementById('sidebar').style.display = 'block';
-  document.getElementById('sidebarOverlay').style.display = 'block';
+function playNextVoice(){
+  if(voiceStopped || voiceQueue.length===0){ voicePlaying=false; return; }
+  voicePlaying=true;
+  var item=voiceQueue.shift();
+  // Google Translate TTS - girl voice, works in WebView/APK
+  var url='https://translate.google.com/translate_tts?ie=UTF-8&q='+encodeURIComponent(item.text)+'&tl='+item.lang+'&client=tw-ob';
+  voiceAudio.src=url;
+  voiceAudio.play().catch(function(){ setTimeout(playNextVoice, 500); });
 }
-function closeSidebar() {
-  if (window.innerWidth < 700) {
-    document.getElementById('sidebar').style.display = 'none';
-    document.getElementById('sidebarOverlay').style.display = 'none';
-  }
+voiceAudio.onended=function(){ if(!voiceStopped) playNextVoice(); };
+voiceAudio.onerror=function(){ if(!voiceStopped) playNextVoice(); };
+function stopVoice(){ voiceStopped=true; voiceQueue=[]; voiceAudio.pause(); voiceAudio.src=''; voicePlaying=false; }
+function toggleVoice(){
+  voiceOn=!voiceOn;
+  document.getElementById('voiceToggleBtn').classList.toggle('active', voiceOn);
+  if(voiceOn){ speakText('Hi, I am Axenova. Girl voice is now on. I will read all my messages for you.'); }
+  else { stopVoice(); }
 }
-function toggleSidebar() {
-  var s = document.getElementById('sidebar');
-  if (s.style.display === 'block') closeSidebar();
-  else openSidebar();
-}
-function newChat() {
-  chatEl.innerHTML = '<div class="bubble ai">New chat started! What do you want us to create today? 🚀<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button></div>';
-  closeSidebar();
-}
-
-// ---------- GIRL VOICE - FULL LENGTH, NO CUT ----------
-function getGirlVoice() {
-  var voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-  return voices.find(v => /zira|samantha|female|natasha|aria|google us english/i.test(v.name))
-    || voices.find(v => v.lang === 'en-GB')
-    || voices.find(v => v.lang === 'en-US')
-    || voices.find(v => v.lang && v.lang.startsWith('en'))
-    || voices[0];
-}
-
-function speakText(txt) {
-  if (!('speechSynthesis' in window)) {
-    alert('Voice not supported on this phone. Try in Chrome.');
-    return;
-  }
-  window.speechSynthesis.cancel();
-  // Clean text - remove buttons, links, tables symbols, keep full text
-  var clean = txt
-    .replace(/🔊 Read aloud/g, '')
-    .replace(/⏹️ Stop/g, '')
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (!clean) return;
-
-  // Split into chunks of ~180 chars at sentence ends so Android does NOT cut off
-  var chunks = [];
-  var sentences = clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [clean];
-  var current = '';
-  sentences.forEach(function(s) {
-    if ((current + s).length > 180) {
-      if (current) chunks.push(current);
-      current = s;
-    } else {
-      current += s;
-    }
-  });
-  if (current) chunks.push(current);
-
-  function speakChunks(index) {
-    if (index >= chunks.length) return;
-    var u = new SpeechSynthesisUtterance(chunks[index]);
-    u.rate = 1;
-    u.pitch = 1.2; // higher pitch = girl voice
-    u.volume = 1;
-    var v = getGirlVoice();
-    if (v) { u.voice = v; u.lang = v.lang; }
-    else { u.lang = 'en-US'; }
-    u.onend = function() { speakChunks(index + 1); };
-    u.onerror = function() { speakChunks(index + 1); };
-    window.speechSynthesis.speak(u);
-  }
-
-  function startSpeaking() {
-    // Android needs a tiny delay after voices load
-    setTimeout(function() { speakChunks(0); }, 100);
-  }
-
-  if (window.speechSynthesis.getVoices().length === 0) {
-    window.speechSynthesis.onvoiceschanged = startSpeaking;
-    setTimeout(startSpeaking, 600);
-  } else {
-    startSpeaking();
-  }
-}
-
-function stopVoice() {
-  window.speechSynthesis.cancel();
-}
-
-function toggleVoice() {
-  voiceOn = !voiceOn;
-  var btn = document.getElementById('voiceToggleBtn');
-  btn.classList.toggle('active', voiceOn);
-  if (voiceOn) {
-    speakText('Hi, I am Axenova. Girl voice is now on. I will read all my messages for you, fully, not short.');
-  } else {
-    stopVoice();
-  }
-}
-
-// ---------- HISTORY ----------
-function renderHistory() {
-  const h = document.getElementById('history');
-  if (!historyChats.length) { h.innerHTML = '<p style="font-size:12px;color:#666">No history yet</p>'; return; }
-  h.innerHTML = historyChats.slice().reverse().map(function(c, i) {
-    var realIndex = historyChats.length - 1 - i;
-    return '<div style="padding:8px;border-radius:8px;background:#1e1e2a;margin:4px 0;cursor:pointer;font-size:13px" onclick="loadChat(' + realIndex + ')">' + (c.title || 'Chat').slice(0, 30) + '</div>';
-  }).join('');
-}
-function loadChat(idx) {
-  closeSidebar();
-  const c = historyChats[idx];
-  if (!c) return;
-  chatEl.innerHTML = c.messages.map(function(m) {
-    return '<div class="bubble ' + m.role + '">' + m.text + (m.role === 'ai' ? '<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button>' : '') + '</div>';
-  }).join('');
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-function saveHistory() {
-  if (historyChats.length > 0) {
-    localStorage.setItem('axenova_history', JSON.stringify(historyChats));
-    renderHistory();
-  }
-}
-
-// ---------- CHAT ----------
-async function send() {
-  const text = msgEl.value.trim();
-  if (!text && !currentImage) return;
-  chatEl.innerHTML += '<div class="bubble user">' + text + (currentImage ? '<br><img src="' + currentImage + '" style="max-width:200px;border-radius:12px;margin-top:8px">' : '') + '</div>';
-  msgEl.value = '';
-  const payload = { message: text, image: currentImage, history: historyChats.length > 0 ? historyChats[historyChats.length-1].messages : [] };
-  currentImage = null;
-  chatEl.scrollTop = chatEl.scrollHeight;
-
-  if (historyChats.length === 0 || historyChats[historyChats.length-1].messages.length > 10) {
-    historyChats.push({ title: text.slice(0, 30), messages: [] });
-  }
-  historyChats[historyChats.length-1].messages.push({ role: 'user', text: text });
-
-  try {
-    const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    const data = await res.json();
-    let reply = data.reply || data.response || "Hey I'm Axenova!";
-    if (data.image) reply += '<br><img src="' + data.image + '" style="max-width:100%;border-radius:12px;margin-top:12px">';
-    chatEl.innerHTML += '<div class="bubble ai">' + reply + '<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button></div>';
-    historyChats[historyChats.length-1].messages.push({ role: 'ai', text: reply });
-    saveHistory();
-    if (voiceOn) speakText(reply);
-  } catch (e) {
-    chatEl.innerHTML += '<div class="bubble ai">Pole error: ' + e.message + '. Try again.</div>';
-  }
-  chatEl.scrollTop = chatEl.scrollHeight;
-}
-
-// ---------- IMAGE / CAMERA / MIC ----------
-function handleImage(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    currentImage = e.target.result;
-    chatEl.innerHTML += '<div class="bubble user"><img src="' + currentImage + '" style="max-width:200px;border-radius:12px"><br>Image ready - what to do?</div>';
-    chatEl.scrollTop = chatEl.scrollHeight;
-  };
-  reader.readAsDataURL(file);
-}
-async function startCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    const video = document.getElementById('camera');
-    video.srcObject = stream;
-    video.style.display = 'block';
-    video.onclick = function() {
-      const canvas = document.getElementById('canvas');
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      currentImage = canvas.toDataURL('image/jpeg');
-      stream.getTracks().forEach(t => t.stop());
-      video.style.display = 'none';
-      chatEl.innerHTML += '<div class="bubble user"><img src="' + currentImage + '" style="max-width:200px;border-radius:12px"><br>Photo captured!</div>';
-      chatEl.scrollTop = chatEl.scrollHeight;
-    };
-  } catch (e) { alert('Camera error: ' + e.message); }
-}
-function startMic() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('Mic not supported'); return; }
-  const rec = new SR();
-  rec.lang = 'en-KE';
-  rec.onresult = function(e) { msgEl.value = e.results[0][0].transcript; };
-  rec.start();
-}
-
+function renderHistory(){const h=document.getElementById('history');if(!historyChats.length){h.innerHTML='<p style="font-size:12px;color:#666">No history yet</p>';return;}h.innerHTML=historyChats.slice().reverse().map((c,i)=>`<div style="padding:8px;border-radius:8px;background:#1e1e2a;margin:4px 0;cursor:pointer;font-size:13px" onclick="loadChat(${historyChats.length-1-i})">${(c.title||'Chat').slice(0,30)}</div>`).join('');}
+function loadChat(idx){closeSidebar();const c=historyChats[idx];if(!c)return;chatEl.innerHTML=c.messages.map(m=>`<div class="bubble ${m.role}">${m.text}${m.role==='ai'?'<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button>':''}</div>`).join('');chatEl.scrollTop=chatEl.scrollHeight;}
+function saveHistory(){if(historyChats.length>0){localStorage.setItem('axenova_history',JSON.stringify(historyChats));renderHistory();}}
+async function send(){const text=msgEl.value.trim();if(!text&&!currentImage)return;chatEl.innerHTML+=`<div class="bubble user">${text}${currentImage?'<br><img src="'+currentImage+'" style="max-width:200px;border-radius:12px;margin-top:8px">':''}</div>`;msgEl.value='';const payload={message:text,image:currentImage,history:historyChats.length>0?historyChats[historyChats.length-1].messages:[]};currentImage=null;chatEl.scrollTop=chatEl.scrollHeight;if(historyChats.length===0||historyChats[historyChats.length-1].messages.length>10){historyChats.push({title:text.slice(0,30),messages:[]});}historyChats[historyChats.length-1].messages.push({role:'user',text:text});try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();let reply=data.reply||data.response||"Hey I'm Axenova!";if(data.image){reply+=`<br><img src="${data.image}" style="max-width:100%;border-radius:12px;margin-top:12px">`;}chatEl.innerHTML+=`<div class="bubble ai">${reply}<br><button class="speakBtn" onclick="speakText(this.parentElement.innerText)">🔊 Read aloud</button> <button class="speakBtn" onclick="stopVoice()">⏹️ Stop</button></div>`;historyChats[historyChats.length-1].messages.push({role:'ai',text:reply});saveHistory();if(voiceOn)speakText(reply);}catch(e){chatEl.innerHTML+=`<div class="bubble ai">Pole error: ${e.message}. Try again.</div>`;}chatEl.scrollTop=chatEl.scrollHeight;}
+function handleImage(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{currentImage=e.target.result;chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Image ready - what to do?</div>`;chatEl.scrollTop=chatEl.scrollHeight;};reader.readAsDataURL(file);}
+async function startCamera(){try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});const video=document.getElementById('camera');video.srcObject=stream;video.style.display='block';video.onclick=()=>{const canvas=document.getElementById('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);currentImage=canvas.toDataURL('image/jpeg');stream.getTracks().forEach(t=>t.stop());video.style.display='none';chatEl.innerHTML+=`<div class="bubble user"><img src="${currentImage}" style="max-width:200px;border-radius:12px"><br>Photo captured!</div>`;chatEl.scrollTop=chatEl.scrollHeight;};}catch(e){alert('Camera error:'+e.message);}}
+function startMic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Mic not supported');return;}const rec=new SR();rec.lang='en-KE';rec.onresult=e=>{msgEl.value=e.results[0][0].transcript;};rec.start();}
 renderHistory();
 </script>
 </body>
-  </html>
+</html>
