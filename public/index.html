@@ -4,261 +4,369 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090a">
+<meta name="theme-color" content="#080a09">
+<meta name="description" content="Axenova AI - Think bigger. Create more.">
 <title>Axenova AI</title>
 
 <style>
-:root {
- --bg:#080909;
- --surface:#191b1b;
- --surface2:#222525;
- --border:#363939;
- --text:#f4f5f4;
- --muted:#929997;
+:root{
+ --bg:#080a09;
+ --panel:#111513;
+ --panel2:#1b201e;
+ --border:#303936;
+ --text:#f3f7f4;
+ --muted:#929d97;
  --green:#10c991;
+ --green2:#087b59;
 }
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;background:var(--bg);
- color:var(--text);font-family:Inter,Arial,sans-serif}
+html,body{
+ margin:0;width:100%;height:100%;
+ background:var(--bg);color:var(--text);
+ font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
 body{overflow:hidden}
 button,input,textarea{font:inherit}
 button{cursor:pointer;color:inherit}
 .hidden{display:none!important}
-
 .app{height:100dvh;display:flex;flex-direction:column}
 
 /* HEADER */
 .header{
- height:64px;flex-shrink:0;padding:0 20px;
+ height:66px;flex-shrink:0;
  display:flex;align-items:center;justify-content:space-between;
- border-bottom:1px solid #252828;background:#0a0b0b;
+ padding:0 18px;background:#090c0b;
+ border-bottom:1px solid #242c28;
+ z-index:5;
 }
 .brand-area{display:flex;align-items:center;gap:12px}
+.header-btn{
+ border:1px solid var(--border);background:#171c19;
+ border-radius:25px;padding:10px 15px;font-size:13px;
+}
+.menu-toggle{
+ width:43px;height:43px;border-radius:50%;
+ display:grid;place-items:center;font-size:19px;
+}
 .brand-icon{
- width:34px;height:34px;border-radius:11px;
+ width:42px;height:42px;border-radius:13px;
  display:grid;place-items:center;
- background:#073c30;color:#10d69a;font-weight:900;font-size:22px;
+ background:#073d2e;color:var(--green);
+ font-weight:900;font-size:25px;
+ border:1px solid #096548;
 }
 .brand{font-size:16px;font-weight:750}
-.status{width:8px;height:8px;border-radius:50%;background:var(--green);
- display:inline-block;margin-left:5px}
-.subtitle{font-size:11px;color:var(--muted);margin-top:3px}
-.header-actions{display:flex;align-items:center;gap:9px}
-.header-btn{
- border:1px solid var(--border);background:#171a1a;
- border-radius:20px;padding:9px 14px;font-size:12px;
+.status-dot{
+ display:inline-block;width:9px;height:9px;
+ border-radius:50%;background:var(--green);margin-left:5px;
 }
+.subtitle{font-size:11px;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;gap:8px;align-items:center}
 
 /* SIDEBAR */
 .sidebar{
- position:fixed;z-index:20;left:0;top:0;bottom:0;width:285px;
- background:#101212;border-right:1px solid var(--border);
- padding:19px;display:flex;flex-direction:column;
- transform:translateX(-105%);transition:.25s;
+ position:fixed;z-index:30;top:0;bottom:0;left:0;
+ width:290px;padding:20px;background:#101512;
+ border-right:1px solid var(--border);
+ display:flex;flex-direction:column;
+ transform:translateX(-105%);transition:transform .25s ease;
 }
 .sidebar.open{transform:translateX(0)}
-.sidebar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.sidebar-head{
+ display:flex;align-items:center;justify-content:space-between;
+ margin-bottom:25px;
+}
+.sidebar-brand{font-weight:800;letter-spacing:1px}
+.close-menu{font-size:22px;padding:5px 12px}
 .new-chat{
- background:#073e30;border:1px solid #087c5b;
- width:100%;padding:14px;border-radius:13px;
- font-weight:650;text-align:left;
+ width:100%;padding:14px;text-align:left;
+ background:#083d2e;border:1px solid #09654a;
+ border-radius:13px;font-weight:700;
 }
-.section-label{font-size:11px;color:var(--muted);
- margin:27px 0 12px;letter-spacing:.8px}
-.history{flex:1;overflow:auto}
+.section-label{
+ font-size:10px;letter-spacing:1.5px;
+ color:var(--muted);margin:27px 0 12px;
+}
+.history{flex:1;overflow-y:auto}
 .history-item{
- padding:12px;border-radius:10px;color:#c4ccca;
- font-size:13px;white-space:nowrap;overflow:hidden;
- text-overflow:ellipsis;cursor:pointer;
+ padding:12px;border-radius:10px;
+ font-size:13px;color:#c8d0cb;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ cursor:pointer;
 }
-.history-item:hover{background:#222626}
-.sidebar-bottom{border-top:1px solid var(--border);padding-top:15px}
-.profile{display:flex;align-items:center;gap:10px;padding:8px}
+.history-item:hover{background:#222a25}
+.sidebar-bottom{border-top:1px solid var(--border);padding-top:13px}
+.profile{display:flex;align-items:center;gap:10px;padding:9px}
 .profile-avatar{
- width:38px;height:38px;border-radius:50%;background:#078d83;
- display:grid;place-items:center;font-weight:bold;
+ width:38px;height:38px;border-radius:50%;
+ background:#087d66;display:grid;place-items:center;font-weight:800;
 }
 .profile-info{font-size:13px}
-.profile-info small{display:block;color:var(--muted);margin-top:4px}
+.profile-info small{display:block;color:var(--muted);margin-top:3px}
 .side-link{
- width:100%;padding:12px;background:transparent;border:0;
- text-align:left;color:#cbd0ce;font-size:13px;
+ width:100%;padding:12px;border:0;background:transparent;
+ text-align:left;color:#c8d0cb;font-size:13px;
 }
-.overlay{position:fixed;inset:0;background:#0009;z-index:19;display:none}
+.overlay{
+ position:fixed;inset:0;background:#0009;z-index:29;display:none;
+}
 .overlay.show{display:block}
 
 /* MAIN */
-.main{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
-.messages{flex:1;overflow-y:auto;padding:35px 17px 160px}
-.messages-inner{max-width:780px;margin:auto;width:100%}
+.main{flex:1;min-height:0;position:relative;display:flex}
+.messages{
+ flex:1;overflow-y:auto;scroll-behavior:smooth;
+ padding:35px 17px 180px;
+}
+.messages-inner{max-width:850px;width:100%;margin:auto}
 
 /* WELCOME */
 .welcome{
  min-height:55vh;display:flex;align-items:center;
  justify-content:center;flex-direction:column;text-align:center;
+ padding:20px;
 }
 .logo-large{
- width:70px;height:70px;border-radius:23px;
- display:grid;place-items:center;background:#063b2e;
- color:#10d99b;font-size:38px;font-weight:900;
- box-shadow:0 0 40px #10b98120;margin-bottom:22px;
+ width:76px;height:76px;border-radius:24px;
+ display:grid;place-items:center;
+ background:linear-gradient(145deg,#06422f,#09251e);
+ color:#14d99b;font-size:42px;font-weight:900;
+ border:1px solid #087b58;
+ box-shadow:0 0 45px #10c99120;margin-bottom:23px;
 }
-.welcome h1{font-size:29px;margin:0 0 10px;letter-spacing:-1px}
-.welcome p{font-size:14px;color:var(--muted)}
+.welcome-tag{
+ font-size:10px;letter-spacing:2.2px;
+ color:var(--green);font-weight:800;margin-bottom:14px;
+}
+.welcome h1{
+ font-size:32px;line-height:1.22;
+ letter-spacing:-1.2px;margin:0 0 12px;
+}
+.welcome p{
+ max-width:390px;font-size:14px;
+ color:var(--muted);line-height:1.8;margin:0;
+}
 .suggestions{
- display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
- margin-top:27px;max-width:650px;
+ display:flex;flex-wrap:wrap;justify-content:center;
+ gap:10px;max-width:620px;margin-top:27px;
 }
 .suggestion{
- border:1px solid var(--border);background:#151818;
- padding:12px 16px;border-radius:13px;color:#c6ceca;font-size:12px;
+ border:1px solid var(--border);background:#151a17;
+ padding:12px 15px;border-radius:13px;
+ color:#d4ddd7;font-size:12px;
 }
-.suggestion:hover{border-color:var(--green)}
+.suggestion:hover{border-color:var(--green);background:#10251c}
 
-/* CHAT MESSAGES */
-.message{display:flex;gap:13px;margin-bottom:30px;align-items:flex-start}
+/* CONVERSATIONS */
+.message{
+ display:flex;gap:13px;align-items:flex-start;
+ width:100%;margin-bottom:34px;
+}
 .avatar{
- width:34px;height:34px;flex-shrink:0;border-radius:11px;
- display:grid;place-items:center;font-size:13px;font-weight:bold;
+ width:40px;height:40px;flex:0 0 40px;
+ border-radius:14px;display:grid;place-items:center;
+ font-size:15px;font-weight:800;
 }
-.user-avatar{background:#292e2d}
-.ai-avatar{background:#073c30;color:#12d69a}
-.message-content{flex:1;min-width:0;line-height:1.7;font-size:15px}
-.message-name{font-size:12px;color:#9ba49f;font-weight:650;margin:3px 0 8px}
-.message-text{white-space:pre-wrap;overflow-wrap:anywhere}
-.message-text pre{
- white-space:pre;overflow:auto;padding:15px;background:#151818;
- border:1px solid var(--border);border-radius:12px;
+.user-avatar{background:#292f2d;color:#f4f7f4}
+.ai-avatar{
+ background:#063d2e;color:#12d99b;
+ border:1px solid #087b58;
+ box-shadow:0 0 18px #10c99115;
 }
-.message-text code{background:#252a28;padding:2px 5px;border-radius:4px}
-.message-text pre code{background:none}
-.message-text img{max-width:100%;border-radius:14px;margin-top:12px}
-.message-actions{display:flex;gap:15px;margin-top:12px}
-.action{
- background:none;border:0;color:#929b96;font-size:12px;padding:3px 0;
+.message-content{flex:1;min-width:0}
+.message-name{
+ font-size:13px;font-weight:750;
+ color:#aeb9b2;margin:3px 0 10px;
 }
-.action:hover{color:white}
-.typing{color:var(--muted);font-size:13px}
+.message-text{
+ font-size:16.5px;line-height:1.85;
+ color:#e6ece8;overflow-wrap:anywhere;
+}
+.user-message{justify-content:flex-end}
+.user-message .avatar{order:2}
+.user-message .message-content{
+ flex:0 1 auto;max-width:82%;
+ display:flex;flex-direction:column;align-items:flex-end;
+}
+.user-message .message-name{text-align:right}
+.user-message .message-text{
+ background:linear-gradient(145deg,#123d30,#172b23);
+ border:1px solid #17654c;
+ border-radius:21px 21px 5px 21px;
+ padding:13px 18px;
+ color:#f4fff9;font-size:15.5px;line-height:1.7;
+}
 
-/* COMPOSER — REFERENCE IMAGE STYLE */
+/* AI FORMATTING */
+.message-text p{margin:0 0 15px}
+.message-text p:last-child{margin-bottom:0}
+.message-text h1,.message-text h2,.message-text h3{
+ color:#fff;font-weight:750;line-height:1.4;
+ margin:23px 0 12px;
+}
+.message-text h1{font-size:25px}
+.message-text h2{font-size:21px}
+.message-text h3{font-size:18px}
+.message-text strong{color:#fff;font-weight:750}
+.message-text em{color:#d5e6dc}
+.message-text ul,.message-text ol{
+ padding-left:25px;margin:12px 0 19px;
+}
+.message-text li{padding-left:4px;margin-bottom:9px}
+.message-text blockquote{
+ border-left:3px solid var(--green);
+ background:#111b16;padding:12px 16px;
+ border-radius:0 10px 10px 0;margin:15px 0;
+ color:#cbd9d0;
+}
+.message-text pre{
+ background:#101613;border:1px solid #344139;
+ padding:16px;border-radius:13px;
+ overflow-x:auto;margin:16px 0;
+}
+.message-text code{
+ color:#75e9b8;background:#1c2922;
+ border-radius:5px;padding:3px 6px;font-size:.9em;
+}
+.message-text pre code{background:transparent;padding:0}
+.message-text a{color:#55dcb0;text-decoration:none}
+.message-text a:hover{text-decoration:underline}
+.message-text table{border-collapse:collapse;width:100%;display:block;overflow-x:auto}
+.message-text th,.message-text td{
+ border:1px solid #374139;padding:9px;text-align:left;
+}
+.message-actions{display:flex;gap:17px;margin-top:14px}
+.action{
+ background:none;border:0;color:#89948d;
+ font-size:12px;padding:4px 0;
+}
+.action:hover{color:var(--green)}
+.typing{font-size:13px;color:var(--muted);padding:5px 0}
+
+/* COMPOSER */
 .composer-area{
  position:absolute;bottom:0;left:0;right:0;
- padding:20px 16px max(14px,env(safe-area-inset-bottom));
- background:linear-gradient(transparent,#080909 22%);
+ padding:20px 15px max(14px,env(safe-area-inset-bottom));
+ background:linear-gradient(transparent,#080a09 20%);
 }
 .composer-wrap{max-width:850px;margin:auto;position:relative}
-.mode-label{font-size:12px;color:var(--green);margin:0 0 8px 12px}
+.mode-label{
+ color:var(--green);font-size:11px;margin:0 0 8px 12px;
+}
 .composer{
- min-height:78px;
- border:1px solid #424747;
- background:#1b1d1d;
- border-radius:45px;
- padding:9px 12px;
- display:flex;
- align-items:center;
- gap:12px;
- box-shadow:0 5px 30px #0007;
- transition:border-color .2s;
+ min-height:78px;padding:9px 12px;
+ display:flex;align-items:center;gap:11px;
+ border:1px solid #454d48;border-radius:48px;
+ background:#1b1e1c;
+ box-shadow:0 6px 30px #0007;
 }
-.composer:focus-within{border-color:#646d69}
-
-/* PLUS BUTTON */
-.plus-btn{
- width:59px;height:59px;flex:0 0 59px;
+.composer:focus-within{border-color:#687a6e}
+.plus-btn,.mic-btn,.send-btn{
+ flex:0 0 58px;width:58px;height:58px;
  border:0;border-radius:50%;
- background:#292d2d;color:white;
  display:grid;place-items:center;
 }
-.plus-btn svg{width:29px;height:29px;stroke-width:1.8}
-.plus-btn:hover{background:#363b3a}
-
-/* TEXT INPUT */
+.plus-btn,.mic-btn{background:#292e2c;color:white}
+.plus-btn svg,.mic-btn svg,.send-btn svg{
+ width:27px;height:27px;fill:none;
+ stroke:currentColor;stroke-width:1.8;
+ stroke-linecap:round;stroke-linejoin:round;
+}
+.plus-btn:hover,.mic-btn:hover{background:#39423d}
 #prompt{
- flex:1;min-width:0;
- border:0;outline:0;background:transparent;
- color:white;font-size:16px;
- resize:none;max-height:120px;
- line-height:1.5;padding:12px 0;
+ flex:1;min-width:0;max-height:120px;resize:none;
+ background:transparent;border:0;outline:0;
+ color:white;font-size:15px;line-height:1.5;
+ padding:12px 0;
 }
-#prompt::placeholder{color:#a0a5a3}
-
-/* MICROPHONE */
-.mic-btn{
- width:59px;height:59px;flex:0 0 59px;
- border:0;border-radius:50%;
- background:#292d2d;color:white;
- display:grid;place-items:center;
+#prompt::placeholder{color:#9da59f}
+.send-btn{background:#f5f8f6;color:#111}
+.send-btn:hover{background:#d9e7df}
+.send-btn:disabled{opacity:.45;cursor:not-allowed}
+.mic-btn.active{background:#a52b35}
+.disclaimer{
+ text-align:center;color:#747e77;
+ font-size:10px;margin-top:12px;
 }
-.mic-btn svg{width:25px;height:25px}
-.mic-btn.active{background:#a32929}
-
-/* SEND */
-.send-btn{
- width:59px;height:59px;flex:0 0 59px;
- border:0;border-radius:50%;
- background:#f7f8f7;color:#111;
- display:grid;place-items:center;
-}
-.send-btn svg{width:29px;height:29px;stroke-width:2}
-.send-btn:hover{background:#dce6e0}
-.send-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* PLUS MENU */
 .plus-menu{
- display:none;position:absolute;bottom:92px;left:0;
- background:#202424;border:1px solid #3a4140;
- border-radius:17px;padding:8px;width:220px;
- box-shadow:0 12px 40px #0009;z-index:10;
+ display:none;position:absolute;bottom:105px;left:0;
+ width:225px;padding:8px;
+ background:#1b211e;border:1px solid #3b453f;
+ border-radius:16px;z-index:10;
+ box-shadow:0 15px 40px #000a;
 }
 .plus-menu.show{display:block}
 .menu-item{
- display:flex;align-items:center;gap:12px;width:100%;
- padding:12px;border:0;border-radius:10px;
- background:transparent;text-align:left;font-size:13px;
- color:#e0e5e2;
+ display:flex;align-items:center;gap:12px;
+ width:100%;padding:12px;border:0;border-radius:10px;
+ background:transparent;text-align:left;
+ color:#e1e8e3;font-size:13px;
 }
-.menu-item:hover{background:#343b38}
+.menu-item:hover{background:#303b34}
 .menu-item svg{width:19px;height:19px;color:var(--green)}
-.disclaimer{text-align:center;color:#727b77;font-size:10px;margin-top:10px}
 
 /* MODALS */
 .modal-backdrop{
- position:fixed;inset:0;z-index:40;background:#000b;
- display:none;align-items:center;justify-content:center;padding:18px;
+ position:fixed;inset:0;z-index:50;
+ display:none;align-items:center;justify-content:center;
+ background:#000b;padding:18px;
 }
 .modal-backdrop.show{display:flex}
 .modal{
- background:#171b1a;border:1px solid var(--border);
- width:100%;max-width:390px;padding:23px;border-radius:19px;
+ width:100%;max-width:400px;
+ background:#171d19;border:1px solid var(--border);
+ border-radius:20px;padding:22px;
 }
 .modal h2{font-size:20px;margin:0 0 8px}
-.modal p{color:var(--muted);font-size:13px}
+.modal p{font-size:13px;color:var(--muted)}
+.close-modal{
+ float:right;background:none;border:0;
+ color:#aaa;font-size:23px;
+}
 .modal input{
- width:100%;padding:13px;margin:7px 0;
- background:#090c0b;color:white;border:1px solid var(--border);
- border-radius:10px;outline:none;
+ display:block;width:100%;padding:13px;
+ margin:9px 0;background:#0c100d;
+ color:white;border:1px solid var(--border);
+ border-radius:10px;outline:0;
 }
 .primary{
- width:100%;padding:13px;background:var(--green);
- border:0;border-radius:10px;color:#05251c;font-weight:bold;margin-top:10px;
+ width:100%;padding:13px;margin-top:10px;
+ border:0;border-radius:11px;
+ background:var(--green);color:#06271c;font-weight:800;
 }
-.close-modal{float:right;background:none;border:0;font-size:22px;color:#aaa}
-.switch-auth{text-align:center;color:var(--green);font-size:13px;margin-top:16px}
-#cameraVideo{width:100%;border-radius:12px;background:black}
+.switch-auth{
+ text-align:center;color:var(--green);
+ font-size:13px;margin-top:16px;cursor:pointer;
+}
+#cameraVideo{
+ width:100%;border-radius:12px;background:#000;
+}
 #cameraCanvas{display:none}
 
 @media(max-width:480px){
- .header{height:59px;padding:0 13px}
- .messages{padding:24px 13px 140px}
- .welcome h1{font-size:24px}
+ .header{height:62px;padding:0 12px}
+ .brand-icon{width:39px;height:39px}
+ .brand{font-size:15px}
+ .subtitle{font-size:10px}
+ .messages{padding:26px 13px 170px}
+ .welcome h1{font-size:27px}
+ .welcome p{font-size:13px}
+ .message{gap:10px;margin-bottom:28px}
+ .avatar{width:36px;height:36px;flex-basis:36px}
+ .ai-message .message-text{font-size:16px;line-height:1.8}
+ .user-message .message-content{max-width:86%}
  .composer-area{padding-left:9px;padding-right:9px}
  .composer{min-height:67px;padding:7px 9px;gap:8px}
- .plus-btn,.mic-btn,.send-btn{width:48px;height:48px;flex-basis:48px}
- .plus-btn svg,.send-btn svg{width:25px;height:25px}
- .mic-btn svg{width:22px;height:22px}
+ .plus-btn,.mic-btn,.send-btn{
+  width:49px;height:49px;flex-basis:49px;
+ }
+ .plus-btn svg,.mic-btn svg,.send-btn svg{
+  width:24px;height:24px;
+ }
  #prompt{font-size:14px}
- .suggestions{gap:7px}
- .suggestion{padding:10px 12px}
+ .disclaimer{font-size:9px}
 }
 </style>
 </head>
@@ -268,10 +376,10 @@ button{cursor:pointer;color:inherit}
 
 <header class="header">
  <div class="brand-area">
-  <button class="header-btn" id="menuBtn" aria-label="Open menu">☰</button>
+  <button class="header-btn menu-toggle" id="menuBtn" aria-label="Menu">☰</button>
   <div class="brand-icon">A</div>
   <div>
-   <div class="brand">Axenova AI <span class="status"></span></div>
+   <div class="brand">Axenova AI <span class="status-dot"></span></div>
    <div class="subtitle">Your intelligent assistant</div>
   </div>
  </div>
@@ -282,19 +390,25 @@ button{cursor:pointer;color:inherit}
 
 <aside class="sidebar" id="sidebar">
  <div class="sidebar-head">
-  <strong>AXENOVA AI</strong>
-  <button class="header-btn" id="closeMenu">×</button>
+  <div class="sidebar-brand">AXENOVA AI</div>
+  <button class="header-btn close-menu" id="closeMenu">×</button>
  </div>
+
  <button class="new-chat" id="newChat">＋ &nbsp; New chat</button>
+
  <div class="section-label">YOUR CONVERSATIONS</div>
  <div class="history" id="historyList"></div>
+
  <div class="sidebar-bottom">
   <div class="profile">
    <div class="profile-avatar">J</div>
-   <div class="profile-info">John<small id="signedStatus">Signed in</small></div>
+   <div class="profile-info">
+    John
+    <small id="signedStatus">Axenova account</small>
+   </div>
   </div>
   <button class="side-link" id="settingsBtn">⚙ &nbsp; Settings</button>
-  <button class="side-link" id="logoutBtn">⇥ &nbsp; Logout</button>
+  <button class="side-link" id="logoutBtn">⇥ &nbsp; Log out</button>
  </div>
 </aside>
 <div class="overlay" id="overlay"></div>
@@ -304,13 +418,17 @@ button{cursor:pointer;color:inherit}
   <div class="messages-inner" id="messagesInner">
    <div class="welcome" id="welcome">
     <div class="logo-large">A</div>
-    <h1>What can I help with?</h1>
-    <p>Ask anything. Create something. Explore new ideas.</p>
+    <div class="welcome-tag">YOUR INTELLIGENCE, REIMAGINED</div>
+    <h1>Think bigger.<br>Let's make it happen.</h1>
+    <p>
+     Your space to explore ideas, solve problems,
+     create, learn and get things done.
+    </p>
     <div class="suggestions">
-     <button class="suggestion">Explain something difficult</button>
-     <button class="suggestion">Write code for me</button>
-     <button class="suggestion">Generate an image</button>
-     <button class="suggestion">Search the web</button>
+     <button class="suggestion">✦ Create something amazing</button>
+     <button class="suggestion">⌘ Build a website or app</button>
+     <button class="suggestion">◈ Help me understand something</button>
+     <button class="suggestion">↗ Explore new ideas</button>
     </div>
    </div>
   </div>
@@ -324,57 +442,53 @@ button{cursor:pointer;color:inherit}
   <div class="mode-label" id="modeLabel"></div>
 
   <div class="plus-menu" id="plusMenu">
-
    <button class="menu-item" id="attachOption">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
-    Attach image
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    Attach an image
    </button>
-
    <button class="menu-item" id="cameraOption">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10H2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="3"/></svg>
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><circle cx="12" cy="14" r="3"/><path d="m8 7 2-3h4l2 3"/></svg>
     Take a photo
    </button>
-
    <button class="menu-item" data-mode="image">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m5 17 5-5 4 4 3-3 4 4"/></svg>
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m5 17 5-5 4 4 3-3 4 4"/></svg>
     Create an image
    </button>
-
    <button class="menu-item" data-mode="search">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
     Search the web
    </button>
-
    <button class="menu-item" data-mode="code">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-2-12-4 16"/></svg>
+    <svg viewBox="0 0 24 24"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-2-12-4 16"/></svg>
     Code assistant
    </button>
   </div>
 
   <div class="composer">
-
    <button class="plus-btn" id="plusBtn" aria-label="More options">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
    </button>
 
    <textarea id="prompt" rows="1" placeholder="Message Axenova..."></textarea>
 
    <button class="mic-btn" id="micBtn" aria-label="Voice input">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg>
+    <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg>
    </button>
 
    <button class="send-btn" id="sendBtn" aria-label="Send message">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m-7 7 7-7 7 7"/></svg>
+    <svg viewBox="0 0 24 24"><path d="M12 19V5m-7 7 7-7 7 7"/></svg>
    </button>
-
   </div>
-  <div class="disclaimer">Axenova AI may make mistakes. Verify important information.</div>
+
+  <div class="disclaimer">
+   Axenova AI may make mistakes. Verify important information.
+  </div>
  </div>
 </div>
 
 <input type="file" id="fileInput" accept="image/*" class="hidden">
 
-<!-- ACCOUNT -->
+<!-- ACCOUNT MODAL -->
 <div class="modal-backdrop" id="accountModal">
  <div class="modal">
   <button class="close-modal" id="closeAccount">×</button>
@@ -389,62 +503,99 @@ button{cursor:pointer;color:inherit}
  </div>
 </div>
 
-<!-- CAMERA -->
+<!-- CAMERA MODAL -->
 <div class="modal-backdrop" id="cameraModal">
  <div class="modal">
   <button class="close-modal" id="closeCamera">×</button>
   <h2>Take a photo</h2>
-  <p>Capture an image to send to Axenova AI.</p>
+  <p>Capture a photo to send to Axenova AI.</p>
   <video id="cameraVideo" autoplay playsinline></video>
   <canvas id="cameraCanvas"></canvas>
   <button class="primary" id="captureBtn">Capture photo</button>
  </div>
 </div>
 
-</div>
-
 <script>
-const API="";
-const $=id=>document.getElementById(id);
+const API = "";
+const $ = id => document.getElementById(id);
 
-let mode="chat";
-let selectedFile=null;
-let busy=false;
-let isRegister=false;
-let cameraStream=null;
-let recognition=null;
-let conversations=[];
-let currentConversation=[];
+let mode = "chat";
+let selectedFile = null;
+let busy = false;
+let registerMode = false;
+let cameraStream = null;
+let recognition = null;
+let conversations = [];
+let currentConversation = [];
+let currentTitle = "New chat";
 
-const promptBox=$("prompt");
-const messagesInner=$("messagesInner");
-const messages=$("messages");
+const promptBox = $("prompt");
+const messagesInner = $("messagesInner");
+const messages = $("messages");
 
-function setMode(value){
- mode=value;
- $("modeLabel").textContent={
-  chat:"",
-  image:"Image generation mode",
-  search:"Web search mode",
-  code:"Code assistant mode"
- }[value];
- promptBox.placeholder={
-  chat:"Message Axenova...",
-  image:"Describe the image you want to create...",
-  search:"What should Axenova search for?",
-  code:"What would you like to build?"
- }[value];
- $("plusMenu").classList.remove("show");
+/* SAFE HTML ESCAPING */
+function escapeHTML(value){
+ return String(value).replace(/[&<>"']/g, char => ({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  '"':"&quot;",
+  "'":"&#039;"
+ })[char]);
 }
 
-function addMessage(role,text){
+/* MARKDOWN FORMATTER */
+function formatAI(text){
+ let safe = escapeHTML(text);
+ const blocks = [];
+
+ safe = safe.replace(/```([\w-]*)\n?([\s\S]*?)```/g,
+  (_, language, code) => {
+   const index = blocks.length;
+   blocks.push("<pre><code>"+code.trim()+"</code></pre>");
+   return "%%CODE"+index+"%%";
+  }
+ );
+
+ safe = safe.replace(/`([^`\n]+)`/g,"<code>$1</code>");
+ safe = safe.replace(/^### (.+)$/gm,"<h3>$1</h3>");
+ safe = safe.replace(/^## (.+)$/gm,"<h2>$1</h2>");
+ safe = safe.replace(/^# (.+)$/gm,"<h1>$1</h1>");
+ safe = safe.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
+ safe = safe.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g,"<em>$1</em>");
+
+ safe = safe.replace(/^\s*[-*] (.+)$/gm,"<li>$1</li>");
+ safe = safe.replace(/^\s*\d+\. (.+)$/gm,"<li>$1</li>");
+ safe = safe.replace(/((?:<li>[\s\S]*?<\/li>\s*)+)/g,
+  match=>"<ul>"+match+"</ul>"
+ );
+
+ safe = safe.split(/\n{2,}/).map(part=>{
+  part=part.trim();
+  if(!part)return "";
+  if(/^%%CODE\d+%%$/.test(part))return part;
+  if(/^<(h[1-3]|ul|ol|pre|blockquote)/.test(part))return part;
+  return "<p>"+part.replace(/\n/g,"<br>")+"</p>";
+ }).join("");
+
+ safe=safe.replace(/%%CODE(\d+)%%/g,
+  (_,index)=>blocks[Number(index)]
+ );
+
+ return safe;
+}
+
+/* MESSAGE DISPLAY */
+function addMessage(role,text,options={}){
  $("welcome")?.remove();
 
  const row=document.createElement("div");
- row.className="message";
+ row.className="message "+
+  (role==="user"?"user-message":"ai-message");
 
  const avatar=document.createElement("div");
- avatar.className="avatar "+(role==="user"?"user-avatar":"ai-avatar");
+ avatar.className="avatar "+
+  (role==="user"?"user-avatar":"ai-avatar");
  avatar.textContent=role==="user"?"U":"A";
 
  const content=document.createElement("div");
@@ -456,7 +607,12 @@ function addMessage(role,text){
 
  const body=document.createElement("div");
  body.className="message-text";
- body.textContent=text;
+
+ if(role==="assistant"){
+  body.innerHTML=formatAI(text);
+ }else{
+  body.textContent=text;
+ }
 
  content.append(name,body);
  row.append(avatar,content);
@@ -469,33 +625,70 @@ function addMessage(role,text){
   const copy=document.createElement("button");
   copy.className="action";
   copy.textContent="Copy";
-  copy.onclick=()=>navigator.clipboard.writeText(text).then(()=>copy.textContent="Copied");
+  copy.onclick=async()=>{
+   try{
+    await navigator.clipboard.writeText(text);
+    copy.textContent="Copied";
+    setTimeout(()=>copy.textContent="Copy",1500);
+   }catch(e){copy.textContent="Copy unavailable"}
+  };
 
   const read=document.createElement("button");
   read.className="action";
   read.textContent="Read aloud";
   read.onclick=()=>{
-   if("speechSynthesis" in window){
-    speechSynthesis.cancel();
-    speechSynthesis.speak(new SpeechSynthesisUtterance(text));
-   }
+   if(!("speechSynthesis" in window))return;
+   speechSynthesis.cancel();
+   const utterance=new SpeechSynthesisUtterance(text);
+   speechSynthesis.speak(utterance);
   };
+
   actions.append(copy,read);
   content.append(actions);
  }
 
- currentConversation.push({role,content:text});
+ if(!options.noSave){
+  currentConversation.push({role,content:text});
+ }
+
  messages.scrollTop=messages.scrollHeight;
  return body;
 }
 
+/* MODE */
+function setMode(value){
+ mode=value;
+ const labels={
+  chat:"",
+  image:"✦ Image generation mode",
+  search:"⌕ Web search mode",
+  code:"⌘ Code assistant mode"
+ };
+ const placeholders={
+  chat:"Message Axenova...",
+  image:"Describe the image you want to create...",
+  search:"What should Axenova search for?",
+  code:"What would you like to build?"
+ };
+ $("modeLabel").textContent=labels[value]||"";
+ promptBox.placeholder=placeholders[value]||"Message Axenova...";
+ $("plusMenu").classList.remove("show");
+}
+
+/* LOADING */
 function typing(show){
  $("typing")?.remove();
  if(!show)return;
+
  const row=document.createElement("div");
  row.id="typing";
- row.className="message";
- row.innerHTML='<div class="avatar ai-avatar">A</div><div class="message-content"><div class="message-name">Axenova AI</div><div class="typing">Thinking...</div></div>';
+ row.className="message ai-message";
+ row.innerHTML=`
+  <div class="avatar ai-avatar">A</div>
+  <div class="message-content">
+   <div class="message-name">Axenova AI</div>
+   <div class="typing">Thinking...</div>
+  </div>`;
  messagesInner.append(row);
  messages.scrollTop=messages.scrollHeight;
 }
@@ -503,27 +696,45 @@ function typing(show){
 function setBusy(value){
  busy=value;
  $("sendBtn").disabled=value;
- $("sendBtn").style.opacity=value?".55":"1";
 }
 
+/* IMAGE TO BASE64 */
+function toBase64(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onload=()=>resolve(reader.result);
+  reader.onerror=()=>reject(new Error("Could not read image."));
+  reader.readAsDataURL(file);
+ });
+}
+
+/* SEND MESSAGE */
 async function sendMessage(){
  const message=promptBox.value.trim();
  if((!message&&!selectedFile)||busy)return;
 
- const chosenMode=mode;
+ const selectedMode=mode;
  const file=selectedFile;
 
  addMessage("user",message||"Please analyse this image.");
+
+ if(currentConversation.length===1){
+  currentTitle=message.slice(0,55)||"Image conversation";
+ }
+
  promptBox.value="";
  promptBox.style.height="auto";
  selectedFile=null;
+
+ if(file)promptBox.placeholder="Message Axenova...";
+
  setBusy(true);
  typing(true);
 
  try{
   let response;
 
-  if(chosenMode==="image"){
+  if(selectedMode==="image"){
    response=await fetch(API+"/api/image",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -532,6 +743,7 @@ async function sendMessage(){
    });
   }else{
    const image=file?await toBase64(file):null;
+
    response=await fetch(API+"/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -539,88 +751,117 @@ async function sendMessage(){
     body:JSON.stringify({
      message,
      image,
-     history:currentConversation.slice(-12),
-     mode:chosenMode
+     history:currentConversation.slice(0,-1).slice(-12),
+     mode:selectedMode
     })
    });
   }
 
   const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data.error||data.message||"Request failed: "+response.status);
+
+  if(!response.ok){
+   throw new Error(data.error||data.message||"Server error "+response.status);
+  }
 
   typing(false);
 
-  if(chosenMode==="image"){
+  if(selectedMode==="image"){
    const url=data.image||data.url||data.imageUrl;
-   if(!url)throw new Error(data.error||"No image returned by the image service.");
+   if(!url)throw new Error(data.error||"No image was returned.");
+
    const body=addMessage("assistant","Your image is ready.");
    const img=document.createElement("img");
    img.src=url;
-   img.alt="Generated image";
+   img.alt="Generated by Axenova AI";
+   img.style.maxWidth="100%";
+   img.style.borderRadius="14px";
+   img.style.marginTop="12px";
    body.append(img);
   }else{
    const answer=data.reply||data.response||data.message||data.content;
    if(!answer)throw new Error(data.error||"The AI returned an empty response.");
    addMessage("assistant",typeof answer==="string"?answer:JSON.stringify(answer));
   }
+
   saveConversation();
+
  }catch(error){
   typing(false);
-  addMessage("assistant","Sorry, I couldn't complete that request. "+error.message);
+  addMessage("assistant","I couldn't complete that request. "+error.message);
+  saveConversation();
  }finally{
   setBusy(false);
   promptBox.focus();
  }
 }
 
-function toBase64(file){
- return new Promise((resolve,reject)=>{
-  const reader=new FileReader();
-  reader.onload=()=>resolve(reader.result);
-  reader.onerror=reject;
-  reader.readAsDataURL(file);
- });
-}
-
-/* CHAT HISTORY */
+/* LOCAL CONVERSATION HISTORY */
 function saveConversation(){
  if(!currentConversation.length)return;
- const title=currentConversation.find(m=>m.role==="user")?.content||"New chat";
- conversations.unshift({
-  title:title.slice(0,55),
+
+ const record={
+  id:Date.now(),
+  title:currentTitle||"New chat",
   messages:[...currentConversation]
- });
- conversations=conversations.slice(0,30);
- localStorage.setItem("axenova_history",JSON.stringify(conversations));
+ };
+
+ const index=conversations.findIndex(c=>c.id===record.id);
+ if(index>=0)conversations[index]=record;
+ else conversations.unshift(record);
+
+ conversations=conversations.slice(0,40);
+ try{
+  localStorage.setItem("axenova_history",JSON.stringify(conversations));
+ }catch(e){}
  renderHistory();
 }
 
 function renderHistory(){
  $("historyList").innerHTML="";
+
  conversations.forEach(item=>{
   const el=document.createElement("div");
   el.className="history-item";
   el.textContent=item.title;
-  el.onclick=()=>{
-   messagesInner.innerHTML="";
-   currentConversation=[];
-   item.messages.forEach(m=>addMessage(m.role,m.content));
-   closeSidebar();
-  };
+  el.onclick=()=>loadConversation(item.id);
   $("historyList").append(el);
  });
 }
 
+function loadConversation(id){
+ const item=conversations.find(c=>c.id===id);
+ if(!item)return;
+
+ currentConversation=[];
+ currentTitle=item.title;
+ messagesInner.innerHTML="";
+
+ item.messages.forEach(m=>{
+  addMessage(m.role,m.content,{noSave:false});
+ });
+
+ closeSidebar();
+}
+
 function newChat(){
  currentConversation=[];
+ currentTitle="New chat";
  messagesInner.innerHTML=`
- <div class="welcome" id="welcome">
- <div class="logo-large">A</div>
- <h1>What can I help with?</h1>
- <p>Ask anything. Create something. Explore new ideas.</p>
- </div>`;
+  <div class="welcome" id="welcome">
+   <div class="logo-large">A</div>
+   <div class="welcome-tag">YOUR INTELLIGENCE, REIMAGINED</div>
+   <h1>Think bigger.<br>Let's make it happen.</h1>
+   <p>Your space to explore ideas, solve problems, create, learn and get things done.</p>
+   <div class="suggestions">
+    <button class="suggestion">✦ Create something amazing</button>
+    <button class="suggestion">⌘ Build a website or app</button>
+    <button class="suggestion">◈ Help me understand something</button>
+    <button class="suggestion">↗ Explore new ideas</button>
+   </div>
+  </div>`;
  setMode("chat");
  closeSidebar();
+ attachSuggestionEvents();
 }
 
 /* SIDEBAR */
@@ -637,7 +878,7 @@ $("closeMenu").onclick=closeSidebar;
 $("overlay").onclick=closeSidebar;
 $("newChat").onclick=newChat;
 
-/* COMPOSER */
+/* COMPOSER EVENTS */
 $("sendBtn").onclick=sendMessage;
 
 promptBox.addEventListener("keydown",e=>{
@@ -646,6 +887,7 @@ promptBox.addEventListener("keydown",e=>{
   sendMessage();
  }
 });
+
 promptBox.addEventListener("input",()=>{
  promptBox.style.height="auto";
  promptBox.style.height=Math.min(promptBox.scrollHeight,120)+"px";
@@ -655,62 +897,62 @@ $("plusBtn").onclick=e=>{
  e.stopPropagation();
  $("plusMenu").classList.toggle("show");
 };
+
 document.addEventListener("click",e=>{
  if(!$("plusMenu").contains(e.target)&&e.target!==$("plusBtn")){
   $("plusMenu").classList.remove("show");
  }
 });
 
-$("attachOption").onclick=()=>$("fileInput").click();
-$("fileInput").onchange=e=>{
- selectedFile=e.target.files[0];
- if(selectedFile){
-  promptBox.placeholder="Image attached. Ask Axenova about it...";
-  $("plusMenu").classList.remove("show");
- }
-};
-$("cameraOption").onclick=async()=>{
+$("attachOption").onclick=()=>{
  $("plusMenu").classList.remove("show");
- $("cameraModal").classList.add("show");
- try{
-  cameraStream=await navigator.mediaDevices.getUserMedia({
-   video:{facingMode:"environment"},audio:false
-  });
-  $("cameraVideo").srcObject=cameraStream;
- }catch(e){
-  $("cameraModal").classList.remove("show");
-  alert("Camera permission failed. Try Attach image instead.");
+ $("fileInput").click();
+};
+
+$("fileInput").onchange=e=>{
+ selectedFile=e.target.files[0]||null;
+ if(selectedFile){
+  promptBox.placeholder="Image attached. Ask Axenova...";
  }
 };
 
-document.querySelectorAll("[data-mode]").forEach(btn=>{
- btn.onclick=()=>setMode(btn.dataset.mode);
+document.querySelectorAll("[data-mode]").forEach(button=>{
+ button.onclick=()=>setMode(button.dataset.mode);
 });
 
-document.querySelectorAll(".suggestion").forEach(btn=>{
- btn.onclick=()=>{
-  promptBox.value=btn.textContent;
-  promptBox.focus();
- };
-});
+/* SUGGESTIONS */
+function attachSuggestionEvents(){
+ document.querySelectorAll(".suggestion").forEach(button=>{
+  button.onclick=()=>{
+   promptBox.value=button.textContent.replace(/^[✦⌘◈↗]\s*/,"");
+   promptBox.focus();
+  };
+ });
+}
+attachSuggestionEvents();
 
-/* VOICE */
+/* VOICE INPUT */
 $("micBtn").onclick=()=>{
  const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+
  if(!Speech){
   alert("Voice input is not supported in this browser. Try Chrome.");
   return;
  }
+
  if(recognition){
   recognition.stop();
   recognition=null;
   $("micBtn").classList.remove("active");
   return;
  }
+
  recognition=new Speech();
  recognition.lang="en-US";
  recognition.interimResults=true;
+
  $("micBtn").classList.add("active");
+
  recognition.onresult=e=>{
   let result="";
   for(let i=e.resultIndex;i<e.results.length;i++){
@@ -718,31 +960,57 @@ $("micBtn").onclick=()=>{
   }
   promptBox.value=result;
  };
+
  recognition.onend=()=>{
   recognition=null;
   $("micBtn").classList.remove("active");
  };
+
  recognition.onerror=()=>{
   recognition=null;
   $("micBtn").classList.remove("active");
  };
+
  recognition.start();
 };
 
 /* CAMERA */
+$("cameraOption").onclick=async()=>{
+ $("plusMenu").classList.remove("show");
+ $("cameraModal").classList.add("show");
+
+ try{
+  cameraStream=await navigator.mediaDevices.getUserMedia({
+   video:{facingMode:"environment"},
+   audio:false
+  });
+  $("cameraVideo").srcObject=cameraStream;
+ }catch(e){
+  $("cameraModal").classList.remove("show");
+  alert("Camera permission failed. Try attaching an image instead.");
+ }
+};
+
 function stopCamera(){
- if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
+ if(cameraStream){
+  cameraStream.getTracks().forEach(track=>track.stop());
+ }
  cameraStream=null;
  $("cameraVideo").srcObject=null;
  $("cameraModal").classList.remove("show");
 }
 $("closeCamera").onclick=stopCamera;
+
 $("captureBtn").onclick=()=>{
  const video=$("cameraVideo");
  const canvas=$("cameraCanvas");
+
+ if(!video.videoWidth)return;
+
  canvas.width=video.videoWidth;
  canvas.height=video.videoHeight;
  canvas.getContext("2d").drawImage(video,0,0);
+
  canvas.toBlob(blob=>{
   if(blob){
    selectedFile=new File([blob],"axenova-photo.jpg",{type:"image/jpeg"});
@@ -752,81 +1020,121 @@ $("captureBtn").onclick=()=>{
  },"image/jpeg",.9);
 };
 
-/* ACCOUNT */
-let registerMode=false;
+/* AUTHENTICATION */
 function updateAuth(){
- $("authTitle").textContent=registerMode?"Create account":"Welcome back";
- $("authDescription").textContent=registerMode?"Join Axenova AI.":"Sign in to your account.";
+ $("authTitle").textContent=registerMode?"Create your account":"Welcome back";
+ $("authDescription").textContent=registerMode?
+  "Join Axenova AI and start exploring.":"Sign in to your Axenova account.";
  $("authName").classList.toggle("hidden",!registerMode);
  $("authSubmit").textContent=registerMode?"Create account":"Sign in";
- $("switchAuth").textContent=registerMode?"Already registered? Sign in":"Create an account";
+ $("switchAuth").textContent=registerMode?
+  "Already registered? Sign in":"Create an account";
  $("authStatus").textContent="";
 }
-$("accountBtn").onclick=()=>$("accountModal").classList.add("show");
-$("closeAccount").onclick=()=>$("accountModal").classList.remove("show");
+
+$("accountBtn").onclick=()=>{
+ $("accountModal").classList.add("show");
+};
+$("closeAccount").onclick=()=>{
+ $("accountModal").classList.remove("show");
+};
+
 $("switchAuth").onclick=()=>{
  registerMode=!registerMode;
  updateAuth();
 };
 
 $("authSubmit").onclick=async()=>{
+ const name=$("authName").value.trim();
  const email=$("authEmail").value.trim();
  const password=$("authPassword").value;
- const name=$("authName").value.trim();
+
  if(!email||!password||(registerMode&&!name)){
-  $("authStatus").textContent="Fill in all required fields.";
+  $("authStatus").textContent="Please complete all required fields.";
   return;
  }
+
  $("authSubmit").disabled=true;
+ $("authStatus").textContent="Please wait...";
+
  try{
-  const res=await fetch(API+(registerMode?"/api/auth/register":"/api/auth/login"),{
-   method:"POST",
-   headers:{"Content-Type":"application/json"},
-   credentials:"include",
-   body:JSON.stringify({name,email,password})
-  });
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok)throw new Error(data.error||data.message||"Login failed.");
-  $("authStatus").style.color=varGreen();
+  const response=await fetch(
+   API+(registerMode?"/api/auth/register":"/api/auth/login"),
+   {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    credentials:"include",
+    body:JSON.stringify({name,email,password})
+   }
+  );
+
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok){
+   throw new Error(data.error||data.message||"Authentication failed.");
+  }
+
+  $("authStatus").style.color="var(--green)";
   $("authStatus").textContent="Successfully signed in.";
+
   $("accountBtn").textContent=name||email.split("@")[0];
-  setTimeout(()=>$("accountModal").classList.remove("show"),900);
- }catch(e){
+  $("signedStatus").textContent="Signed in";
+
+  setTimeout(()=>{
+   $("accountModal").classList.remove("show");
+  },900);
+
+ }catch(error){
   $("authStatus").style.color="#ff7777";
-  $("authStatus").textContent=e.message;
+  $("authStatus").textContent=error.message;
  }finally{
   $("authSubmit").disabled=false;
  }
 };
-function varGreen(){return "#10c991"}
 
 async function checkAccount(){
  try{
-  const res=await fetch(API+"/api/auth/me",{credentials:"include"});
-  if(!res.ok)return;
-  const data=await res.json();
+  const response=await fetch(API+"/api/auth/me",{
+   credentials:"include"
+  });
+
+  if(!response.ok)return;
+
+  const data=await response.json();
   if(data.user){
-   $("accountBtn").textContent=data.user.name||data.user.email||"Account";
+   $("accountBtn").textContent=
+    data.user.name||data.user.email||"Account";
+   $("signedStatus").textContent="Signed in";
   }
  }catch(e){}
 }
 
 $("logoutBtn").onclick=async()=>{
  try{
-  await fetch(API+"/api/auth/logout",{method:"POST",credentials:"include"});
+  await fetch(API+"/api/auth/logout",{
+   method:"POST",
+   credentials:"include"
+  });
  }catch(e){}
+
  $("accountBtn").textContent="Account";
+ $("signedStatus").textContent="Not signed in";
  closeSidebar();
 };
 
 $("settingsBtn").onclick=()=>{
- alert("Axenova AI settings will be added here.");
+ alert("More Axenova settings will be added in a future update.");
 };
 
-/* START */
+/* INITIALISE */
 try{
- conversations=JSON.parse(localStorage.getItem("axenova_history")||"[]");
-}catch(e){conversations=[]}
+ conversations=JSON.parse(
+  localStorage.getItem("axenova_history")||"[]"
+ );
+ if(!Array.isArray(conversations))conversations=[];
+}catch(e){
+ conversations=[];
+}
+
 renderHistory();
 checkAccount();
 </script>
