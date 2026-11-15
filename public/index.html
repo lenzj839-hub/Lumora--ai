@@ -10,14 +10,9 @@
 
 <style>
 :root{
- --bg:#080a09;
- --panel:#111513;
- --panel2:#1b201e;
- --border:#303936;
- --text:#f3f7f4;
- --muted:#929d97;
- --green:#10c991;
- --green2:#087b59;
+ --bg:#080a09;--panel:#111513;--panel2:#1b201e;
+ --border:#303936;--text:#f3f7f4;--muted:#929d97;
+ --green:#10c991;--green2:#087b59;
 }
 *{box-sizing:border-box}
 html,body{
@@ -31,318 +26,160 @@ button{cursor:pointer;color:inherit}
 .hidden{display:none!important}
 .app{height:100dvh;display:flex;flex-direction:column}
 
-/* HEADER */
 .header{
- height:66px;flex-shrink:0;
- display:flex;align-items:center;justify-content:space-between;
- padding:0 18px;background:#090c0b;
- border-bottom:1px solid #242c28;
- z-index:5;
+ height:66px;flex-shrink:0;display:flex;align-items:center;
+ justify-content:space-between;padding:0 18px;
+ background:#090c0b;border-bottom:1px solid #242c28;z-index:5;
 }
 .brand-area{display:flex;align-items:center;gap:12px}
 .header-btn{
  border:1px solid var(--border);background:#171c19;
  border-radius:25px;padding:10px 15px;font-size:13px;
 }
-.menu-toggle{
- width:43px;height:43px;border-radius:50%;
- display:grid;place-items:center;font-size:19px;
-}
+.menu-toggle{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;font-size:19px}
 .brand-icon{
- width:42px;height:42px;border-radius:13px;
- display:grid;place-items:center;
- background:#073d2e;color:var(--green);
- font-weight:900;font-size:25px;
- border:1px solid #096548;
+ width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+ background:#073d2e;color:var(--green);font-weight:900;font-size:25px;border:1px solid #096548;
 }
 .brand{font-size:16px;font-weight:750}
-.status-dot{
- display:inline-block;width:9px;height:9px;
- border-radius:50%;background:var(--green);margin-left:5px;
-}
+.status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-left:5px}
 .subtitle{font-size:11px;color:var(--muted);margin-top:3px}
 .header-actions{display:flex;gap:8px;align-items:center}
 
-/* SIDEBAR */
 .sidebar{
- position:fixed;z-index:30;top:0;bottom:0;left:0;
- width:290px;padding:20px;background:#101512;
- border-right:1px solid var(--border);
- display:flex;flex-direction:column;
- transform:translateX(-105%);transition:transform .25s ease;
+ position:fixed;z-index:30;top:0;bottom:0;left:0;width:290px;
+ padding:20px;background:#101512;border-right:1px solid var(--border);
+ display:flex;flex-direction:column;transform:translateX(-105%);
+ transition:transform .25s ease;
 }
 .sidebar.open{transform:translateX(0)}
-.sidebar-head{
- display:flex;align-items:center;justify-content:space-between;
- margin-bottom:25px;
-}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:25px}
 .sidebar-brand{font-weight:800;letter-spacing:1px}
 .close-menu{font-size:22px;padding:5px 12px}
 .new-chat{
- width:100%;padding:14px;text-align:left;
- background:#083d2e;border:1px solid #09654a;
- border-radius:13px;font-weight:700;
+ width:100%;padding:14px;text-align:left;background:#083d2e;
+ border:1px solid #09654a;border-radius:13px;font-weight:700;
 }
-.section-label{
- font-size:10px;letter-spacing:1.5px;
- color:var(--muted);margin:27px 0 12px;
-}
+.section-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);margin:27px 0 12px}
 .history{flex:1;overflow-y:auto}
 .history-item{
- padding:12px;border-radius:10px;
- font-size:13px;color:#c8d0cb;
- white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
- cursor:pointer;
+ display:flex;align-items:center;gap:8px;padding:12px;border-radius:10px;
+ font-size:13px;color:#c8d0cb;cursor:pointer;
 }
-.history-item:hover{background:#222a25}
+.history-item:hover,.history-item.active{background:#222a25}
+.history-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-delete{border:0;background:transparent;color:#89948d;padding:5px;font-size:16px}
+.history-delete:hover{color:#ff8585}
+.empty-history{color:var(--muted);font-size:12px;padding:12px}
 .sidebar-bottom{border-top:1px solid var(--border);padding-top:13px}
 .profile{display:flex;align-items:center;gap:10px;padding:9px}
-.profile-avatar{
- width:38px;height:38px;border-radius:50%;
- background:#087d66;display:grid;place-items:center;font-weight:800;
-}
+.profile-avatar{width:38px;height:38px;border-radius:50%;background:#087d66;display:grid;place-items:center;font-weight:800}
 .profile-info{font-size:13px}
 .profile-info small{display:block;color:var(--muted);margin-top:3px}
-.side-link{
- width:100%;padding:12px;border:0;background:transparent;
- text-align:left;color:#c8d0cb;font-size:13px;
-}
-.overlay{
- position:fixed;inset:0;background:#0009;z-index:29;display:none;
-}
+.side-link{width:100%;padding:12px;border:0;background:transparent;text-align:left;color:#c8d0cb;font-size:13px}
+.overlay{position:fixed;inset:0;background:#0009;z-index:29;display:none}
 .overlay.show{display:block}
 
-/* MAIN */
 .main{flex:1;min-height:0;position:relative;display:flex}
-.messages{
- flex:1;overflow-y:auto;scroll-behavior:smooth;
- padding:35px 17px 180px;
-}
+.messages{flex:1;overflow-y:auto;scroll-behavior:smooth;padding:35px 17px 180px}
 .messages-inner{max-width:850px;width:100%;margin:auto}
-
-/* WELCOME */
 .welcome{
- min-height:55vh;display:flex;align-items:center;
- justify-content:center;flex-direction:column;text-align:center;
- padding:20px;
+ min-height:55vh;display:flex;align-items:center;justify-content:center;
+ flex-direction:column;text-align:center;padding:20px;
 }
 .logo-large{
- width:76px;height:76px;border-radius:24px;
- display:grid;place-items:center;
- background:linear-gradient(145deg,#06422f,#09251e);
- color:#14d99b;font-size:42px;font-weight:900;
- border:1px solid #087b58;
+ width:76px;height:76px;border-radius:24px;display:grid;place-items:center;
+ background:linear-gradient(145deg,#06422f,#09251e);color:#14d99b;
+ font-size:42px;font-weight:900;border:1px solid #087b58;
  box-shadow:0 0 45px #10c99120;margin-bottom:23px;
 }
-.welcome-tag{
- font-size:10px;letter-spacing:2.2px;
- color:var(--green);font-weight:800;margin-bottom:14px;
-}
-.welcome h1{
- font-size:32px;line-height:1.22;
- letter-spacing:-1.2px;margin:0 0 12px;
-}
-.welcome p{
- max-width:390px;font-size:14px;
- color:var(--muted);line-height:1.8;margin:0;
-}
-.suggestions{
- display:flex;flex-wrap:wrap;justify-content:center;
- gap:10px;max-width:620px;margin-top:27px;
-}
-.suggestion{
- border:1px solid var(--border);background:#151a17;
- padding:12px 15px;border-radius:13px;
- color:#d4ddd7;font-size:12px;
-}
+.welcome-tag{font-size:10px;letter-spacing:2.2px;color:var(--green);font-weight:800;margin-bottom:14px}
+.welcome h1{font-size:32px;line-height:1.22;letter-spacing:-1.2px;margin:0 0 12px}
+.welcome p{max-width:390px;font-size:14px;color:var(--muted);line-height:1.8;margin:0}
+.suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:620px;margin-top:27px}
+.suggestion{border:1px solid var(--border);background:#151a17;padding:12px 15px;border-radius:13px;color:#d4ddd7;font-size:12px}
 .suggestion:hover{border-color:var(--green);background:#10251c}
 
-/* CONVERSATIONS */
-.message{
- display:flex;gap:13px;align-items:flex-start;
- width:100%;margin-bottom:34px;
-}
+.message{display:flex;gap:13px;align-items:flex-start;width:100%;margin-bottom:34px}
 .avatar{
- width:40px;height:40px;flex:0 0 40px;
- border-radius:14px;display:grid;place-items:center;
- font-size:15px;font-weight:800;
+ width:40px;height:40px;flex:0 0 40px;border-radius:14px;
+ display:grid;place-items:center;font-size:15px;font-weight:800;
 }
 .user-avatar{background:#292f2d;color:#f4f7f4}
-.ai-avatar{
- background:#063d2e;color:#12d99b;
- border:1px solid #087b58;
- box-shadow:0 0 18px #10c99115;
-}
+.ai-avatar{background:#063d2e;color:#12d99b;border:1px solid #087b58;box-shadow:0 0 18px #10c99115}
 .message-content{flex:1;min-width:0}
-.message-name{
- font-size:13px;font-weight:750;
- color:#aeb9b2;margin:3px 0 10px;
-}
-.message-text{
- font-size:16.5px;line-height:1.85;
- color:#e6ece8;overflow-wrap:anywhere;
-}
+.message-name{font-size:13px;font-weight:750;color:#aeb9b2;margin:3px 0 10px}
+.message-text{font-size:16.5px;line-height:1.85;color:#e6ece8;overflow-wrap:anywhere}
 .user-message{justify-content:flex-end}
 .user-message .avatar{order:2}
-.user-message .message-content{
- flex:0 1 auto;max-width:82%;
- display:flex;flex-direction:column;align-items:flex-end;
-}
+.user-message .message-content{flex:0 1 auto;max-width:82%;display:flex;flex-direction:column;align-items:flex-end}
 .user-message .message-name{text-align:right}
 .user-message .message-text{
- background:linear-gradient(145deg,#123d30,#172b23);
- border:1px solid #17654c;
- border-radius:21px 21px 5px 21px;
- padding:13px 18px;
+ background:linear-gradient(145deg,#123d30,#172b23);border:1px solid #17654c;
+ border-radius:21px 21px 5px 21px;padding:13px 18px;
  color:#f4fff9;font-size:15.5px;line-height:1.7;
 }
-
-/* AI FORMATTING */
 .message-text p{margin:0 0 15px}
 .message-text p:last-child{margin-bottom:0}
-.message-text h1,.message-text h2,.message-text h3{
- color:#fff;font-weight:750;line-height:1.4;
- margin:23px 0 12px;
-}
+.message-text h1,.message-text h2,.message-text h3{color:#fff;font-weight:750;line-height:1.4;margin:23px 0 12px}
 .message-text h1{font-size:25px}
 .message-text h2{font-size:21px}
 .message-text h3{font-size:18px}
 .message-text strong{color:#fff;font-weight:750}
 .message-text em{color:#d5e6dc}
-.message-text ul,.message-text ol{
- padding-left:25px;margin:12px 0 19px;
-}
+.message-text ul,.message-text ol{padding-left:25px;margin:12px 0 19px}
 .message-text li{padding-left:4px;margin-bottom:9px}
-.message-text blockquote{
- border-left:3px solid var(--green);
- background:#111b16;padding:12px 16px;
- border-radius:0 10px 10px 0;margin:15px 0;
- color:#cbd9d0;
-}
-.message-text pre{
- background:#101613;border:1px solid #344139;
- padding:16px;border-radius:13px;
- overflow-x:auto;margin:16px 0;
-}
-.message-text code{
- color:#75e9b8;background:#1c2922;
- border-radius:5px;padding:3px 6px;font-size:.9em;
-}
+.message-text blockquote{border-left:3px solid var(--green);background:#111b16;padding:12px 16px;border-radius:0 10px 10px 0;margin:15px 0;color:#cbd9d0}
+.message-text pre{background:#101613;border:1px solid #344139;padding:16px;border-radius:13px;overflow-x:auto;margin:16px 0}
+.message-text code{color:#75e9b8;background:#1c2922;border-radius:5px;padding:3px 6px;font-size:.9em}
 .message-text pre code{background:transparent;padding:0}
 .message-text a{color:#55dcb0;text-decoration:none}
-.message-text a:hover{text-decoration:underline}
 .message-text table{border-collapse:collapse;width:100%;display:block;overflow-x:auto}
-.message-text th,.message-text td{
- border:1px solid #374139;padding:9px;text-align:left;
-}
+.message-text th,.message-text td{border:1px solid #374139;padding:9px;text-align:left}
 .message-actions{display:flex;gap:17px;margin-top:14px}
-.action{
- background:none;border:0;color:#89948d;
- font-size:12px;padding:4px 0;
-}
+.action{background:none;border:0;color:#89948d;font-size:12px;padding:4px 0}
 .action:hover{color:var(--green)}
 .typing{font-size:13px;color:var(--muted);padding:5px 0}
 
-/* COMPOSER */
 .composer-area{
- position:absolute;bottom:0;left:0;right:0;
- padding:20px 15px max(14px,env(safe-area-inset-bottom));
+ position:absolute;bottom:0;left:0;right:0;padding:20px 15px max(14px,env(safe-area-inset-bottom));
  background:linear-gradient(transparent,#080a09 20%);
 }
 .composer-wrap{max-width:850px;margin:auto;position:relative}
-.mode-label{
- color:var(--green);font-size:11px;margin:0 0 8px 12px;
-}
+.mode-label{color:var(--green);font-size:11px;margin:0 0 8px 12px}
 .composer{
- min-height:78px;padding:9px 12px;
- display:flex;align-items:center;gap:11px;
- border:1px solid #454d48;border-radius:48px;
- background:#1b1e1c;
- box-shadow:0 6px 30px #0007;
+ min-height:78px;padding:9px 12px;display:flex;align-items:center;gap:11px;
+ border:1px solid #454d48;border-radius:48px;background:#1b1e1c;box-shadow:0 6px 30px #0007;
 }
 .composer:focus-within{border-color:#687a6e}
-.plus-btn,.mic-btn,.send-btn{
- flex:0 0 58px;width:58px;height:58px;
- border:0;border-radius:50%;
- display:grid;place-items:center;
-}
+.plus-btn,.mic-btn,.send-btn{flex:0 0 58px;width:58px;height:58px;border:0;border-radius:50%;display:grid;place-items:center}
 .plus-btn,.mic-btn{background:#292e2c;color:white}
-.plus-btn svg,.mic-btn svg,.send-btn svg{
- width:27px;height:27px;fill:none;
- stroke:currentColor;stroke-width:1.8;
- stroke-linecap:round;stroke-linejoin:round;
-}
+.plus-btn svg,.mic-btn svg,.send-btn svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .plus-btn:hover,.mic-btn:hover{background:#39423d}
-#prompt{
- flex:1;min-width:0;max-height:120px;resize:none;
- background:transparent;border:0;outline:0;
- color:white;font-size:15px;line-height:1.5;
- padding:12px 0;
-}
+#prompt{flex:1;min-width:0;max-height:120px;resize:none;background:transparent;border:0;outline:0;color:white;font-size:15px;line-height:1.5;padding:12px 0}
 #prompt::placeholder{color:#9da59f}
 .send-btn{background:#f5f8f6;color:#111}
 .send-btn:hover{background:#d9e7df}
 .send-btn:disabled{opacity:.45;cursor:not-allowed}
 .mic-btn.active{background:#a52b35}
-.disclaimer{
- text-align:center;color:#747e77;
- font-size:10px;margin-top:12px;
-}
+.disclaimer{text-align:center;color:#747e77;font-size:10px;margin-top:12px}
 
-/* PLUS MENU */
-.plus-menu{
- display:none;position:absolute;bottom:105px;left:0;
- width:225px;padding:8px;
- background:#1b211e;border:1px solid #3b453f;
- border-radius:16px;z-index:10;
- box-shadow:0 15px 40px #000a;
-}
+.plus-menu{display:none;position:absolute;bottom:105px;left:0;width:225px;padding:8px;background:#1b211e;border:1px solid #3b453f;border-radius:16px;z-index:10;box-shadow:0 15px 40px #000a}
 .plus-menu.show{display:block}
-.menu-item{
- display:flex;align-items:center;gap:12px;
- width:100%;padding:12px;border:0;border-radius:10px;
- background:transparent;text-align:left;
- color:#e1e8e3;font-size:13px;
-}
+.menu-item{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:0;border-radius:10px;background:transparent;text-align:left;color:#e1e8e3;font-size:13px}
 .menu-item:hover{background:#303b34}
 .menu-item svg{width:19px;height:19px;color:var(--green)}
 
-/* MODALS */
-.modal-backdrop{
- position:fixed;inset:0;z-index:50;
- display:none;align-items:center;justify-content:center;
- background:#000b;padding:18px;
-}
+.modal-backdrop{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:#000b;padding:18px}
 .modal-backdrop.show{display:flex}
-.modal{
- width:100%;max-width:400px;
- background:#171d19;border:1px solid var(--border);
- border-radius:20px;padding:22px;
-}
+.modal{width:100%;max-width:400px;background:#171d19;border:1px solid var(--border);border-radius:20px;padding:22px}
 .modal h2{font-size:20px;margin:0 0 8px}
 .modal p{font-size:13px;color:var(--muted)}
-.close-modal{
- float:right;background:none;border:0;
- color:#aaa;font-size:23px;
-}
-.modal input{
- display:block;width:100%;padding:13px;
- margin:9px 0;background:#0c100d;
- color:white;border:1px solid var(--border);
- border-radius:10px;outline:0;
-}
-.primary{
- width:100%;padding:13px;margin-top:10px;
- border:0;border-radius:11px;
- background:var(--green);color:#06271c;font-weight:800;
-}
-.switch-auth{
- text-align:center;color:var(--green);
- font-size:13px;margin-top:16px;cursor:pointer;
-}
-#cameraVideo{
- width:100%;border-radius:12px;background:#000;
-}
+.close-modal{float:right;background:none;border:0;color:#aaa;font-size:23px}
+.modal input{display:block;width:100%;padding:13px;margin:9px 0;background:#0c100d;color:white;border:1px solid var(--border);border-radius:10px;outline:0}
+.primary{width:100%;padding:13px;margin-top:10px;border:0;border-radius:11px;background:var(--green);color:#06271c;font-weight:800}
+.switch-auth{text-align:center;color:var(--green);font-size:13px;margin-top:16px;cursor:pointer}
+#cameraVideo{width:100%;border-radius:12px;background:#000}
 #cameraCanvas{display:none}
 
 @media(max-width:480px){
@@ -359,12 +196,8 @@ button{cursor:pointer;color:inherit}
  .user-message .message-content{max-width:86%}
  .composer-area{padding-left:9px;padding-right:9px}
  .composer{min-height:67px;padding:7px 9px;gap:8px}
- .plus-btn,.mic-btn,.send-btn{
-  width:49px;height:49px;flex-basis:49px;
- }
- .plus-btn svg,.mic-btn svg,.send-btn svg{
-  width:24px;height:24px;
- }
+ .plus-btn,.mic-btn,.send-btn{width:49px;height:49px;flex-basis:49px}
+ .plus-btn svg,.mic-btn svg,.send-btn svg{width:24px;height:24px}
  #prompt{font-size:14px}
  .disclaimer{font-size:9px}
 }
@@ -373,7 +206,6 @@ button{cursor:pointer;color:inherit}
 
 <body>
 <div class="app">
-
 <header class="header">
  <div class="brand-area">
   <button class="header-btn menu-toggle" id="menuBtn" aria-label="Menu">☰</button>
@@ -393,18 +225,15 @@ button{cursor:pointer;color:inherit}
   <div class="sidebar-brand">AXENOVA AI</div>
   <button class="header-btn close-menu" id="closeMenu">×</button>
  </div>
-
  <button class="new-chat" id="newChat">＋ &nbsp; New chat</button>
-
  <div class="section-label">YOUR CONVERSATIONS</div>
  <div class="history" id="historyList"></div>
-
  <div class="sidebar-bottom">
   <div class="profile">
-   <div class="profile-avatar">J</div>
+   <div class="profile-avatar" id="profileAvatar">J</div>
    <div class="profile-info">
-    John
-    <small id="signedStatus">Axenova account</small>
+    <span id="profileName">Guest</span>
+    <small id="signedStatus">Not signed in</small>
    </div>
   </div>
   <button class="side-link" id="settingsBtn">⚙ &nbsp; Settings</button>
@@ -420,10 +249,7 @@ button{cursor:pointer;color:inherit}
     <div class="logo-large">A</div>
     <div class="welcome-tag">YOUR INTELLIGENCE, REIMAGINED</div>
     <h1>Think bigger.<br>Let's make it happen.</h1>
-    <p>
-     Your space to explore ideas, solve problems,
-     create, learn and get things done.
-    </p>
+    <p>Your space to explore ideas, solve problems, create, learn and get things done.</p>
     <div class="suggestions">
      <button class="suggestion">✦ Create something amazing</button>
      <button class="suggestion">⌘ Build a website or app</button>
@@ -435,32 +261,24 @@ button{cursor:pointer;color:inherit}
  </section>
 </main>
 
-<!-- CHATBOX -->
 <div class="composer-area">
  <div class="composer-wrap">
-
   <div class="mode-label" id="modeLabel"></div>
-
   <div class="plus-menu" id="plusMenu">
    <button class="menu-item" id="attachOption">
-    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-    Attach an image
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Attach an image
    </button>
    <button class="menu-item" id="cameraOption">
-    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><circle cx="12" cy="14" r="3"/><path d="m8 7 2-3h4l2 3"/></svg>
-    Take a photo
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><circle cx="12" cy="14" r="3"/><path d="m8 7 2-3h4l2 3"/></svg>Take a photo
    </button>
    <button class="menu-item" data-mode="image">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m5 17 5-5 4 4 3-3 4 4"/></svg>
-    Create an image
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m5 17 5-5 4 4 3-3 4 4"/></svg>Create an image
    </button>
    <button class="menu-item" data-mode="search">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
-    Search the web
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>Search the web
    </button>
    <button class="menu-item" data-mode="code">
-    <svg viewBox="0 0 24 24"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-2-12-4 16"/></svg>
-    Code assistant
+    <svg viewBox="0 0 24 24"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-2-12-4 16"/></svg>Code assistant
    </button>
   </div>
 
@@ -468,27 +286,20 @@ button{cursor:pointer;color:inherit}
    <button class="plus-btn" id="plusBtn" aria-label="More options">
     <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
    </button>
-
    <textarea id="prompt" rows="1" placeholder="Message Axenova..."></textarea>
-
    <button class="mic-btn" id="micBtn" aria-label="Voice input">
     <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg>
    </button>
-
    <button class="send-btn" id="sendBtn" aria-label="Send message">
     <svg viewBox="0 0 24 24"><path d="M12 19V5m-7 7 7-7 7 7"/></svg>
    </button>
   </div>
-
-  <div class="disclaimer">
-   Axenova AI may make mistakes. Verify important information.
-  </div>
+  <div class="disclaimer">Axenova AI may make mistakes. Verify important information.</div>
  </div>
 </div>
 
 <input type="file" id="fileInput" accept="image/*" class="hidden">
 
-<!-- ACCOUNT MODAL -->
 <div class="modal-backdrop" id="accountModal">
  <div class="modal">
   <button class="close-modal" id="closeAccount">×</button>
@@ -503,7 +314,6 @@ button{cursor:pointer;color:inherit}
  </div>
 </div>
 
-<!-- CAMERA MODAL -->
 <div class="modal-backdrop" id="cameraModal">
  <div class="modal">
   <button class="close-modal" id="closeCamera">×</button>
@@ -516,61 +326,57 @@ button{cursor:pointer;color:inherit}
 </div>
 
 <script>
-const API = "";
-const $ = id => document.getElementById(id);
+"use strict";
 
-let mode = "chat";
-let selectedFile = null;
-let busy = false;
-let registerMode = false;
-let cameraStream = null;
-let recognition = null;
-let conversations = [];
-let currentConversation = [];
-let currentTitle = "New chat";
+const API="";
+const $=id=>document.getElementById(id);
 
-const promptBox = $("prompt");
-const messagesInner = $("messagesInner");
-const messages = $("messages");
+let mode="chat";
+let selectedFile=null;
+let busy=false;
+let registerMode=false;
+let cameraStream=null;
+let recognition=null;
 
-/* SAFE HTML ESCAPING */
+let conversations=[];
+let currentConversation=[];
+let currentConversationId=null;
+let currentTitle="New chat";
+let signedInUser=null;
+let saveTimer=null;
+
+const promptBox=$("prompt");
+const messagesInner=$("messagesInner");
+const messages=$("messages");
+
 function escapeHTML(value){
- return String(value).replace(/[&<>"']/g, char => ({
-  "&":"&amp;",
-  "<":"&lt;",
-  ">":"&gt;",
-  '"':"&quot;",
-  "'":"&#039;"
+ return String(value).replace(/[&<>"']/g,char=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
  })[char]);
 }
 
-/* MARKDOWN FORMATTER */
 function formatAI(text){
- let safe = escapeHTML(text);
- const blocks = [];
+ let safe=escapeHTML(text);
+ const blocks=[];
 
- safe = safe.replace(/```([\w-]*)\n?([\s\S]*?)```/g,
-  (_, language, code) => {
-   const index = blocks.length;
-   blocks.push("<pre><code>"+code.trim()+"</code></pre>");
-   return "%%CODE"+index+"%%";
-  }
- );
+ safe=safe.replace(/```([\w-]*)\n?([\s\S]*?)```/g,(_,language,code)=>{
+  const i=blocks.length;
+  blocks.push("<pre><code>"+code.trim()+"</code></pre>");
+  return "%%CODE"+i+"%%";
+ });
 
- safe = safe.replace(/`([^`\n]+)`/g,"<code>$1</code>");
- safe = safe.replace(/^### (.+)$/gm,"<h3>$1</h3>");
- safe = safe.replace(/^## (.+)$/gm,"<h2>$1</h2>");
- safe = safe.replace(/^# (.+)$/gm,"<h1>$1</h1>");
- safe = safe.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
- safe = safe.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g,"<em>$1</em>");
+ safe=safe.replace(/`([^`\n]+)`/g,"<code>$1</code>");
+ safe=safe.replace(/^### (.+)$/gm,"<h3>$1</h3>");
+ safe=safe.replace(/^## (.+)$/gm,"<h2>$1</h2>");
+ safe=safe.replace(/^# (.+)$/gm,"<h1>$1</h1>");
+ safe=safe.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
+ safe=safe.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g,"<em>$1</em>");
 
- safe = safe.replace(/^\s*[-*] (.+)$/gm,"<li>$1</li>");
- safe = safe.replace(/^\s*\d+\. (.+)$/gm,"<li>$1</li>");
- safe = safe.replace(/((?:<li>[\s\S]*?<\/li>\s*)+)/g,
-  match=>"<ul>"+match+"</ul>"
- );
+ safe=safe.replace(/^\s*[-*] (.+)$/gm,"<li>$1</li>");
+ safe=safe.replace(/^\s*\d+\. (.+)$/gm,"<li>$1</li>");
+ safe=safe.replace(/((?:<li>[\s\S]*?<\/li>\s*)+)/g,m=>"<ul>"+m+"</ul>");
 
- safe = safe.split(/\n{2,}/).map(part=>{
+ safe=safe.split(/\n{2,}/).map(part=>{
   part=part.trim();
   if(!part)return "";
   if(/^%%CODE\d+%%$/.test(part))return part;
@@ -578,24 +384,34 @@ function formatAI(text){
   return "<p>"+part.replace(/\n/g,"<br>")+"</p>";
  }).join("");
 
- safe=safe.replace(/%%CODE(\d+)%%/g,
-  (_,index)=>blocks[Number(index)]
- );
-
- return safe;
+ return safe.replace(/%%CODE(\d+)%%/g,(_,i)=>blocks[Number(i)]);
 }
 
-/* MESSAGE DISPLAY */
+function showWelcome(){
+ messagesInner.innerHTML=`
+ <div class="welcome" id="welcome">
+  <div class="logo-large">A</div>
+  <div class="welcome-tag">YOUR INTELLIGENCE, REIMAGINED</div>
+  <h1>Think bigger.<br>Let's make it happen.</h1>
+  <p>Your space to explore ideas, solve problems, create, learn and get things done.</p>
+  <div class="suggestions">
+   <button class="suggestion">✦ Create something amazing</button>
+   <button class="suggestion">⌘ Build a website or app</button>
+   <button class="suggestion">◈ Help me understand something</button>
+   <button class="suggestion">↗ Explore new ideas</button>
+  </div>
+ </div>`;
+ attachSuggestionEvents();
+}
+
 function addMessage(role,text,options={}){
  $("welcome")?.remove();
 
  const row=document.createElement("div");
- row.className="message "+
-  (role==="user"?"user-message":"ai-message");
+ row.className="message "+(role==="user"?"user-message":"ai-message");
 
  const avatar=document.createElement("div");
- avatar.className="avatar "+
-  (role==="user"?"user-avatar":"ai-avatar");
+ avatar.className="avatar "+(role==="user"?"user-avatar":"ai-avatar");
  avatar.textContent=role==="user"?"U":"A";
 
  const content=document.createElement("div");
@@ -607,12 +423,8 @@ function addMessage(role,text,options={}){
 
  const body=document.createElement("div");
  body.className="message-text";
-
- if(role==="assistant"){
-  body.innerHTML=formatAI(text);
- }else{
-  body.textContent=text;
- }
+ if(role==="assistant")body.innerHTML=formatAI(text);
+ else body.textContent=text;
 
  content.append(name,body);
  row.append(avatar,content);
@@ -639,8 +451,7 @@ function addMessage(role,text,options={}){
   read.onclick=()=>{
    if(!("speechSynthesis" in window))return;
    speechSynthesis.cancel();
-   const utterance=new SpeechSynthesisUtterance(text);
-   speechSynthesis.speak(utterance);
+   speechSynthesis.speak(new SpeechSynthesisUtterance(text));
   };
 
   actions.append(copy,read);
@@ -650,20 +461,13 @@ function addMessage(role,text,options={}){
  if(!options.noSave){
   currentConversation.push({role,content:text});
  }
-
  messages.scrollTop=messages.scrollHeight;
  return body;
 }
 
-/* MODE */
 function setMode(value){
  mode=value;
- const labels={
-  chat:"",
-  image:"✦ Image generation mode",
-  search:"⌕ Web search mode",
-  code:"⌘ Code assistant mode"
- };
+ const labels={chat:"",image:"✦ Image generation mode",search:"⌕ Web search mode",code:"⌘ Code assistant mode"};
  const placeholders={
   chat:"Message Axenova...",
   image:"Describe the image you want to create...",
@@ -675,20 +479,18 @@ function setMode(value){
  $("plusMenu").classList.remove("show");
 }
 
-/* LOADING */
 function typing(show){
  $("typing")?.remove();
  if(!show)return;
-
  const row=document.createElement("div");
  row.id="typing";
  row.className="message ai-message";
  row.innerHTML=`
-  <div class="avatar ai-avatar">A</div>
-  <div class="message-content">
-   <div class="message-name">Axenova AI</div>
-   <div class="typing">Thinking...</div>
-  </div>`;
+ <div class="avatar ai-avatar">A</div>
+ <div class="message-content">
+  <div class="message-name">Axenova AI</div>
+  <div class="typing">Thinking...</div>
+ </div>`;
  messagesInner.append(row);
  messages.scrollTop=messages.scrollHeight;
 }
@@ -698,7 +500,202 @@ function setBusy(value){
  $("sendBtn").disabled=value;
 }
 
-/* IMAGE TO BASE64 */
+/* ---------- SERVER CONVERSATION HISTORY ---------- */
+
+function normalizeConversation(item){
+ if(!item)return null;
+
+ let parsed=item.messages??[];
+ if(typeof parsed==="string"){
+  try{parsed=JSON.parse(parsed)}catch(e){parsed=[]}
+ }
+ if(!Array.isArray(parsed))parsed=[];
+
+ return {
+  id:String(item.id??item.conversation_id??""),
+  title:item.title||"New chat",
+  messages:parsed.map(m=>({
+   role:m.role==="user"?"user":"assistant",
+   content:String(m.content??m.text??"")
+  })).filter(m=>m.content)
+ };
+}
+
+function saveLocalFallback(){
+ try{
+  localStorage.setItem("axenova_history",JSON.stringify(conversations));
+ }catch(e){}
+}
+
+async function loadConversations(){
+ if(!signedInUser)return;
+
+ try{
+  const response=await fetch(API+"/api/conversations",{
+   method:"GET",
+   credentials:"include",
+   headers:{"Accept":"application/json"}
+  });
+
+  if(response.status===401){
+   signedInUser=null;
+   conversations=[];
+   renderHistory();
+   return;
+  }
+
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||"Could not load conversations.");
+
+  const list=Array.isArray(data)?data:
+   (data.conversations||data.items||[]);
+
+  conversations=list.map(normalizeConversation).filter(c=>c&&c.id);
+  saveLocalFallback();
+  renderHistory();
+ }catch(error){
+  console.error("Conversation loading failed:",error);
+  renderHistory();
+ }
+}
+
+async function saveConversation(){
+ if(!signedInUser||!currentConversation.length)return;
+
+ const payload={
+  id:currentConversationId,
+  title:currentTitle||"New chat",
+  messages:currentConversation
+ };
+
+ try{
+  const response=await fetch(API+"/api/conversations",{
+   method:"POST",
+   credentials:"include",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(payload)
+  });
+
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok){
+   throw new Error(data.error||data.message||"Could not save conversation.");
+  }
+
+  const saved=data.conversation||data.item||data;
+  if(saved&&saved.id)currentConversationId=String(saved.id);
+
+  const localRecord={
+   id:currentConversationId||String(Date.now()),
+   title:currentTitle,
+   messages:[...currentConversation]
+  };
+
+  const index=conversations.findIndex(c=>c.id===localRecord.id);
+  if(index>=0)conversations[index]=localRecord;
+  else conversations.unshift(localRecord);
+
+  renderHistory();
+  saveLocalFallback();
+ }catch(error){
+  console.error("Conversation save failed:",error);
+ }
+}
+
+function scheduleSave(){
+ clearTimeout(saveTimer);
+ saveTimer=setTimeout(saveConversation,700);
+}
+
+function renderHistory(){
+ const list=$("historyList");
+ list.innerHTML="";
+
+ if(!signedInUser){
+  list.innerHTML='<div class="empty-history">Sign in to see your saved conversations.</div>';
+  return;
+ }
+
+ if(!conversations.length){
+  list.innerHTML='<div class="empty-history">No saved conversations yet.</div>';
+  return;
+ }
+
+ conversations.forEach(item=>{
+  const row=document.createElement("div");
+  row.className="history-item"+(item.id===currentConversationId?" active":"");
+
+  const title=document.createElement("span");
+  title.className="history-title";
+  title.textContent=item.title||"New chat";
+  title.onclick=()=>loadConversation(item.id);
+
+  const remove=document.createElement("button");
+  remove.className="history-delete";
+  remove.textContent="×";
+  remove.title="Delete conversation";
+  remove.onclick=e=>{
+   e.stopPropagation();
+   deleteConversation(item.id);
+  };
+
+  row.append(title,remove);
+  row.onclick=()=>loadConversation(item.id);
+  list.append(row);
+ });
+}
+
+async function loadConversation(id){
+ const item=conversations.find(c=>c.id===String(id));
+ if(!item)return;
+
+ currentConversationId=item.id;
+ currentTitle=item.title;
+ currentConversation=[];
+ messagesInner.innerHTML="";
+
+ item.messages.forEach(m=>{
+  addMessage(m.role,m.content);
+ });
+
+ renderHistory();
+ closeSidebar();
+}
+
+async function deleteConversation(id){
+ if(!signedInUser)return;
+ if(!confirm("Delete this conversation?"))return;
+
+ try{
+  const response=await fetch(API+"/api/conversations/"+encodeURIComponent(id),{
+   method:"DELETE",credentials:"include"
+  });
+  if(!response.ok){
+   const data=await response.json().catch(()=>({}));
+   throw new Error(data.error||"Could not delete conversation.");
+  }
+
+  conversations=conversations.filter(c=>c.id!==String(id));
+  if(currentConversationId===String(id))newChat();
+  renderHistory();
+  saveLocalFallback();
+ }catch(error){
+  alert(error.message);
+ }
+}
+
+function newChat(){
+ clearTimeout(saveTimer);
+ currentConversation=[];
+ currentConversationId=null;
+ currentTitle="New chat";
+ showWelcome();
+ setMode("chat");
+ renderHistory();
+ closeSidebar();
+}
+
+/* ---------- CHAT ---------- */
+
 function toBase64(file){
  return new Promise((resolve,reject)=>{
   const reader=new FileReader();
@@ -708,10 +705,15 @@ function toBase64(file){
  });
 }
 
-/* SEND MESSAGE */
 async function sendMessage(){
  const message=promptBox.value.trim();
  if((!message&&!selectedFile)||busy)return;
+
+ if(!signedInUser){
+  $("accountModal").classList.add("show");
+  $("authStatus").textContent="Please sign in to use Axenova.";
+  return;
+ }
 
  const selectedMode=mode;
  const file=selectedFile;
@@ -725,9 +727,7 @@ async function sendMessage(){
  promptBox.value="";
  promptBox.style.height="auto";
  selectedFile=null;
-
- if(file)promptBox.placeholder="Message Axenova...";
-
+ $("fileInput").value="";
  setBusy(true);
  typing(true);
 
@@ -736,21 +736,17 @@ async function sendMessage(){
 
   if(selectedMode==="image"){
    response=await fetch(API+"/api/image",{
-    method:"POST",
+    method:"POST",credentials:"include",
     headers:{"Content-Type":"application/json"},
-    credentials:"include",
     body:JSON.stringify({prompt:message})
    });
   }else{
    const image=file?await toBase64(file):null;
-
    response=await fetch(API+"/api/chat",{
-    method:"POST",
+    method:"POST",credentials:"include",
     headers:{"Content-Type":"application/json"},
-    credentials:"include",
     body:JSON.stringify({
-     message,
-     image,
+     message,image,
      history:currentConversation.slice(0,-1).slice(-12),
      mode:selectedMode
     })
@@ -758,10 +754,7 @@ async function sendMessage(){
   }
 
   const data=await response.json().catch(()=>({}));
-
-  if(!response.ok){
-   throw new Error(data.error||data.message||"Server error "+response.status);
-  }
+  if(!response.ok)throw new Error(data.error||data.message||"Server error "+response.status);
 
   typing(false);
 
@@ -783,88 +776,20 @@ async function sendMessage(){
    addMessage("assistant",typeof answer==="string"?answer:JSON.stringify(answer));
   }
 
-  saveConversation();
+  await saveConversation();
 
  }catch(error){
   typing(false);
   addMessage("assistant","I couldn't complete that request. "+error.message);
-  saveConversation();
+  await saveConversation();
  }finally{
   setBusy(false);
   promptBox.focus();
  }
 }
 
-/* LOCAL CONVERSATION HISTORY */
-function saveConversation(){
- if(!currentConversation.length)return;
+/* ---------- SIDEBAR ---------- */
 
- const record={
-  id:Date.now(),
-  title:currentTitle||"New chat",
-  messages:[...currentConversation]
- };
-
- const index=conversations.findIndex(c=>c.id===record.id);
- if(index>=0)conversations[index]=record;
- else conversations.unshift(record);
-
- conversations=conversations.slice(0,40);
- try{
-  localStorage.setItem("axenova_history",JSON.stringify(conversations));
- }catch(e){}
- renderHistory();
-}
-
-function renderHistory(){
- $("historyList").innerHTML="";
-
- conversations.forEach(item=>{
-  const el=document.createElement("div");
-  el.className="history-item";
-  el.textContent=item.title;
-  el.onclick=()=>loadConversation(item.id);
-  $("historyList").append(el);
- });
-}
-
-function loadConversation(id){
- const item=conversations.find(c=>c.id===id);
- if(!item)return;
-
- currentConversation=[];
- currentTitle=item.title;
- messagesInner.innerHTML="";
-
- item.messages.forEach(m=>{
-  addMessage(m.role,m.content,{noSave:false});
- });
-
- closeSidebar();
-}
-
-function newChat(){
- currentConversation=[];
- currentTitle="New chat";
- messagesInner.innerHTML=`
-  <div class="welcome" id="welcome">
-   <div class="logo-large">A</div>
-   <div class="welcome-tag">YOUR INTELLIGENCE, REIMAGINED</div>
-   <h1>Think bigger.<br>Let's make it happen.</h1>
-   <p>Your space to explore ideas, solve problems, create, learn and get things done.</p>
-   <div class="suggestions">
-    <button class="suggestion">✦ Create something amazing</button>
-    <button class="suggestion">⌘ Build a website or app</button>
-    <button class="suggestion">◈ Help me understand something</button>
-    <button class="suggestion">↗ Explore new ideas</button>
-   </div>
-  </div>`;
- setMode("chat");
- closeSidebar();
- attachSuggestionEvents();
-}
-
-/* SIDEBAR */
 function openSidebar(){
  $("sidebar").classList.add("open");
  $("overlay").classList.add("show");
@@ -878,16 +803,15 @@ $("closeMenu").onclick=closeSidebar;
 $("overlay").onclick=closeSidebar;
 $("newChat").onclick=newChat;
 
-/* COMPOSER EVENTS */
-$("sendBtn").onclick=sendMessage;
+/* ---------- COMPOSER ---------- */
 
+$("sendBtn").onclick=sendMessage;
 promptBox.addEventListener("keydown",e=>{
  if(e.key==="Enter"&&!e.shiftKey){
   e.preventDefault();
   sendMessage();
  }
 });
-
 promptBox.addEventListener("input",()=>{
  promptBox.style.height="auto";
  promptBox.style.height=Math.min(promptBox.scrollHeight,120)+"px";
@@ -897,30 +821,23 @@ $("plusBtn").onclick=e=>{
  e.stopPropagation();
  $("plusMenu").classList.toggle("show");
 };
-
 document.addEventListener("click",e=>{
  if(!$("plusMenu").contains(e.target)&&e.target!==$("plusBtn")){
   $("plusMenu").classList.remove("show");
  }
 });
-
 $("attachOption").onclick=()=>{
  $("plusMenu").classList.remove("show");
  $("fileInput").click();
 };
-
 $("fileInput").onchange=e=>{
  selectedFile=e.target.files[0]||null;
- if(selectedFile){
-  promptBox.placeholder="Image attached. Ask Axenova...";
- }
+ if(selectedFile)promptBox.placeholder="Image attached. Ask Axenova...";
 };
-
 document.querySelectorAll("[data-mode]").forEach(button=>{
  button.onclick=()=>setMode(button.dataset.mode);
 });
 
-/* SUGGESTIONS */
 function attachSuggestionEvents(){
  document.querySelectorAll(".suggestion").forEach(button=>{
   button.onclick=()=>{
@@ -931,10 +848,10 @@ function attachSuggestionEvents(){
 }
 attachSuggestionEvents();
 
-/* VOICE INPUT */
+/* ---------- VOICE ---------- */
+
 $("micBtn").onclick=()=>{
  const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
-
  if(!Speech){
   alert("Voice input is not supported in this browser. Try Chrome.");
   return;
@@ -950,7 +867,6 @@ $("micBtn").onclick=()=>{
  recognition=new Speech();
  recognition.lang="en-US";
  recognition.interimResults=true;
-
  $("micBtn").classList.add("active");
 
  recognition.onresult=e=>{
@@ -965,24 +881,22 @@ $("micBtn").onclick=()=>{
   recognition=null;
   $("micBtn").classList.remove("active");
  };
-
  recognition.onerror=()=>{
   recognition=null;
   $("micBtn").classList.remove("active");
  };
-
  recognition.start();
 };
 
-/* CAMERA */
+/* ---------- CAMERA ---------- */
+
 $("cameraOption").onclick=async()=>{
  $("plusMenu").classList.remove("show");
  $("cameraModal").classList.add("show");
 
  try{
   cameraStream=await navigator.mediaDevices.getUserMedia({
-   video:{facingMode:"environment"},
-   audio:false
+   video:{facingMode:"environment"},audio:false
   });
   $("cameraVideo").srcObject=cameraStream;
  }catch(e){
@@ -992,9 +906,7 @@ $("cameraOption").onclick=async()=>{
 };
 
 function stopCamera(){
- if(cameraStream){
-  cameraStream.getTracks().forEach(track=>track.stop());
- }
+ if(cameraStream)cameraStream.getTracks().forEach(track=>track.stop());
  cameraStream=null;
  $("cameraVideo").srcObject=null;
  $("cameraModal").classList.remove("show");
@@ -1004,7 +916,6 @@ $("closeCamera").onclick=stopCamera;
 $("captureBtn").onclick=()=>{
  const video=$("cameraVideo");
  const canvas=$("cameraCanvas");
-
  if(!video.videoWidth)return;
 
  canvas.width=video.videoWidth;
@@ -1020,15 +931,15 @@ $("captureBtn").onclick=()=>{
  },"image/jpeg",.9);
 };
 
-/* AUTHENTICATION */
+/* ---------- AUTH ---------- */
+
 function updateAuth(){
  $("authTitle").textContent=registerMode?"Create your account":"Welcome back";
  $("authDescription").textContent=registerMode?
   "Join Axenova AI and start exploring.":"Sign in to your Axenova account.";
  $("authName").classList.toggle("hidden",!registerMode);
  $("authSubmit").textContent=registerMode?"Create account":"Sign in";
- $("switchAuth").textContent=registerMode?
-  "Already registered? Sign in":"Create an account";
+ $("switchAuth").textContent=registerMode?"Already registered? Sign in":"Create an account";
  $("authStatus").textContent="";
 }
 
@@ -1038,13 +949,12 @@ $("accountBtn").onclick=()=>{
 $("closeAccount").onclick=()=>{
  $("accountModal").classList.remove("show");
 };
-
 $("switchAuth").onclick=()=>{
  registerMode=!registerMode;
  updateAuth();
 };
 
-$("authSubmit").onclick=async()=>{
+async function authenticate(){
  const name=$("authName").value.trim();
  const email=$("authEmail").value.trim();
  const password=$("authPassword").value;
@@ -1058,66 +968,81 @@ $("authSubmit").onclick=async()=>{
  $("authStatus").textContent="Please wait...";
 
  try{
-  const response=await fetch(
-   API+(registerMode?"/api/auth/register":"/api/auth/login"),
-   {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    credentials:"include",
-    body:JSON.stringify({name,email,password})
-   }
-  );
+  const response=await fetch(API+(registerMode?"/api/auth/register":"/api/auth/login"),{
+   method:"POST",credentials:"include",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({name,email,password})
+  });
 
   const data=await response.json().catch(()=>({}));
-  if(!response.ok){
-   throw new Error(data.error||data.message||"Authentication failed.");
-  }
+  if(!response.ok)throw new Error(data.error||data.message||"Authentication failed.");
 
   $("authStatus").style.color="var(--green)";
   $("authStatus").textContent="Successfully signed in.";
 
-  $("accountBtn").textContent=name||email.split("@")[0];
-  $("signedStatus").textContent="Signed in";
+  await checkAccount();
 
-  setTimeout(()=>{
-   $("accountModal").classList.remove("show");
-  },900);
-
+  setTimeout(()=>$("accountModal").classList.remove("show"),600);
  }catch(error){
   $("authStatus").style.color="#ff7777";
   $("authStatus").textContent=error.message;
  }finally{
   $("authSubmit").disabled=false;
  }
-};
+}
+$("authSubmit").onclick=authenticate;
 
 async function checkAccount(){
  try{
-  const response=await fetch(API+"/api/auth/me",{
-   credentials:"include"
-  });
-
-  if(!response.ok)return;
+  const response=await fetch(API+"/api/auth/me",{credentials:"include"});
+  if(!response.ok){
+   signedInUser=null;
+   conversations=[];
+   renderHistory();
+   updateProfile(null);
+   return;
+  }
 
   const data=await response.json();
   if(data.user){
-   $("accountBtn").textContent=
-    data.user.name||data.user.email||"Account";
-   $("signedStatus").textContent="Signed in";
+   signedInUser=data.user;
+   updateProfile(data.user);
+   await loadConversations();
   }
- }catch(e){}
+ }catch(error){
+  console.error("Account check failed:",error);
+ }
+}
+
+function updateProfile(user){
+ if(user){
+  const name=user.name||user.email||"Account";
+  $("accountBtn").textContent=name;
+  $("profileName").textContent=name;
+  $("profileAvatar").textContent=name.charAt(0).toUpperCase();
+  $("signedStatus").textContent="Signed in";
+ }else{
+  $("accountBtn").textContent="Account";
+  $("profileName").textContent="Guest";
+  $("profileAvatar").textContent="G";
+  $("signedStatus").textContent="Not signed in";
+ }
+ renderHistory();
 }
 
 $("logoutBtn").onclick=async()=>{
  try{
-  await fetch(API+"/api/auth/logout",{
-   method:"POST",
-   credentials:"include"
-  });
+  await fetch(API+"/api/auth/logout",{method:"POST",credentials:"include"});
  }catch(e){}
 
- $("accountBtn").textContent="Account";
- $("signedStatus").textContent="Not signed in";
+ signedInUser=null;
+ conversations=[];
+ currentConversation=[];
+ currentConversationId=null;
+ currentTitle="New chat";
+ clearTimeout(saveTimer);
+ showWelcome();
+ updateProfile(null);
  closeSidebar();
 };
 
@@ -1125,15 +1050,7 @@ $("settingsBtn").onclick=()=>{
  alert("More Axenova settings will be added in a future update.");
 };
 
-/* INITIALISE */
-try{
- conversations=JSON.parse(
-  localStorage.getItem("axenova_history")||"[]"
- );
- if(!Array.isArray(conversations))conversations=[];
-}catch(e){
- conversations=[];
-}
+/* ---------- START ---------- */
 
 renderHistory();
 checkAccount();
