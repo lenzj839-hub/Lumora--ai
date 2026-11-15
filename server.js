@@ -6,10 +6,9 @@ const path = require("path");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Database = require("better-sqlite3");
 const rateLimit = require("express-rate-limit");
-const fs = require("fs");
 const crypto = require("crypto");
+const { Pool } = require("pg");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -86,7 +85,9 @@ Your purpose is to make every interaction useful, intelligent and natural.
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  console.error("WARNING: Set a JWT_SECRET of at least 32 characters in Render.");
+  console.error(
+    "WARNING: Set a secure JWT_SECRET of at least 32 characters in Render."
+  );
 }
 
 const ACTIVE_JWT_SECRET =
@@ -106,8 +107,66 @@ const VISION_MODEL =
   process.env.GROQ_VISION_MODEL ||
   "meta-llama/llama-4-scout-17b-16e-instruct";
 
-const DB_PATH = process.env.DB_PATH || "/tmp/axenova.db";
 const PUBLIC_DIR = path.join(__dirname, "public");
+
+// --------------------------------------------------
+// POSTGRESQL DATABASE
+// --------------------------------------------------
+
+if (!process.env.DATABASE_URL) {
+  console.error("FATAL: DATABASE_URL is missing in Render.");
+  process.exit(1);
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  },
+  max: 5,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 15000
+});
+
+pool.on("error", error => {
+  console.error("Unexpected PostgreSQL pool error:", error.message);
+});
+
+async function initializeDatabase() {
+  await pool.query("SELECT 1");
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS public.users (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS public.conversations (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      title TEXT DEFAULT 'New conversation',
+      messages TEXT NOT NULL DEFAULT '[]',
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT conversations_user_id_fkey
+        FOREIGN KEY (user_id)
+        REFERENCES public.users(id)
+        ON DELETE CASCADE
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS conversations_user_id_idx
+    ON public.conversations(user_id)
+  `);
+
+  console.log("Supabase PostgreSQL connected successfully.");
+  console.log("Axenova database tables verified.");
+}
 
 // --------------------------------------------------
 // MIDDLEWARE
@@ -158,85 +217,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
-// --------------------------------------------------
-// DATABASE
-// --------------------------------------------------
-
-try {
-  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-} catch (error) {
-  console.error("Database directory error:", error.message);
-  throw error;
-}
-
-const db = new Database(DB_PATH);
-
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS conversations (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    title TEXT DEFAULT 'New conversation',
-    messages TEXT NOT NULL DEFAULT '[]',
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
-
-  CREATE INDEX IF NOT EXISTS conversations_user_id
-  ON conversations(user_id);
-`);
-
-console.log("Axenova database ready:", DB_PATH);
-
-// --------------------------------------------------
-// DATABASE HELPERS
-// --------------------------------------------------
-
-const findUserByEmail = db.prepare(
-  "SELECT * FROM users WHERE email = ?"
-);
-
-const findUserById = db.prepare(
-  "SELECT id, name, email, created_at FROM users WHERE id = ?"
-);
-
-const createUser = db.prepare(`
-  INSERT INTO users (id, name, email, password)
-  VALUES (?, ?, ?, ?)
-`);
-
-const getUserConversations = db.prepare(`
-  SELECT id, title, messages, updated_at
-  FROM conversations
-  WHERE user_id = ?
-  ORDER BY updated_at DESC
-`);
-
-const saveConversation = db.prepare(`
-  INSERT INTO conversations (id, user_id, title, messages, updated_at)
-  VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-  ON CONFLICT(id) DO UPDATE SET
-    title = excluded.title,
-    messages = excluded.messages,
-    updated_at = CURRENT_TIMESTAMP
-  WHERE conversations.user_id = excluded.user_id
-`);
-
-const deleteConversation = db.prepare(`
-  DELETE FROM conversations
-  WHERE id = ? AND user_id = ?
-`);
 
 // --------------------------------------------------
 // AUTHENTICATION
@@ -327,7 +307,12 @@ app.post("/api/auth/register", async (req, res, next) => {
       });
     }
 
-    if (findUserByEmail.get(email)) {
+    const existing = await pool.query(
+      "SELECT id FROM public.users WHERE email = $1",
+      [email]
+    );
+
+    if (existing.rows.length > 0) {
       return res.status(409).json({
         ok: false,
         error: "An account with this email already exists."
@@ -337,9 +322,15 @@ app.post("/api/auth/register", async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 12);
     const userId = crypto.randomUUID();
 
-    createUser.run(userId, name, email, hashedPassword);
+    const result = await pool.query(
+      `INSERT INTO public.users (id, name, email, password)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, created_at`,
+      [userId, name, email, hashedPassword]
+    );
 
-    const user = findUserById.get(userId);
+    const user = result.rows[0];
+
     setAuthCookie(res, createToken(user));
 
     return res.status(201).json({
@@ -348,6 +339,13 @@ app.post("/api/auth/register", async (req, res, next) => {
       user
     });
   } catch (error) {
+    if (error.code === "23505") {
+      return res.status(409).json({
+        ok: false,
+        error: "An account with this email already exists."
+      });
+    }
+
     next(error);
   }
 });
@@ -365,7 +363,12 @@ app.post("/api/auth/login", async (req, res, next) => {
       });
     }
 
-    const userRecord = findUserByEmail.get(email);
+    const result = await pool.query(
+      "SELECT * FROM public.users WHERE email = $1",
+      [email]
+    );
+
+    const userRecord = result.rows[0];
 
     if (!userRecord) {
       return res.status(401).json({
@@ -386,7 +389,13 @@ app.post("/api/auth/login", async (req, res, next) => {
       });
     }
 
-    const user = findUserById.get(userRecord.id);
+    const user = {
+      id: userRecord.id,
+      name: userRecord.name,
+      email: userRecord.email,
+      created_at: userRecord.created_at
+    };
+
     setAuthCookie(res, createToken(user));
 
     return res.json({
@@ -400,17 +409,28 @@ app.post("/api/auth/login", async (req, res, next) => {
 });
 
 // CURRENT USER
-app.get("/api/auth/me", authMiddleware, (req, res) => {
-  const user = findUserById.get(req.user.id);
+app.get("/api/auth/me", authMiddleware, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, email, created_at
+       FROM public.users
+       WHERE id = $1`,
+      [req.user.id]
+    );
 
-  if (!user) {
-    return res.status(401).json({
-      ok: false,
-      error: "Account not found."
-    });
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(401).json({
+        ok: false,
+        error: "Account not found."
+      });
+    }
+
+    res.json({ ok: true, user });
+  } catch (error) {
+    next(error);
   }
-
-  res.json({ ok: true, user });
 });
 
 // LOGOUT
@@ -427,57 +447,80 @@ app.post("/api/auth/logout", (req, res) => {
 // CONVERSATION HISTORY
 // --------------------------------------------------
 
-app.get("/api/conversations", authMiddleware, (req, res) => {
-  const rows = getUserConversations.all(req.user.id);
+app.get("/api/conversations", authMiddleware, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, title, messages, updated_at
+       FROM public.conversations
+       WHERE user_id = $1
+       ORDER BY updated_at DESC`,
+      [req.user.id]
+    );
 
-  const conversations = rows.map(row => {
-    let messages = [];
+    const conversations = result.rows.map(row => {
+      let messages = [];
 
-    try {
-      messages = JSON.parse(row.messages);
-    } catch {
-      messages = [];
-    }
+      try {
+        messages = JSON.parse(row.messages);
+      } catch {
+        messages = [];
+      }
 
-    return {
-      id: row.id,
-      title: row.title,
-      messages,
-      updatedAt: row.updated_at
-    };
-  });
+      return {
+        id: row.id,
+        title: row.title,
+        messages,
+        updatedAt: row.updated_at
+      };
+    });
 
-  res.json({
-    ok: true,
-    conversations
-  });
+    res.json({
+      ok: true,
+      conversations
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.post("/api/conversations", authMiddleware, (req, res) => {
-  const id = String(req.body.id || crypto.randomUUID());
-  const title = String(req.body.title || "New conversation").slice(0, 150);
-  const messages = req.body.messages;
-
-  if (!Array.isArray(messages)) {
-    return res.status(400).json({
-      ok: false,
-      error: "Messages must be an array."
-    });
-  }
-
-  if (messages.length > 500) {
-    return res.status(400).json({
-      ok: false,
-      error: "This conversation contains too many messages."
-    });
-  }
-
+app.post("/api/conversations", authMiddleware, async (req, res, next) => {
   try {
-    saveConversation.run(
-      id,
-      req.user.id,
-      title,
-      JSON.stringify(messages)
+    const id = String(req.body.id || crypto.randomUUID());
+    const title = String(
+      req.body.title || "New conversation"
+    ).slice(0, 150);
+
+    const messages = req.body.messages;
+
+    if (!Array.isArray(messages)) {
+      return res.status(400).json({
+        ok: false,
+        error: "Messages must be an array."
+      });
+    }
+
+    if (messages.length > 500) {
+      return res.status(400).json({
+        ok: false,
+        error: "This conversation contains too many messages."
+      });
+    }
+
+    await pool.query(
+      `INSERT INTO public.conversations
+        (id, user_id, title, messages, updated_at)
+       VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
+       ON CONFLICT (id) DO UPDATE SET
+         title = EXCLUDED.title,
+         messages = EXCLUDED.messages,
+         updated_at = CURRENT_TIMESTAMP
+       WHERE public.conversations.user_id = EXCLUDED.user_id`,
+      [
+        id,
+        req.user.id,
+        title,
+        JSON.stringify(messages)
+      ]
     );
 
     res.json({
@@ -495,17 +538,26 @@ app.post("/api/conversations", authMiddleware, (req, res) => {
   }
 });
 
-app.delete("/api/conversations/:id", authMiddleware, (req, res) => {
-  const result = deleteConversation.run(
-    req.params.id,
-    req.user.id
-  );
+app.delete(
+  "/api/conversations/:id",
+  authMiddleware,
+  async (req, res, next) => {
+    try {
+      const result = await pool.query(
+        `DELETE FROM public.conversations
+         WHERE id = $1 AND user_id = $2`,
+        [req.params.id, req.user.id]
+      );
 
-  res.json({
-    ok: true,
-    deleted: result.changes > 0
-  });
-});
+      res.json({
+        ok: true,
+        deleted: result.rowCount > 0
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 // --------------------------------------------------
 // GOOGLE SEARCH
@@ -860,11 +912,21 @@ app.post("/api/image", async (req, res) => {
 // HEALTH CHECK
 // --------------------------------------------------
 
-app.get("/health", (req, res) => {
-  res.json({
-    ok: true,
+app.get("/health", async (req, res) => {
+  let databaseConnected = false;
+
+  try {
+    await pool.query("SELECT 1");
+    databaseConnected = true;
+  } catch {
+    databaseConnected = false;
+  }
+
+  res.status(databaseConnected ? 200 : 503).json({
+    ok: databaseConnected,
     app: "Axenova AI",
-    status: "running",
+    status: databaseConnected ? "running" : "database unavailable",
+    database: databaseConnected ? "Supabase PostgreSQL" : "disconnected",
     googleSearch: Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID),
     chat: Boolean(GROQ_API_KEY),
     imageGeneration: Boolean(OPENAI_API_KEY),
@@ -872,12 +934,23 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.get("/api/health", (req, res) => {
-  res.json({
-    ok: true,
-    app: "Axenova AI",
-    status: "running"
-  });
+app.get("/api/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+
+    res.json({
+      ok: true,
+      app: "Axenova AI",
+      status: "running",
+      database: "connected"
+    });
+  } catch {
+    res.status(503).json({
+      ok: false,
+      app: "Axenova AI",
+      status: "database unavailable"
+    });
+  }
 });
 
 // --------------------------------------------------
@@ -911,17 +984,29 @@ app.use((err, req, res, next) => {
 // START SERVER
 // --------------------------------------------------
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("==================================");
-  console.log("       AXENOVA AI SERVER");
-  console.log("==================================");
-  console.log("Server running on port:", PORT);
-  console.log("Database:", DB_PATH);
-  console.log("Chat configured:", Boolean(GROQ_API_KEY));
-  console.log("Chat model:", CHAT_MODEL);
-  console.log(
-    "Google Search configured:",
-    Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID)
-  );
-  console.log("Image generation configured:", Boolean(OPENAI_API_KEY));
-});
+async function startServer() {
+  try {
+    await initializeDatabase();
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log("==================================");
+      console.log("       AXENOVA AI SERVER");
+      console.log("==================================");
+      console.log("Server running on port:", PORT);
+      console.log("Database: Supabase PostgreSQL");
+      console.log("Chat configured:", Boolean(GROQ_API_KEY));
+      console.log("Chat model:", CHAT_MODEL);
+      console.log(
+        "Google Search configured:",
+        Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID)
+      );
+      console.log("Image generation configured:", Boolean(OPENAI_API_KEY));
+    });
+  } catch (error) {
+    console.error("FATAL: Could not initialize Axenova database.");
+    console.error(error.message);
+    process.exit(1);
+  }
+}
+
+startServer();
