@@ -3,1913 +3,1541 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050706">
-<meta name="description" content="Axenova AI - Your intelligent creative assistant.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08090b">
+<meta name="description" content="Axenova AI - Your intelligent assistant">
 <title>Axenova AI</title>
+
+<!-- Modern icons and Markdown renderer -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 
 <style>
 :root {
-  --bg:#050706;
-  --panel:#0b100e;
-  --panel2:#101713;
-  --border:rgba(255,255,255,.09);
-  --green:#00d6a0;
-  --green2:#00a982;
-  --text:#f4f8f6;
-  --muted:#84928c;
-  --radius:20px;
+  --bg:#08090b;
+  --panel:#101214;
+  --panel2:#171a1d;
+  --border:#25292d;
+  --text:#eceeef;
+  --muted:#92999e;
+  --green:#10b981;
+  --green2:#059669;
+  --user:#202428;
 }
 
-* {
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 
-html,body {
+html,body{
   width:100%;
   height:100%;
   overflow:hidden;
-}
-
-body {
   background:var(--bg);
   color:var(--text);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 
-button,input,textarea {
-  font:inherit;
-}
-
-button {
-  cursor:pointer;
-  color:inherit;
-}
-
-button:focus-visible,input:focus-visible,textarea:focus-visible {
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible{
   outline:2px solid var(--green);
-  outline-offset:3px;
+  outline-offset:2px;
 }
 
-.app {
+.app{
   display:flex;
   width:100%;
   height:100dvh;
   overflow:hidden;
-  background:
-    radial-gradient(ellipse at 70% -20%,rgba(0,214,160,.09),transparent 42%),
-    var(--bg);
 }
 
 /* SIDEBAR */
 
-.sidebar {
-  width:270px;
-  min-width:270px;
-  height:100%;
-  padding:22px 15px;
-  background:rgba(8,13,11,.96);
+.sidebar{
+  width:275px;
+  flex-shrink:0;
+  background:#0d0f11;
   border-right:1px solid var(--border);
   display:flex;
   flex-direction:column;
-  transition:transform .3s ease;
+  padding:16px 12px;
+  transition:transform .25s ease,width .25s ease;
   z-index:30;
 }
 
-.brand {
+.sidebar-top{
   display:flex;
   align-items:center;
-  gap:11px;
-  padding:5px 9px 27px;
+  justify-content:space-between;
+  padding:4px 5px 20px;
 }
 
-.brand-logo {
-  width:39px;
-  height:39px;
-  border-radius:13px;
-  background:linear-gradient(145deg,#00e2a6,#007f65);
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:17px;
+  font-weight:750;
+  letter-spacing:-.5px;
+}
+
+.brand-dot{
+  width:8px;
+  height:8px;
+  background:var(--green);
+  border-radius:50%;
+  box-shadow:0 0 12px #10b98199;
+}
+
+.icon-btn{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:10px;
+  background:transparent;
   display:grid;
   place-items:center;
-  color:#001b13;
-  font-size:22px;
-  font-weight:900;
-  box-shadow:0 0 28px rgba(0,214,160,.18);
-}
-
-.brand-name {
-  font-size:19px;
-  font-weight:750;
-  letter-spacing:-.7px;
-}
-
-.brand-name span {
-  color:var(--green);
-}
-
-.brand-sub {
-  color:var(--muted);
-  font-size:10px;
-  margin-top:3px;
-  letter-spacing:1.4px;
-  text-transform:uppercase;
-}
-
-.new-chat {
-  width:100%;
-  padding:13px 15px;
-  border:1px solid rgba(0,214,160,.25);
-  border-radius:14px;
-  background:rgba(0,214,160,.09);
-  color:#8af3d2;
-  display:flex;
-  align-items:center;
-  gap:11px;
-  font-size:13px;
-  font-weight:650;
+  color:#aeb5b9;
   transition:.2s;
 }
 
-.new-chat:hover {
-  background:rgba(0,214,160,.17);
-  transform:translateY(-1px);
+.icon-btn:hover{background:#202428;color:white}
+.icon-btn svg{width:19px;height:19px}
+
+.new-chat{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:var(--text);
+  font-size:14px;
+  margin-bottom:24px;
+  transition:.2s;
 }
 
-.side-label {
-  color:#68756f;
-  font-size:10px;
-  font-weight:750;
-  letter-spacing:1.6px;
-  margin:29px 9px 12px;
+.new-chat:hover{background:var(--panel2);border-color:#3b4247}
+.new-chat svg{width:18px;height:18px}
+
+.sidebar-label{
+  color:#777f84;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  padding:0 10px 10px;
 }
 
-.history {
+.history{
   flex:1;
   overflow-y:auto;
 }
 
-.history-item {
-  display:flex;
-  align-items:center;
-  gap:8px;
+.history-item{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#b9c0c4;
   padding:11px 10px;
-  border-radius:11px;
-  color:#aab5af;
-  font-size:12px;
-  cursor:pointer;
+  border-radius:9px;
+  text-align:left;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
   margin-bottom:3px;
 }
 
-.history-item:hover {
-  background:var(--panel2);
+.history-item:hover,.history-item.active{
+  background:#1b1f22;
   color:white;
 }
 
-.history-item.active {
-  background:rgba(0,214,160,.09);
-  color:#9bf2d5;
-}
-
-.history-title {
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  flex:1;
-}
-
-.history-delete {
-  border:0;
-  background:transparent;
-  color:#75827b;
-  padding:3px;
-  opacity:0;
-}
-
-.history-item:hover .history-delete {
-  opacity:1;
-}
-
-.sidebar-bottom {
+.sidebar-bottom{
   border-top:1px solid var(--border);
-  padding-top:15px;
+  padding-top:12px;
 }
 
-.profile {
+.profile-button{
+  width:100%;
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:10px;
-  border-radius:13px;
-  cursor:pointer;
+  gap:11px;
+  padding:9px;
+  background:transparent;
+  border:0;
+  border-radius:10px;
+  text-align:left;
 }
 
-.profile:hover {
-  background:var(--panel2);
-}
+.profile-button:hover{background:#1b1f22}
 
-.avatar {
-  width:35px;
-  height:35px;
-  border-radius:50%;
+.avatar{
+  width:34px;
+  height:34px;
   display:grid;
   place-items:center;
-  background:linear-gradient(135deg,#0c8065,#073c32);
-  color:#a6ffe4;
-  font-weight:800;
+  border-radius:50%;
+  background:#173b31;
+  color:#43d6a7;
+  font-weight:700;
+  flex-shrink:0;
 }
 
-.profile-name {
-  font-size:12px;
-  font-weight:650;
-}
-
-.profile-status {
-  font-size:10px;
-  color:var(--muted);
-  margin-top:3px;
-}
+.profile-info{min-width:0;flex:1}
+.profile-name{font-size:13px;font-weight:650}
+.profile-status{font-size:11px;color:var(--muted);margin-top:3px}
 
 /* MAIN */
 
-.main {
+.main{
   flex:1;
   min-width:0;
+  height:100%;
   display:flex;
   flex-direction:column;
-  height:100%;
   position:relative;
+  background:
+    radial-gradient(ellipse at 70% 0%,#073b2812,transparent 42%),
+    var(--bg);
 }
 
-.topbar {
-  height:70px;
-  min-height:70px;
-  padding:0 30px;
+.topbar{
+  height:64px;
+  flex-shrink:0;
+  border-bottom:1px solid #ffffff0c;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  border-bottom:1px solid var(--border);
-  background:rgba(5,7,6,.75);
-  backdrop-filter:blur(20px);
+  padding:0 22px;
+  background:#08090bf0;
   z-index:5;
 }
 
-.top-left {
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
+.top-left{display:flex;align-items:center;gap:13px}
+.mobile-brand{display:none}
 
-.menu-btn {
-  display:none;
-  width:39px;
-  height:39px;
-  border:1px solid var(--border);
-  background:var(--panel);
-  border-radius:12px;
-}
-
-.page-title {
+.top-title{
   font-size:14px;
   font-weight:700;
 }
 
-.online {
-  display:inline-block;
-  width:7px;
-  height:7px;
-  background:var(--green);
-  border-radius:50%;
-  margin-left:5px;
-  box-shadow:0 0 10px var(--green);
-}
-
-.page-subtitle {
+.top-subtitle{
   color:var(--muted);
   font-size:11px;
-  margin-top:4px;
+  margin-top:3px;
 }
 
-.account-btn {
-  padding:10px 17px;
+.account-btn{
   border:1px solid var(--border);
-  background:var(--panel);
-  border-radius:12px;
+  background:#111416;
+  border-radius:20px;
+  padding:9px 15px;
   font-size:12px;
   font-weight:600;
 }
 
-.account-btn:hover {
-  border-color:rgba(0,214,160,.4);
-}
+.account-btn:hover{background:#202428}
 
 /* CHAT AREA */
 
-.chat-scroll {
+.chat-area{
   flex:1;
   overflow-y:auto;
   scroll-behavior:smooth;
-  padding:35px 22px 25px;
+  padding:30px 20px 25px;
 }
 
-.chat-content {
+.chat-content{
+  max-width:790px;
   width:100%;
-  max-width:850px;
-  margin:auto;
+  margin:0 auto;
 }
 
-.welcome {
+.welcome{
   min-height:100%;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  padding:30px 0 70px;
   text-align:center;
-  padding:35px 10px 50px;
 }
 
-.welcome-logo {
-  width:76px;
-  height:76px;
-  border-radius:25px;
-  background:linear-gradient(145deg,#00e6ad,#007a60);
+.welcome-logo{
+  width:58px;
+  height:58px;
   display:grid;
   place-items:center;
-  color:#00271d;
-  font-size:39px;
-  font-weight:900;
-  box-shadow:0 0 65px rgba(0,214,160,.16);
-  margin-bottom:26px;
-  animation:float 4s ease-in-out infinite;
+  border:1px solid #17684f;
+  background:#0d211a;
+  border-radius:19px;
+  color:#31d6a0;
+  margin-bottom:22px;
 }
 
-@keyframes float {
-  0%,100% {transform:translateY(0)}
-  50% {transform:translateY(-7px)}
+.welcome-logo svg{width:29px;height:29px}
+
+.welcome h1{
+  font-size:29px;
+  font-weight:700;
+  letter-spacing:-1px;
+  margin-bottom:10px;
 }
 
-.welcome h1 {
-  font-size:clamp(28px,5vw,43px);
-  letter-spacing:-1.8px;
-  font-weight:760;
-  line-height:1.15;
-}
-
-.welcome h1 span {
-  background:linear-gradient(90deg,#f4fff9,#00d6a0);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-
-.welcome p {
+.welcome p{
   color:var(--muted);
-  font-size:13px;
-  line-height:1.7;
+  font-size:14px;
+  line-height:1.6;
   max-width:420px;
-  margin:14px auto 30px;
 }
 
-.suggestion-grid {
+.suggestions{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:11px;
+  gap:10px;
   width:100%;
-  max-width:580px;
+  max-width:560px;
+  margin-top:32px;
 }
 
-.suggestion {
-  min-height:83px;
-  padding:15px;
+.suggestion{
+  display:flex;
+  align-items:center;
+  gap:12px;
   text-align:left;
+  padding:15px;
   border:1px solid var(--border);
-  border-radius:16px;
-  background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
-  transition:.2s;
-}
-
-.suggestion:hover {
-  border-color:rgba(0,214,160,.4);
-  background:rgba(0,214,160,.06);
-  transform:translateY(-2px);
-}
-
-.suggestion-icon {
-  font-size:17px;
-  margin-bottom:8px;
-}
-
-.suggestion-title {
+  background:#101315;
+  border-radius:13px;
+  color:#c8ced1;
   font-size:12px;
-  font-weight:650;
+  line-height:1.4;
+  min-height:65px;
 }
 
-.suggestion-desc {
-  color:var(--muted);
-  font-size:10px;
-  margin-top:4px;
+.suggestion:hover{
+  background:#171c1d;
+  border-color:#27634f;
+}
+
+.suggestion svg{
+  color:#42c99c;
+  width:19px;
+  height:19px;
+  flex-shrink:0;
 }
 
 /* MESSAGES */
 
-.message {
+.message{
   display:flex;
-  gap:14px;
-  margin:0 0 29px;
-  animation:appear .25s ease;
+  gap:15px;
+  margin:0 auto 30px;
+  max-width:790px;
+  width:100%;
+  align-items:flex-start;
 }
 
-@keyframes appear {
-  from {opacity:0;transform:translateY(7px)}
-  to {opacity:1;transform:translateY(0)}
-}
-
-.message-avatar {
-  width:34px;
-  height:34px;
-  min-width:34px;
-  border-radius:12px;
+.message-avatar{
+  width:32px;
+  height:32px;
+  flex-shrink:0;
+  border-radius:50%;
   display:grid;
   place-items:center;
-  font-size:13px;
-  font-weight:800;
-}
-
-.message.user .message-avatar {
-  background:#202823;
-  color:#fff;
-}
-
-.message.assistant .message-avatar {
-  background:rgba(0,214,160,.15);
-  color:var(--green);
-}
-
-.message-body {
-  flex:1;
-  min-width:0;
-  padding-top:5px;
-}
-
-.message-role {
-  font-size:11px;
-  font-weight:750;
-  color:#9ba9a1;
-  margin-bottom:9px;
-}
-
-.message-text {
-  font-size:14px;
-  line-height:1.8;
-  color:#e3eae6;
-  overflow-wrap:anywhere;
-}
-
-.message-text p {
-  margin-bottom:12px;
-}
-
-.message-text ul,.message-text ol {
-  padding-left:22px;
-  margin:10px 0;
-}
-
-.message-text h1,.message-text h2,.message-text h3 {
-  margin:17px 0 9px;
-  color:white;
-}
-
-.message-text h1 {font-size:21px}
-.message-text h2 {font-size:18px}
-.message-text h3 {font-size:15px}
-
-.message-text strong {
-  color:white;
-}
-
-.message-text a {
-  color:#69eac1;
-  text-decoration:underline;
-}
-
-.message-text pre {
-  background:#080d0b;
-  border:1px solid var(--border);
-  border-radius:13px;
-  padding:15px;
-  overflow-x:auto;
-  margin:13px 0;
   font-size:12px;
+  font-weight:750;
 }
 
-.message-text code {
-  font-family:Consolas,monospace;
-  background:rgba(255,255,255,.07);
+.user-avatar{background:#292e32;color:#e3e8e9}
+.ai-avatar{background:#0b3328;color:#36d6a0}
+
+.message-body{flex:1;min-width:0;padding-top:3px}
+
+.message-name{
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:9px;
+  color:#aeb7b9;
+}
+
+.message-text{
+  font-size:15px;
+  line-height:1.8;
+  overflow-wrap:anywhere;
+  color:#e5e8e9;
+}
+
+.message-text p{margin:0 0 13px}
+.message-text h1,.message-text h2,.message-text h3{
+  line-height:1.4;
+  margin:20px 0 10px;
+  color:white;
+}
+.message-text h1{font-size:22px}
+.message-text h2{font-size:19px}
+.message-text h3{font-size:16px}
+.message-text ul,.message-text ol{padding-left:23px;margin:10px 0 16px}
+.message-text li{margin:5px 0}
+.message-text a{color:#51d6ac}
+.message-text blockquote{
+  border-left:3px solid var(--green);
+  padding-left:13px;
+  color:#b9c3c2;
+  margin:12px 0;
+}
+.message-text table{
+  border-collapse:collapse;
+  display:block;
+  overflow-x:auto;
+  max-width:100%;
+  margin:14px 0;
+}
+.message-text th,.message-text td{
+  border:1px solid #343a3e;
+  padding:8px 11px;
+  text-align:left;
+  font-size:13px;
+}
+.message-text th{background:#171c1e}
+.message-text code{
+  background:#202629;
   padding:2px 5px;
   border-radius:5px;
+  font-size:.9em;
 }
-
-.message-text pre code {
-  background:none;
-  padding:0;
+.message-text pre{
+  background:#111518;
+  border:1px solid #2a3034;
+  padding:15px;
+  border-radius:12px;
+  overflow-x:auto;
+  margin:13px 0;
 }
-
-.message-image {
-  display:block;
-  max-width:min(100%,500px);
-  max-height:500px;
-  object-fit:contain;
-  border-radius:15px;
-  margin-top:12px;
-  border:1px solid var(--border);
-}
-
-.message-actions {
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-}
-
-.action-btn {
-  padding:7px 10px;
-  border:1px solid var(--border);
-  border-radius:9px;
+.message-text pre code{
   background:transparent;
-  color:#85928b;
-  font-size:10px;
+  padding:0;
+  font-size:13px;
+  line-height:1.6;
 }
 
-.action-btn:hover {
-  color:var(--green);
-  border-color:rgba(0,214,160,.4);
+.message-image{
+  max-width:100%;
+  max-height:350px;
+  border-radius:13px;
+  margin-top:10px;
+  border:1px solid var(--border);
 }
 
-.typing {
+.message-actions{
+  display:flex;
+  gap:5px;
+  margin-top:10px;
+}
+
+.message-actions button{
   display:flex;
   align-items:center;
+  gap:6px;
+  background:transparent;
+  border:0;
+  color:#858e93;
+  padding:6px 8px;
+  border-radius:7px;
+  font-size:11px;
+}
+
+.message-actions button:hover{background:#1b2023;color:white}
+.message-actions svg{width:14px;height:14px}
+
+.typing{
+  display:flex;
   gap:5px;
-  padding:8px 0;
+  padding:7px 0;
 }
-
-.typing span {
-  width:6px;
-  height:6px;
-  background:var(--green);
+.typing span{
+  width:6px;height:6px;
   border-radius:50%;
-  animation:bounce 1s infinite;
+  background:#4ccba1;
+  animation:pulse 1s infinite alternate;
 }
-
-.typing span:nth-child(2) {animation-delay:.15s}
-.typing span:nth-child(3) {animation-delay:.3s}
-
-@keyframes bounce {
-  0%,60%,100% {transform:translateY(0);opacity:.4}
-  30% {transform:translateY(-5px);opacity:1}
-}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{to{opacity:.25;transform:translateY(-4px)}}
 
 /* COMPOSER */
 
-.composer-area {
-  padding:15px 22px 12px;
-  background:linear-gradient(transparent,rgba(5,7,6,.97) 22%);
+.composer-wrap{
+  flex-shrink:0;
+  padding:12px 20px 8px;
+  background:linear-gradient(transparent,#08090b 15%);
 }
 
-.composer-wrap {
-  max-width:850px;
-  margin:auto;
-}
-
-.attachment-preview {
-  display:none;
-  margin:0 0 10px;
-  padding:9px;
-  border:1px solid var(--border);
-  background:var(--panel);
-  border-radius:12px;
-  width:max-content;
-  max-width:100%;
-  align-items:center;
-  gap:10px;
-}
-
-.attachment-preview img {
-  width:43px;
-  height:43px;
-  object-fit:cover;
-  border-radius:8px;
-}
-
-.attachment-preview button {
-  background:none;
-  border:0;
-  color:#ff7777;
-  padding:5px;
-}
-
-.composer {
-  background:rgba(17,23,20,.94);
-  border:1px solid rgba(255,255,255,.11);
+.composer{
+  width:100%;
+  max-width:790px;
+  margin:0 auto;
+  background:#151819;
+  border:1px solid #303638;
   border-radius:23px;
-  padding:13px 14px 11px;
-  box-shadow:0 15px 55px rgba(0,0,0,.3);
+  padding:13px 14px 10px;
+  box-shadow:0 8px 35px #0005;
   transition:border-color .2s;
 }
 
-.composer:focus-within {
-  border-color:rgba(0,214,160,.4);
-}
+.composer:focus-within{border-color:#28765b}
 
-#messageInput {
+#messageInput{
   display:block;
   width:100%;
-  min-height:54px;
-  max-height:150px;
+  min-height:35px;
+  max-height:160px;
   resize:none;
   border:0;
-  outline:none;
-  background:transparent;
+  outline:0;
   color:white;
-  font-size:14px;
-  line-height:1.6;
-  padding:7px 7px 12px;
+  background:transparent;
+  padding:5px 5px 10px;
+  font-size:15px;
+  line-height:1.5;
 }
 
-#messageInput::placeholder {
-  color:#78857e;
-}
+#messageInput::placeholder{color:#828b8f}
 
-.toolbar {
+.composer-bottom{
   display:flex;
   align-items:center;
-  gap:7px;
+  justify-content:space-between;
+  gap:8px;
 }
 
-.tool-btn {
+.tools{
   display:flex;
   align-items:center;
-  justify-content:center;
-  gap:6px;
-  height:43px;
-  padding:0 13px;
+  gap:4px;
+  min-width:0;
+}
+
+.tool-btn{
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  background:transparent;
+  border:0;
+  color:#aeb6b8;
+  border-radius:50%;
+  transition:.2s;
+  flex-shrink:0;
+}
+
+.tool-btn:hover{background:#292f32;color:white}
+.tool-btn.active{background:#103b2e;color:#45d7a7}
+.tool-btn svg{width:18px;height:18px}
+
+.send-btn{
+  width:39px;
+  height:39px;
+  flex-shrink:0;
+  display:grid;
+  place-items:center;
+  background:var(--green);
+  color:#04150f;
+  border:0;
   border-radius:13px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,.025);
-  color:#a8b4ad;
-  font-size:11px;
-  font-weight:600;
-  white-space:nowrap;
   transition:.2s;
 }
 
-.tool-btn:hover {
-  background:rgba(255,255,255,.07);
-  color:white;
+.send-btn:hover{background:#34d399;transform:translateY(-1px)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.send-btn svg{width:19px;height:19px}
+
+.mode-label{
+  max-width:790px;
+  width:100%;
+  margin:0 auto 7px;
+  padding-left:5px;
+  color:#54cba2;
+  font-size:11px;
+  min-height:14px;
 }
 
-.tool-btn.active {
-  border-color:rgba(0,214,160,.6);
-  color:var(--green);
-  background:rgba(0,214,160,.09);
+.disclaimer{
+  text-align:center;
+  color:#60696d;
+  font-size:10px;
+  padding:8px 5px 0;
 }
 
-.send-btn {
-  width:48px;
-  height:43px;
+.file-preview{
+  display:none;
+  align-items:center;
+  gap:9px;
+  padding:8px;
+  margin:3px 0 8px;
+  border-radius:10px;
+  background:#202629;
+  font-size:12px;
+  color:#cbd2d4;
+}
+
+.file-preview img{
+  width:40px;height:40px;
+  object-fit:cover;
+  border-radius:7px;
+}
+
+.file-preview button{
   margin-left:auto;
   border:0;
-  border-radius:14px;
-  background:linear-gradient(135deg,#00d6a0,#00a982);
-  color:#00251b;
-  font-size:21px;
-  font-weight:800;
-  transition:.2s;
+  background:transparent;
+  color:#aaa;
 }
 
-.send-btn:hover {
-  transform:translateY(-2px);
-  box-shadow:0 6px 20px rgba(0,214,160,.2);
-}
+/* MOBILE */
 
-.send-btn:disabled {
-  opacity:.45;
-  cursor:not-allowed;
-  transform:none;
-}
-
-.disclaimer {
-  text-align:center;
-  font-size:10px;
-  color:#647069;
-  margin-top:11px;
-}
-
-/* MODALS */
-
-.overlay {
+.overlay{
+  display:none;
   position:fixed;
   inset:0;
-  z-index:100;
-  background:rgba(0,0,0,.75);
-  backdrop-filter:blur(8px);
+  background:#0009;
+  z-index:20;
+}
+
+@media(max-width:700px){
+  .sidebar{
+    position:fixed;
+    top:0;bottom:0;left:0;
+    width:285px;
+    transform:translateX(-100%);
+    box-shadow:15px 0 50px #0008;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .overlay.show{display:block}
+  .topbar{height:59px;padding:0 14px}
+  .mobile-brand{display:flex;align-items:center;gap:9px}
+  .mobile-brand .brand{font-size:15px}
+  .top-title,.top-subtitle{display:none}
+  .chat-area{padding:22px 14px 18px}
+  .message{gap:10px;margin-bottom:25px}
+  .message-avatar{width:30px;height:30px}
+  .message-text{font-size:14px;line-height:1.75}
+  .welcome h1{font-size:24px}
+  .welcome p{font-size:13px}
+  .suggestions{grid-template-columns:1fr;max-width:390px;margin-top:25px}
+  .suggestion{min-height:54px;padding:12px}
+  .composer-wrap{padding:8px 10px 5px}
+  .composer{border-radius:21px;padding:11px 10px 9px}
+  #messageInput{font-size:14px}
+  .tool-btn{width:34px;height:34px}
+  .tool-btn svg{width:17px;height:17px}
+  .send-btn{width:39px;height:39px}
+  .disclaimer{font-size:9px}
+}
+
+@media(max-width:370px){
+  .tools{gap:0}
+  .tool-btn{width:31px;height:32px}
+  .account-btn{padding:8px 11px}
+}
+
+/* ACCOUNT DIALOG */
+
+.modal{
   display:none;
+  position:fixed;
+  inset:0;
+  z-index:60;
+  background:#000b;
   align-items:center;
   justify-content:center;
   padding:18px;
 }
 
-.overlay.show {
-  display:flex;
-}
+.modal.show{display:flex}
 
-.modal {
+.modal-card{
   width:100%;
   max-width:390px;
-  background:#101713;
-  border:1px solid var(--border);
-  border-radius:23px;
-  padding:25px;
-  box-shadow:0 25px 100px #000;
-  animation:appear .2s ease;
+  background:#111517;
+  border:1px solid #30383a;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 20px 80px #0009;
 }
 
-.modal-top {
+.modal-head{
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  margin-bottom:22px;
+  justify-content:space-between;
+  margin-bottom:20px;
 }
 
-.modal h2 {
-  font-size:20px;
-}
-
-.close-btn {
-  width:32px;
-  height:32px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:#18211c;
-}
-
-.modal p {
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.6;
-  margin:8px 0 18px;
-}
-
-.field {
-  margin-bottom:14px;
-}
-
-.field label {
+.modal-head h2{font-size:19px}
+.modal-card label{
   display:block;
-  color:#aab7af;
-  font-size:11px;
-  margin-bottom:7px;
+  color:#aab2b5;
+  font-size:12px;
+  margin:13px 0 7px;
 }
 
-.field input {
+.modal-card input{
   width:100%;
-  padding:13px;
-  background:#080d0a;
+  padding:12px;
+  border-radius:10px;
+  background:#080b0c;
+  border:1px solid #30383a;
   color:white;
-  border:1px solid var(--border);
-  border-radius:11px;
   outline:none;
 }
 
-.field input:focus {
-  border-color:var(--green);
-}
-
-.primary-btn {
+.modal-submit{
   width:100%;
-  padding:13px;
+  margin-top:19px;
+  padding:12px;
+  border:0;
+  border-radius:10px;
   background:var(--green);
-  border:0;
-  border-radius:12px;
-  color:#00271d;
-  font-weight:800;
-  margin-top:5px;
+  color:#04150f;
+  font-weight:750;
 }
 
-.switch-auth {
+.modal-switch{
+  margin-top:15px;
+  color:#aab2b5;
   text-align:center;
-  margin-top:16px;
-  font-size:11px;
-  color:var(--muted);
+  font-size:12px;
 }
 
-.switch-auth button {
-  border:0;
-  background:none;
-  color:var(--green);
+.modal-switch button{
+  background:none;border:0;color:#4bd5a5;
 }
 
-.modal-message {
-  color:#ff8888;
-  font-size:11px;
-  margin-top:12px;
-}
-
-/* MOBILE */
-
-.mobile-overlay {
+#toast{
+  position:fixed;
+  bottom:100px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#202729;
+  border:1px solid #3a4447;
+  color:white;
+  border-radius:10px;
+  padding:10px 15px;
+  font-size:12px;
   display:none;
-}
-
-@media(max-width:760px) {
-  .sidebar {
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    width:285px;
-    transform:translateX(-105%);
-    box-shadow:20px 0 60px rgba(0,0,0,.4);
-  }
-
-  .sidebar.open {
-    transform:translateX(0);
-  }
-
-  .mobile-overlay.show {
-    display:block;
-    position:fixed;
-    inset:0;
-    z-index:20;
-    background:rgba(0,0,0,.6);
-  }
-
-  .menu-btn {
-    display:block;
-  }
-
-  .topbar {
-    height:62px;
-    min-height:62px;
-    padding:0 14px;
-  }
-
-  .chat-scroll {
-    padding:23px 14px;
-  }
-
-  .welcome {
-    padding:25px 2px 35px;
-  }
-
-  .welcome-logo {
-    width:65px;
-    height:65px;
-    font-size:32px;
-  }
-
-  .welcome h1 {
-    font-size:31px;
-  }
-
-  .welcome p {
-    font-size:12px;
-    margin:12px auto 23px;
-  }
-
-  .suggestion-grid {
-    gap:8px;
-  }
-
-  .suggestion {
-    min-height:82px;
-    padding:12px;
-  }
-
-  .suggestion-title {
-    font-size:11px;
-  }
-
-  .suggestion-desc {
-    font-size:9px;
-  }
-
-  .composer-area {
-    padding:8px 10px max(8px,env(safe-area-inset-bottom));
-  }
-
-  .composer {
-    border-radius:19px;
-    padding:10px;
-  }
-
-  #messageInput {
-    min-height:48px;
-    font-size:13px;
-  }
-
-  .toolbar {
-    gap:5px;
-  }
-
-  .tool-btn {
-    height:39px;
-    padding:0 10px;
-    font-size:10px;
-  }
-
-  .tool-btn .tool-label {
-    display:none;
-  }
-
-  .send-btn {
-    width:43px;
-    height:39px;
-    border-radius:12px;
-  }
-
-  .disclaimer {
-    font-size:9px;
-    margin-top:8px;
-  }
-
-  .message {
-    gap:10px;
-    margin-bottom:23px;
-  }
-
-  .message-avatar {
-    width:30px;
-    height:30px;
-    min-width:30px;
-    border-radius:10px;
-  }
-
-  .message-text {
-    font-size:13px;
-  }
-}
-
-@media(max-width:370px) {
-  .tool-btn {
-    padding:0 8px;
-  }
-
-  .suggestion-grid {
-    grid-template-columns:1fr;
-  }
+  z-index:100;
+  max-width:90%;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
   <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="brand-logo">A</div>
-      <div>
-        <div class="brand-name">Axenova <span>AI</span></div>
-        <div class="brand-sub">Intelligence evolved</div>
+    <div class="sidebar-top">
+      <div class="brand">
+        <span>Axenova AI</span>
+        <span class="brand-dot"></span>
       </div>
+      <button class="icon-btn" onclick="toggleSidebar()" aria-label="Close menu">
+        <i data-lucide="panel-left-close"></i>
+      </button>
     </div>
 
-    <button class="new-chat" id="newChatBtn">
-      <span>＋</span> New conversation
+    <button class="new-chat" onclick="newChat()">
+      <i data-lucide="plus"></i>
+      <span>New chat</span>
     </button>
 
-    <div class="side-label">YOUR CONVERSATIONS</div>
+    <div class="sidebar-label">YOUR CHATS</div>
     <div class="history" id="historyList"></div>
 
     <div class="sidebar-bottom">
-      <div class="profile" id="profileButton">
-        <div class="avatar" id="profileAvatar">G</div>
-        <div>
-          <div class="profile-name" id="profileName">Guest user</div>
-          <div class="profile-status" id="profileStatus">Not signed in</div>
+      <button class="profile-button" onclick="openAccount()">
+        <div class="avatar" id="profileAvatar">A</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">Guest</div>
+          <div class="profile-status" id="profileStatus">Sign in to your account</div>
         </div>
-      </div>
+        <i data-lucide="settings" style="width:17px;color:#8e989c"></i>
+      </button>
     </div>
   </aside>
 
-  <div class="mobile-overlay" id="mobileOverlay"></div>
-
   <main class="main">
-
     <header class="topbar">
       <div class="top-left">
-        <button class="menu-btn" id="menuBtn">☰</button>
-        <div>
-          <div class="page-title">Axenova AI <span class="online"></span></div>
-          <div class="page-subtitle" id="modeSubtitle">Your intelligent assistant</div>
-        </div>
-      </div>
+        <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open menu">
+          <i data-lucide="menu"></i>
+        </button>
 
-      <button class="account-btn" id="accountBtn">Account ↗</button>
-    </header>
-
-    <section class="chat-scroll" id="chatScroll">
-      <div class="chat-content" id="chatContent">
-
-        <div class="welcome" id="welcome">
-          <div class="welcome-logo">A</div>
-
-          <h1>Think beyond.<br><span>Create without limits.</span></h1>
-
-          <p>
-            Meet Axenova AI, your intelligent companion for learning,
-            creativity, research and building amazing things.
-          </p>
-
-          <div class="suggestion-grid">
-            <button class="suggestion" data-prompt="Help me build a modern website using HTML, CSS and JavaScript.">
-              <div class="suggestion-icon">⌘</div>
-              <div class="suggestion-title">Build something</div>
-              <div class="suggestion-desc">Create websites and applications</div>
-            </button>
-
-            <button class="suggestion" data-prompt="Explain a difficult topic in simple steps with examples.">
-              <div class="suggestion-icon">✧</div>
-              <div class="suggestion-title">Learn anything</div>
-              <div class="suggestion-desc">Understand difficult topics</div>
-            </button>
-
-            <button class="suggestion" data-prompt="Give me five creative business ideas I can start with little capital in Kenya.">
-              <div class="suggestion-icon">◈</div>
-              <div class="suggestion-title">Explore ideas</div>
-              <div class="suggestion-desc">Discover new opportunities</div>
-            </button>
-
-            <button class="suggestion" data-prompt="Help me research the latest developments in artificial intelligence.">
-              <div class="suggestion-icon">⌕</div>
-              <div class="suggestion-title">Research topics</div>
-              <div class="suggestion-desc">Explore information online</div>
-            </button>
+        <div class="mobile-brand">
+          <div class="brand">
+            <span>Axenova AI</span>
+            <span class="brand-dot"></span>
           </div>
         </div>
 
+        <div>
+          <div class="top-title">Axenova AI</div>
+          <div class="top-subtitle">Your intelligent assistant</div>
+        </div>
+      </div>
+
+      <button class="account-btn" onclick="openAccount()">Account</button>
+    </header>
+
+    <section class="chat-area" id="chatArea">
+      <div class="chat-content" id="chatContent">
+        <div class="welcome" id="welcome">
+          <div class="welcome-logo"><i data-lucide="sparkles"></i></div>
+          <h1>How can I help you?</h1>
+          <p>Ask anything, explore ideas, write code, search the web or create images.</p>
+
+          <div class="suggestions">
+            <button class="suggestion" onclick="useSuggestion('Help me build a modern website')">
+              <i data-lucide="code-2"></i>
+              <span>Build a modern website</span>
+            </button>
+            <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms')">
+              <i data-lucide="book-open"></i>
+              <span>Learn something new</span>
+            </button>
+            <button class="suggestion" onclick="useSuggestion('Give me five creative business ideas')">
+              <i data-lucide="lightbulb"></i>
+              <span>Explore business ideas</span>
+            </button>
+            <button class="suggestion" onclick="useSuggestion('Help me write a professional CV')">
+              <i data-lucide="file-text"></i>
+              <span>Write something</span>
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
-    <footer class="composer-area">
-      <div class="composer-wrap">
+    <div class="composer-wrap">
+      <div class="mode-label" id="modeLabel"></div>
 
-        <div class="attachment-preview" id="attachmentPreview">
+      <div class="composer">
+        <div class="file-preview" id="filePreview">
           <img id="previewImage" alt="Selected image">
-          <span style="font-size:11px;color:#b7c4bc">Image attached</span>
-          <button id="removeImage" title="Remove image">✕</button>
+          <span id="fileName">Image selected</span>
+          <button onclick="removeFile()" aria-label="Remove image">
+            <i data-lucide="x"></i>
+          </button>
         </div>
 
-        <div class="composer">
-          <textarea
-            id="messageInput"
-            rows="1"
-            placeholder="Message Axenova AI..."
-            aria-label="Message Axenova AI"
-          ></textarea>
+        <textarea id="messageInput" rows="1" placeholder="Message Axenova AI..." aria-label="Message"></textarea>
 
-          <div class="toolbar">
+        <div class="composer-bottom">
+          <div class="tools">
+            <button class="tool-btn" onclick="document.getElementById('fileInput').click()" title="Attach file">
+              <i data-lucide="plus"></i>
+            </button>
 
-            <button class="tool-btn" id="attachBtn" title="Attach an image">＋ <span class="tool-label">Attach</span></button>
+            <button class="tool-btn" id="cameraBtn" onclick="document.getElementById('cameraInput').click()" title="Take a photo">
+              <i data-lucide="camera"></i>
+            </button>
 
-            <button class="tool-btn" id="cameraBtn" title="Take a photo">▣ <span class="tool-label">Camera</span></button>
+            <button class="tool-btn" id="imageBtn" onclick="setMode('image')" title="Create image">
+              <i data-lucide="image"></i>
+            </button>
 
-            <button class="tool-btn" id="imageMode" title="Generate an image">✧ <span class="tool-label">Image</span></button>
+            <button class="tool-btn" id="searchBtn" onclick="setMode('search')" title="Web search">
+              <i data-lucide="globe"></i>
+            </button>
 
-            <button class="tool-btn" id="searchMode" title="Search the web">⌕ <span class="tool-label">Search</span></button>
+            <button class="tool-btn" id="codeBtn" onclick="setMode('code')" title="Coding mode">
+              <i data-lucide="code"></i>
+            </button>
 
-            <button class="tool-btn" id="codeMode" title="Coding assistant">⌘ <span class="tool-label">Code</span></button>
-
-            <button class="tool-btn" id="voiceBtn" title="Voice input">🎙</button>
-
-            <button class="send-btn" id="sendBtn" title="Send message">↑</button>
+            <button class="tool-btn" id="voiceBtn" onclick="startVoice()" title="Voice input">
+              <i data-lucide="mic"></i>
+            </button>
           </div>
-        </div>
 
-        <input type="file" id="fileInput" accept="image/*" hidden>
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
-
-        <div class="disclaimer">
-          Axenova AI can make mistakes. Verify important information.
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
+            <i data-lucide="arrow-up"></i>
+          </button>
         </div>
       </div>
-    </footer>
 
+      <div class="disclaimer">Axenova AI can make mistakes. Verify important information.</div>
+    </div>
   </main>
 </div>
 
-<!-- ACCOUNT MODAL -->
+<input type="file" id="fileInput" accept="image/*" hidden onchange="handleFile(this)">
+<input type="file" id="cameraInput" accept="image/*" capture="environment" hidden onchange="handleFile(this)">
 
-<div class="overlay" id="authOverlay">
-  <div class="modal">
-    <div class="modal-top">
-      <h2 id="authTitle">Welcome back</h2>
-      <button class="close-btn" id="closeAuth">✕</button>
+<!-- ACCOUNT MODAL -->
+<div class="modal" id="accountModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="modalTitle">Your account</h2>
+      <button class="icon-btn" onclick="closeAccount()">
+        <i data-lucide="x"></i>
+      </button>
     </div>
 
-    <p id="authDescription">Sign in to access your Axenova account and saved conversations.</p>
+    <form id="accountForm">
+      <label for="email">Email address</label>
+      <input type="email" id="email" required autocomplete="email">
 
-    <form id="authForm">
-      <div class="field" id="nameField" style="display:none">
-        <label for="authName">Your name</label>
-        <input id="authName" type="text" autocomplete="name" placeholder="Enter your name">
-      </div>
+      <label for="password">Password</label>
+      <input type="password" id="password" required autocomplete="current-password">
 
-      <div class="field">
-        <label for="authEmail">Email address</label>
-        <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com">
-      </div>
-
-      <div class="field">
-        <label for="authPassword">Password</label>
-        <input id="authPassword" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters">
-      </div>
-
-      <button class="primary-btn" id="authSubmit" type="submit">Sign in</button>
-      <div class="modal-message" id="authMessage"></div>
+      <button class="modal-submit" id="accountSubmit" type="submit">Sign in</button>
     </form>
 
-    <div class="switch-auth">
+    <div class="modal-switch">
       <span id="switchText">Don't have an account?</span>
-      <button id="switchAuth">Create account</button>
+      <button onclick="switchAccountMode()" id="switchButton">Create account</button>
+    </div>
+
+    <div class="modal-switch">
+      <button onclick="logout()" id="logoutButton" style="display:none">Sign out</button>
     </div>
   </div>
 </div>
 
+<div id="toast"></div>
+
 <script>
-"use strict";
+/* =========================
+   AXENOVA AI CONFIGURATION
+========================= */
 
-/* -----------------------------------------------
-   AXENOVA AI FRONTEND
------------------------------------------------- */
+const API = "";
+let currentMode = "chat";
+let selectedImage = null;
+let isSending = false;
+let accountMode = "login";
+let currentUser = null;
+let conversationId = null;
+let conversationHistory = [];
 
-const $ = id => document.getElementById(id);
+const chatContent = document.getElementById("chatContent");
+const chatArea = document.getElementById("chatArea");
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
 
-const state = {
-  mode: "chat",
-  image: null,
-  messages: [],
-  conversationId: null,
-  user: null,
-  busy: false,
-  authMode: "login",
-  conversations: [],
-  recognition: null
-};
+function icons(){
+  if(window.lucide) lucide.createIcons();
+}
+icons();
 
-const chatContent = $("chatContent");
-const chatScroll = $("chatScroll");
-const messageInput = $("messageInput");
+/* =========================
+   SIDEBAR
+========================= */
 
-/* -----------------------------------------------
-   API HELPER
------------------------------------------------- */
-
-async function api(url, options = {}) {
-  const response = await fetch(url, {
-    credentials: "same-origin",
-    ...options,
-    headers: {
-      ...(options.body ? {"Content-Type":"application/json"} : {}),
-      ...(options.headers || {})
-    }
-  });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || data.message || `Request failed (${response.status})`);
-  }
-
-  return data;
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
 }
 
-/* -----------------------------------------------
-   SAFE TEXT AND MARKDOWN
------------------------------------------------- */
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, character => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  })[character]);
+function closeSidebar(){
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
 }
 
-function renderMarkdown(text) {
-  let value = escapeHTML(text);
+/* =========================
+   NOTIFICATIONS
+========================= */
 
-  const codeBlocks = [];
-
-  value = value.replace(/```([\w-]*)\n?([\s\S]*?)```/g, (match, language, code) => {
-    const index = codeBlocks.length;
-    codeBlocks.push(`<pre><code>${code.trim()}</code></pre>`);
-    return `@@CODE${index}@@`;
-  });
-
-  value = value.replace(/^### (.*)$/gm, "<h3>$1</h3>");
-  value = value.replace(/^## (.*)$/gm, "<h2>$1</h2>");
-  value = value.replace(/^# (.*)$/gm, "<h1>$1</h1>");
-  value = value.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  value = value.replace(/\*(.*?)\*/g, "<em>$1</em>");
-  value = value.replace(/`([^`]+)`/g, "<code>$1</code>");
-  value = value.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-
-  value = value.replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>");
-  value = value.replace(/(<li>.*<\/li>\n?)+/g, match => `<ul>${match}</ul>`);
-
-  value = value.split(/\n{2,}/).map(part => {
-    part = part.trim();
-    if (!part) return "";
-    if (/^<(h[1-3]|ul|pre|li)/.test(part) || /^@@CODE\d+@@$/.test(part)) {
-      return part;
-    }
-    return `<p>${part.replace(/\n/g,"<br>")}</p>`;
-  }).join("");
-
-  value = value.replace(/@@CODE(\d+)@@/g, (match, index) => codeBlocks[index]);
-
-  return value;
+function toast(message){
+  const el=document.getElementById("toast");
+  el.textContent=message;
+  el.style.display="block";
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>el.style.display="none",3000);
 }
 
-/* -----------------------------------------------
-   WELCOME SCREEN
------------------------------------------------- */
+/* =========================
+   CHAT MANAGEMENT
+========================= */
 
-function showWelcome() {
-  chatContent.innerHTML = `
+function newChat(){
+  conversationId=null;
+  conversationHistory=[];
+  chatContent.innerHTML="";
+  showWelcome();
+  renderHistory();
+  closeSidebar();
+  messageInput.focus();
+}
+
+function showWelcome(){
+  chatContent.innerHTML=`
     <div class="welcome" id="welcome">
-      <div class="welcome-logo">A</div>
-      <h1>Think beyond.<br><span>Create without limits.</span></h1>
-      <p>Meet Axenova AI, your intelligent companion for learning, creativity, research and building amazing things.</p>
-
-      <div class="suggestion-grid">
-        <button class="suggestion" data-prompt="Help me build a modern website using HTML, CSS and JavaScript.">
-          <div class="suggestion-icon">⌘</div>
-          <div class="suggestion-title">Build something</div>
-          <div class="suggestion-desc">Create websites and applications</div>
-        </button>
-        <button class="suggestion" data-prompt="Explain a difficult topic in simple steps with examples.">
-          <div class="suggestion-icon">✧</div>
-          <div class="suggestion-title">Learn anything</div>
-          <div class="suggestion-desc">Understand difficult topics</div>
-        </button>
-        <button class="suggestion" data-prompt="Give me five creative business ideas I can start with little capital in Kenya.">
-          <div class="suggestion-icon">◈</div>
-          <div class="suggestion-title">Explore ideas</div>
-          <div class="suggestion-desc">Discover new opportunities</div>
-        </button>
-        <button class="suggestion" data-prompt="Help me research the latest developments in artificial intelligence.">
-          <div class="suggestion-icon">⌕</div>
-          <div class="suggestion-title">Research topics</div>
-          <div class="suggestion-desc">Explore information online</div>
-        </button>
+      <div class="welcome-logo"><i data-lucide="sparkles"></i></div>
+      <h1>How can I help you?</h1>
+      <p>Ask anything, explore ideas, write code, search the web or create images.</p>
+      <div class="suggestions">
+        <button class="suggestion" onclick="useSuggestion('Help me build a modern website')"><i data-lucide="code-2"></i><span>Build a modern website</span></button>
+        <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms')"><i data-lucide="book-open"></i><span>Learn something new</span></button>
+        <button class="suggestion" onclick="useSuggestion('Give me five creative business ideas')"><i data-lucide="lightbulb"></i><span>Explore business ideas</span></button>
+        <button class="suggestion" onclick="useSuggestion('Help me write a professional CV')"><i data-lucide="file-text"></i><span>Write something</span></button>
       </div>
-    </div>
-  `;
+    </div>`;
+  icons();
 }
 
-function scrollToBottom() {
-  requestAnimationFrame(() => {
-    chatScroll.scrollTop = chatScroll.scrollHeight;
+function useSuggestion(text){
+  messageInput.value=text;
+  autoResize();
+  sendMessage();
+}
+
+function renderHistory(){
+  const list=document.getElementById("historyList");
+  const saved=JSON.parse(localStorage.getItem("axenova_chats")||"[]");
+  list.innerHTML="";
+
+  saved.forEach(item=>{
+    const btn=document.createElement("button");
+    btn.className="history-item";
+    btn.textContent=item.title;
+    btn.onclick=()=>loadLocalChat(item.id);
+    list.appendChild(btn);
   });
 }
 
-/* -----------------------------------------------
-   MESSAGE DISPLAY
------------------------------------------------- */
+function saveLocalChat(){
+  if(!conversationId) conversationId="chat_"+Date.now();
 
-function addMessage(role, text, image = null) {
-  const message = {
-    role,
-    content: text,
-    image: image || null
+  const saved=JSON.parse(localStorage.getItem("axenova_chats")||"[]");
+  const title=conversationHistory.find(x=>x.role==="user")?.content || "New conversation";
+
+  const existing=saved.findIndex(x=>x.id===conversationId);
+  const item={
+    id:conversationId,
+    title:title.slice(0,55),
+    messages:conversationHistory
   };
 
-  state.messages.push(message);
+  if(existing>=0) saved[existing]=item;
+  else saved.unshift(item);
 
-  const element = document.createElement("div");
-  element.className = `message ${role}`;
-
-  const avatar = document.createElement("div");
-  avatar.className = "message-avatar";
-  avatar.textContent = role === "user" ? "U" : "A";
-
-  const body = document.createElement("div");
-  body.className = "message-body";
-
-  const roleName = document.createElement("div");
-  roleName.className = "message-role";
-  roleName.textContent = role === "user" ? "You" : "Axenova AI";
-
-  const content = document.createElement("div");
-  content.className = "message-text";
-  content.innerHTML = renderMarkdown(text || "");
-
-  body.appendChild(roleName);
-  body.appendChild(content);
-
-  if (image) {
-    const imageElement = document.createElement("img");
-    imageElement.className = "message-image";
-    imageElement.src = image;
-    imageElement.alt = role === "assistant" ? "Generated image" : "Uploaded image";
-    body.appendChild(imageElement);
-  }
-
-  if (role === "assistant") {
-    const actions = document.createElement("div");
-    actions.className = "message-actions";
-
-    const copy = document.createElement("button");
-    copy.className = "action-btn";
-    copy.textContent = "Copy";
-    copy.onclick = () => {
-      navigator.clipboard.writeText(text || "")
-        .then(() => copy.textContent = "Copied!")
-        .catch(() => copy.textContent = "Copy unavailable");
-    };
-
-    const read = document.createElement("button");
-    read.className = "action-btn";
-    read.textContent = "Read aloud";
-    read.onclick = () => {
-      if (!("speechSynthesis" in window)) {
-        alert("Read aloud is not supported on this device.");
-        return;
-      }
-
-      speechSynthesis.cancel();
-      speechSynthesis.speak(new SpeechSynthesisUtterance(text || ""));
-    };
-
-    actions.append(copy, read);
-    body.appendChild(actions);
-  }
-
-  element.append(avatar, body);
-  chatContent.appendChild(element);
-  scrollToBottom();
+  localStorage.setItem("axenova_chats",JSON.stringify(saved.slice(0,40)));
+  renderHistory();
 }
 
-function showTyping() {
-  const element = document.createElement("div");
-  element.className = "message assistant";
-  element.id = "typingIndicator";
+function loadLocalChat(id){
+  const saved=JSON.parse(localStorage.getItem("axenova_chats")||"[]");
+  const item=saved.find(x=>x.id===id);
+  if(!item)return;
 
-  element.innerHTML = `
-    <div class="message-avatar">A</div>
-    <div class="message-body">
-      <div class="message-role">Axenova AI</div>
-      <div class="typing"><span></span><span></span><span></span></div>
-    </div>
-  `;
+  conversationId=item.id;
+  conversationHistory=item.messages||[];
+  chatContent.innerHTML="";
 
-  chatContent.appendChild(element);
-  scrollToBottom();
-}
-
-function removeTyping() {
-  $("typingIndicator")?.remove();
-}
-
-/* -----------------------------------------------
-   MODE SELECTION
------------------------------------------------- */
-
-function setMode(mode) {
-  state.mode = mode;
-
-  ["imageMode","searchMode","codeMode"].forEach(id => {
-    $(id).classList.remove("active");
+  conversationHistory.forEach(m=>{
+    addMessage(m.role==="user"?"user":"ai",m.content);
   });
 
-  if (mode === "image") $("imageMode").classList.add("active");
-  if (mode === "search") $("searchMode").classList.add("active");
-  if (mode === "code") $("codeMode").classList.add("active");
+  closeSidebar();
+  scrollBottom();
+}
 
-  const subtitles = {
-    chat:"Your intelligent assistant",
+/* =========================
+   MODE BUTTONS
+========================= */
+
+function setMode(mode){
+  currentMode=currentMode===mode?"chat":mode;
+
+  document.querySelectorAll(".tool-btn").forEach(b=>b.classList.remove("active"));
+
+  const labels={
+    chat:"",
     image:"Image generation mode",
     search:"Web search mode",
     code:"Coding assistant mode"
   };
 
-  const placeholders = {
+  const ids={image:"imageBtn",search:"searchBtn",code:"codeBtn"};
+  if(ids[currentMode]) document.getElementById(ids[currentMode]).classList.add("active");
+
+  document.getElementById("modeLabel").textContent=labels[currentMode]||"";
+
+  const placeholders={
     chat:"Message Axenova AI...",
     image:"Describe the image you want to create...",
     search:"What should Axenova search for?",
-    code:"Describe the code or application you want to build..."
+    code:"Describe the code you want help with..."
   };
 
-  $("modeSubtitle").textContent = subtitles[mode];
-  messageInput.placeholder = placeholders[mode];
+  messageInput.placeholder=placeholders[currentMode];
+  messageInput.focus();
 }
 
-$("imageMode").onclick = () => setMode(state.mode === "image" ? "chat" : "image");
-$("searchMode").onclick = () => setMode(state.mode === "search" ? "chat" : "search");
-$("codeMode").onclick = () => setMode(state.mode === "code" ? "chat" : "code");
+/* =========================
+   FILE UPLOAD
+========================= */
 
-/* -----------------------------------------------
-   IMAGE ATTACHMENT
------------------------------------------------- */
+function handleFile(input){
+  const file=input.files && input.files[0];
+  if(!file)return;
 
-function readImage(file) {
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    alert("Please select an image file.");
+  if(!file.type.startsWith("image/")){
+    toast("Please select an image.");
+    input.value="";
     return;
   }
 
-  if (file.size > 8 * 1024 * 1024) {
-    alert("Please select an image smaller than 8 MB.");
+  if(file.size>10*1024*1024){
+    toast("Image must be smaller than 10 MB.");
+    input.value="";
     return;
   }
 
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    state.image = reader.result;
-    $("previewImage").src = state.image;
-    $("attachmentPreview").style.display = "flex";
+  const reader=new FileReader();
+  reader.onload=()=>{
+    selectedImage=reader.result;
+    document.getElementById("previewImage").src=selectedImage;
+    document.getElementById("fileName").textContent=file.name;
+    document.getElementById("filePreview").style.display="flex";
+    icons();
   };
-
-  reader.onerror = () => alert("Could not read that image.");
   reader.readAsDataURL(file);
 }
 
-$("attachBtn").onclick = () => $("fileInput").click();
-$("cameraBtn").onclick = () => $("cameraInput").click();
+function removeFile(){
+  selectedImage=null;
+  document.getElementById("filePreview").style.display="none";
+  document.getElementById("fileInput").value="";
+  document.getElementById("cameraInput").value="";
+}
 
-$("fileInput").onchange = event => {
-  readImage(event.target.files[0]);
-  event.target.value = "";
-};
+/* =========================
+   MESSAGE DISPLAY
+========================= */
 
-$("cameraInput").onchange = event => {
-  readImage(event.target.files[0]);
-  event.target.value = "";
-};
+function markdown(text){
+  if(!window.marked)return escapeHTML(text);
+  const raw=marked.parse(text||"");
+  return window.DOMPurify?DOMPurify.sanitize(raw):raw;
+}
 
-$("removeImage").onclick = () => {
-  state.image = null;
-  $("attachmentPreview").style.display = "none";
-  $("previewImage").src = "";
-};
+function escapeHTML(text){
+  return String(text).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
 
-/* -----------------------------------------------
-   CHAT AND IMAGE API
------------------------------------------------- */
+function addMessage(type,text,image=null){
+  const row=document.createElement("div");
+  row.className="message";
 
-async function sendMessage() {
-  if (state.busy) return;
+  const avatar=document.createElement("div");
+  avatar.className="message-avatar "+(type==="user"?"user-avatar":"ai-avatar");
+  avatar.textContent=type==="user"?"U":"A";
 
-  const text = messageInput.value.trim();
-  const image = state.image;
+  const body=document.createElement("div");
+  body.className="message-body";
 
-  if (!text && !image) return;
+  const name=document.createElement("div");
+  name.className="message-name";
+  name.textContent=type==="user"?"You":"Axenova AI";
 
-  const mode = state.mode;
+  const content=document.createElement("div");
+  content.className="message-text";
+  content.innerHTML=markdown(text);
 
-  if (mode === "image" && !text) {
-    alert("Describe the image you want Axenova to create.");
+  body.appendChild(name);
+  body.appendChild(content);
+
+  if(image){
+    const img=document.createElement("img");
+    img.className="message-image";
+    img.src=image;
+    img.alt="Uploaded image";
+    body.appendChild(img);
+  }
+
+  if(type==="ai"){
+    const actions=document.createElement("div");
+    actions.className="message-actions";
+
+    const copy=document.createElement("button");
+    copy.innerHTML='<i data-lucide="copy"></i> Copy';
+    copy.onclick=()=>copyText(text);
+
+    const read=document.createElement("button");
+    read.innerHTML='<i data-lucide="volume-2"></i> Read aloud';
+    read.onclick=()=>readAloud(text);
+
+    actions.append(copy,read);
+    body.appendChild(actions);
+  }
+
+  row.append(avatar,body);
+  chatContent.appendChild(row);
+  icons();
+  scrollBottom();
+}
+
+function showTyping(){
+  const row=document.createElement("div");
+  row.className="message";
+  row.id="typingIndicator";
+  row.innerHTML=`
+    <div class="message-avatar ai-avatar">A</div>
+    <div class="message-body">
+      <div class="message-name">Axenova AI</div>
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`;
+  chatContent.appendChild(row);
+  scrollBottom();
+}
+
+function removeTyping(){
+  document.getElementById("typingIndicator")?.remove();
+}
+
+function scrollBottom(){
+  setTimeout(()=>chatArea.scrollTop=chatArea.scrollHeight,50);
+}
+
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Copied to clipboard");
+  }catch(e){
+    toast("Could not copy text");
+  }
+}
+
+function readAloud(text){
+  if(!("speechSynthesis" in window)){
+    toast("Read aloud is not supported on this browser.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.rate=1;
+  speechSynthesis.speak(utterance);
+}
+
+/* =========================
+   SEND CHAT MESSAGE
+========================= */
+
+async function sendMessage(){
+  if(isSending)return;
+
+  let message=messageInput.value.trim();
+  if(!message && !selectedImage)return;
+
+  if(currentMode==="image" && !message){
+    toast("Describe the image you want.");
     return;
   }
 
-  state.busy = true;
-  $("sendBtn").disabled = true;
+  if(currentMode==="image"){
+    await generateImage(message);
+    return;
+  }
 
-  if ($("welcome")) chatContent.innerHTML = "";
+  if(currentMode==="search"){
+    message="Search the web for the following and give me an accurate answer with sources: "+message;
+  }
 
-  addMessage("user", text || "Please describe this image.", image);
+  if(currentMode==="code"){
+    message="Act as an expert software developer. Help me with this coding request, provide clear explanations and working code where appropriate: "+message;
+  }
 
-  messageInput.value = "";
-  messageInput.style.height = "auto";
-  state.image = null;
-  $("attachmentPreview").style.display = "none";
+  const imageForMessage=selectedImage;
+  const visibleMessage=messageInput.value.trim();
 
+  messageInput.value="";
+  autoResize();
+  removeFile();
+
+  document.getElementById("welcome")?.remove();
+
+  addMessage("user",visibleMessage||"Please analyse this image.",imageForMessage);
+  conversationHistory.push({role:"user",content:visibleMessage||"Please analyse this image."});
+
+  isSending=true;
+  sendBtn.disabled=true;
   showTyping();
 
-  try {
-    let reply = "";
-    let outputImage = null;
+  try{
+    const response=await fetch(API+"/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      credentials:"include",
+      body:JSON.stringify({
+        message:message,
+        image:imageForMessage,
+        history:conversationHistory.slice(-12)
+      })
+    });
 
-    if (mode === "image") {
-      const data = await api("/api/image", {
-        method:"POST",
-        body:JSON.stringify({prompt:text})
-      });
+    const data=await response.json();
 
-      outputImage = data.image || data.url;
+    if(!response.ok){
+      throw new Error(data.error||data.message||"Request failed. Check your server.");
+    }
 
-      if (!outputImage) {
-        throw new Error("The image service returned no image.");
-      }
+    const reply=data.reply||data.response||data.content||data.answer||
+      data.choices?.[0]?.message?.content;
 
-      reply = "Your image has been generated.";
-    } else {
-      let prompt = text;
-
-      if (mode === "code") {
-        prompt =
-          "Act as an expert software developer. Help me with the following coding task. Provide complete, working code and clear setup instructions where appropriate.\n\n" +
-          text;
-      }
-
-      const history = state.messages
-        .slice(-12)
-        .slice(0, -1)
-        .map(item => ({
-          role:item.role,
-          content:item.content
-        }));
-
-      const data = await api("/api/chat", {
-        method:"POST",
-        body:JSON.stringify({
-          message:prompt,
-          image:image || null,
-          history,
-          search:mode === "search"
-        })
-      });
-
-      reply = data.reply || data.response || "";
-
-      if (!reply.trim()) {
-        throw new Error("The AI returned an empty response.");
-      }
-
-      if (mode === "search" && data.searchUsed === false) {
-        reply += "\n\nNote: Web search could not be completed, so this response may not contain live information.";
-      }
+    if(!reply || !String(reply).trim()){
+      throw new Error("The AI returned an empty response. Check the model configuration in server.js.");
     }
 
     removeTyping();
-    addMessage("assistant", reply, outputImage);
+    addMessage("ai",String(reply));
+    conversationHistory.push({role:"assistant",content:String(reply)});
+    saveLocalChat();
 
-    await saveCurrentConversation();
-
-  } catch (error) {
+  }catch(error){
     removeTyping();
-
-    addMessage(
-      "assistant",
-      "Sorry, I couldn't complete that request.\n\n**Reason:** " +
-      error.message +
-      "\n\nPlease try again in a moment."
-    );
-  } finally {
-    state.busy = false;
-    $("sendBtn").disabled = false;
+    const errorText="Sorry, I couldn't complete that request. "+error.message;
+    addMessage("ai",errorText);
+    toast("Message failed");
+  }finally{
+    isSending=false;
+    sendBtn.disabled=false;
     messageInput.focus();
   }
 }
 
-$("sendBtn").onclick = sendMessage;
+/* =========================
+   IMAGE GENERATION
+========================= */
 
-messageInput.addEventListener("keydown", event => {
-  if (event.key === "Enter" && !event.shiftKey) {
+async function generateImage(prompt){
+  if(isSending)return;
+
+  messageInput.value="";
+  autoResize();
+
+  document.getElementById("welcome")?.remove();
+  addMessage("user","Create an image: "+prompt);
+
+  isSending=true;
+  sendBtn.disabled=true;
+  showTyping();
+
+  try{
+    const response=await fetch(API+"/api/image",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      credentials:"include",
+      body:JSON.stringify({prompt})
+    });
+
+    const data=await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error||data.message||"Image generation failed.");
+    }
+
+    removeTyping();
+
+    const imageUrl=data.image||data.url||data.imageUrl||
+      data.data?.[0]?.url;
+
+    if(!imageUrl){
+      throw new Error("No image was returned by the image service.");
+    }
+
+    addMessage("ai","Your image is ready.");
+    const lastMessage=chatContent.lastElementChild;
+    const img=document.createElement("img");
+    img.className="message-image";
+    img.src=imageUrl;
+    img.alt="AI generated image";
+    lastMessage.querySelector(".message-body").appendChild(img);
+
+    saveLocalChat();
+
+  }catch(error){
+    removeTyping();
+    addMessage("ai","Image generation failed: "+error.message);
+    toast("Image generation failed");
+  }finally{
+    isSending=false;
+    sendBtn.disabled=false;
+    setMode("chat");
+  }
+}
+
+/* =========================
+   VOICE INPUT
+========================= */
+
+function startVoice(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+    toast("Voice input is not supported in this browser.");
+    return;
+  }
+
+  const recognition=new SpeechRecognition();
+  recognition.lang="en-US";
+  recognition.interimResults=false;
+  recognition.maxAlternatives=1;
+
+  const btn=document.getElementById("voiceBtn");
+  btn.classList.add("active");
+  toast("Listening... speak now");
+
+  recognition.onresult=(event)=>{
+    messageInput.value+=(messageInput.value?" ":"")+event.results[0][0].transcript;
+    autoResize();
+  };
+
+  recognition.onerror=()=>{
+    toast("Voice input failed. Try again.");
+  };
+
+  recognition.onend=()=>btn.classList.remove("active");
+  recognition.start();
+}
+
+/* =========================
+   TEXT AREA
+========================= */
+
+function autoResize(){
+  messageInput.style.height="auto";
+  messageInput.style.height=Math.min(messageInput.scrollHeight,160)+"px";
+}
+
+messageInput.addEventListener("input",autoResize);
+
+messageInput.addEventListener("keydown",event=>{
+  if(event.key==="Enter"&&!event.shiftKey){
     event.preventDefault();
     sendMessage();
   }
 });
 
-messageInput.addEventListener("input", () => {
-  messageInput.style.height = "auto";
-  messageInput.style.height =
-    Math.min(messageInput.scrollHeight,150) + "px";
-});
+/* =========================
+   ACCOUNT
+========================= */
 
-/* -----------------------------------------------
-   SUGGESTED PROMPTS
------------------------------------------------- */
-
-document.addEventListener("click", event => {
-  const suggestion = event.target.closest("[data-prompt]");
-
-  if (suggestion) {
-    messageInput.value = suggestion.dataset.prompt;
-    messageInput.focus();
-    messageInput.dispatchEvent(new Event("input"));
-  }
-});
-
-/* -----------------------------------------------
-   VOICE INPUT
------------------------------------------------- */
-
-$("voiceBtn").onclick = () => {
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    alert("Voice input is not supported by this browser. Try Chrome.");
-    return;
-  }
-
-  if (state.recognition) {
-    state.recognition.stop();
-    state.recognition = null;
-    $("voiceBtn").classList.remove("active");
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.interimResults = true;
-  recognition.continuous = false;
-
-  state.recognition = recognition;
-  $("voiceBtn").classList.add("active");
-
-  recognition.onresult = event => {
-    let transcript = "";
-
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
-    }
-
-    messageInput.value = transcript;
-    messageInput.dispatchEvent(new Event("input"));
-  };
-
-  recognition.onerror = () => {
-    $("voiceBtn").classList.remove("active");
-    state.recognition = null;
-  };
-
-  recognition.onend = () => {
-    $("voiceBtn").classList.remove("active");
-    state.recognition = null;
-  };
-
-  recognition.start();
-};
-
-/* -----------------------------------------------
-   AUTHENTICATION
------------------------------------------------- */
-
-function openAuth(mode = "login") {
-  state.authMode = mode;
-  updateAuthModal();
-  $("authOverlay").classList.add("show");
+function openAccount(){
+  document.getElementById("accountModal").classList.add("show");
+  document.getElementById("logoutButton").style.display=currentUser?"inline":"none";
+  icons();
 }
 
-function closeAuth() {
-  $("authOverlay").classList.remove("show");
+function closeAccount(){
+  document.getElementById("accountModal").classList.remove("show");
 }
 
-function updateAuthModal() {
-  const register = state.authMode === "register";
+function switchAccountMode(){
+  accountMode=accountMode==="login"?"register":"login";
 
-  $("authTitle").textContent = register ? "Create your account" : "Welcome back";
-  $("authDescription").textContent = register
-    ? "Create an account to access your Axenova conversations."
-    : "Sign in to access your Axenova account and saved conversations.";
+  document.getElementById("modalTitle").textContent=
+    accountMode==="login"?"Sign in":"Create your account";
 
-  $("nameField").style.display = register ? "block" : "none";
-  $("authName").required = register;
+  document.getElementById("accountSubmit").textContent=
+    accountMode==="login"?"Sign in":"Create account";
 
-  $("authSubmit").textContent = register ? "Create account" : "Sign in";
-  $("switchText").textContent = register
-    ? "Already have an account?"
-    : "Don't have an account?";
+  document.getElementById("switchText").textContent=
+    accountMode==="login"?"Don't have an account?":"Already have an account?";
 
-  $("switchAuth").textContent = register ? "Sign in" : "Create account";
-  $("authMessage").textContent = "";
+  document.getElementById("switchButton").textContent=
+    accountMode==="login"?"Create account":"Sign in";
 }
 
-$("switchAuth").onclick = () => {
-  state.authMode = state.authMode === "login" ? "register" : "login";
-  updateAuthModal();
-};
-
-$("closeAuth").onclick = closeAuth;
-$("accountBtn").onclick = () => openAuth(state.user ? "login" : "login");
-$("profileButton").onclick = () => openAuth("login");
-
-$("authOverlay").onclick = event => {
-  if (event.target === $("authOverlay")) closeAuth();
-};
-
-$("authForm").onsubmit = async event => {
+document.getElementById("accountForm").addEventListener("submit",async event=>{
   event.preventDefault();
 
-  const register = state.authMode === "register";
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
 
-  const body = {
-    email:$("authEmail").value.trim(),
-    password:$("authPassword").value
-  };
-
-  if (register) body.name = $("authName").value.trim();
-
-  $("authSubmit").disabled = true;
-  $("authSubmit").textContent = "Please wait...";
-  $("authMessage").textContent = "";
-
-  try {
-    const data = await api(
-      register ? "/api/auth/register" : "/api/auth/login",
-      {
-        method:"POST",
-        body:JSON.stringify(body)
-      }
-    );
-
-    state.user = data.user;
-    updateProfile();
-    closeAuth();
-    await loadConversations();
-
-  } catch (error) {
-    $("authMessage").textContent = error.message;
-  } finally {
-    $("authSubmit").disabled = false;
-    $("authSubmit").textContent =
-      register ? "Create account" : "Sign in";
-  }
-};
-
-function updateProfile() {
-  if (state.user) {
-    $("profileName").textContent = state.user.name || "Account";
-    $("profileAvatar").textContent =
-      (state.user.name || "A").charAt(0).toUpperCase();
-    $("profileStatus").textContent = state.user.email || "Signed in";
-    $("accountBtn").textContent = "Account";
-  } else {
-    $("profileName").textContent = "Guest user";
-    $("profileAvatar").textContent = "G";
-    $("profileStatus").textContent = "Not signed in";
-    $("accountBtn").textContent = "Account ↗";
-  }
-}
-
-async function checkSession() {
-  try {
-    const data = await api("/api/auth/me");
-    state.user = data.user;
-    updateProfile();
-    await loadConversations();
-  } catch {
-    state.user = null;
-    updateProfile();
-  }
-}
-
-/* -----------------------------------------------
-   CONVERSATION HISTORY
------------------------------------------------- */
-
-function newChat() {
-  state.messages = [];
-  state.conversationId = null;
-  messageInput.value = "";
-  state.image = null;
-  $("attachmentPreview").style.display = "none";
-  setMode("chat");
-  showWelcome();
-  renderHistory();
-  closeSidebar();
-}
-
-$("newChatBtn").onclick = newChat;
-
-async function saveCurrentConversation() {
-  if (!state.user || state.messages.length === 0) return;
-
-  if (!state.conversationId) {
-    state.conversationId =
-      crypto.randomUUID
-        ? crypto.randomUUID()
-        : "chat-" + Date.now();
-  }
-
-  const firstMessage = state.messages.find(m => m.role === "user");
-  const title = (firstMessage?.content || "New conversation").slice(0,55);
-
-  try {
-    await api("/api/conversations", {
+  try{
+    const response=await fetch(API+"/api/auth/"+accountMode,{
       method:"POST",
-      body:JSON.stringify({
-        id:state.conversationId,
-        title,
-        messages:state.messages
-      })
+      headers:{"Content-Type":"application/json"},
+      credentials:"include",
+      body:JSON.stringify({email,password})
     });
 
-    await loadConversations();
-  } catch (error) {
-    console.warn("Conversation saving failed:",error.message);
+    const data=await response.json();
+
+    if(!response.ok)throw new Error(data.error||data.message||"Account request failed.");
+
+    currentUser=data.user||data;
+    updateProfile();
+    closeAccount();
+    toast(accountMode==="login"?"Signed in successfully":"Account created successfully");
+
+  }catch(error){
+    toast(error.message);
+  }
+});
+
+function updateProfile(){
+  const email=currentUser?.email||currentUser?.user?.email||"User";
+  const display=email.split("@")[0];
+
+  document.getElementById("profileName").textContent=display;
+  document.getElementById("profileStatus").textContent="Signed in";
+  document.getElementById("profileAvatar").textContent=display.charAt(0).toUpperCase();
+  document.getElementById("logoutButton").style.display="inline";
+}
+
+async function checkAccount(){
+  try{
+    const response=await fetch(API+"/api/auth/me",{
+      credentials:"include"
+    });
+
+    if(!response.ok)return;
+
+    const data=await response.json();
+    if(data.user||data.email){
+      currentUser=data.user||data;
+      updateProfile();
+    }
+  }catch(error){
+    console.log("Account check unavailable");
   }
 }
 
-async function loadConversations() {
-  if (!state.user) return;
+async function logout(){
+  try{
+    await fetch(API+"/api/auth/logout",{
+      method:"POST",
+      credentials:"include"
+    });
+  }catch(error){}
 
-  try {
-    const data = await api("/api/conversations");
-    state.conversations = data.conversations || [];
-    renderHistory();
-  } catch (error) {
-    console.warn("Could not load conversations:",error.message);
-  }
+  currentUser=null;
+  document.getElementById("profileName").textContent="Guest";
+  document.getElementById("profileStatus").textContent="Sign in to your account";
+  document.getElementById("profileAvatar").textContent="A";
+  document.getElementById("logoutButton").style.display="none";
+  closeAccount();
+  toast("Signed out");
 }
 
-function renderHistory() {
-  const container = $("historyList");
-  container.innerHTML = "";
+/* =========================
+   STARTUP
+========================= */
 
-  state.conversations.forEach(conversation => {
-    const item = document.createElement("div");
-    item.className =
-      "history-item" +
-      (conversation.id === state.conversationId ? " active" : "");
-
-    const title = document.createElement("span");
-    title.className = "history-title";
-    title.textContent = conversation.title || "New conversation";
-
-    const remove = document.createElement("button");
-    remove.className = "history-delete";
-    remove.textContent = "×";
-    remove.title = "Delete conversation";
-
-    remove.onclick = async event => {
-      event.stopPropagation();
-
-      if (!confirm("Delete this conversation?")) return;
-
-      try {
-        await api("/api/conversations/" + encodeURIComponent(conversation.id), {
-          method:"DELETE"
-        });
-
-        if (state.conversationId === conversation.id) newChat();
-        await loadConversations();
-      } catch (error) {
-        alert(error.message);
-      }
-    };
-
-    item.append(title,remove);
-    item.onclick = () => openConversation(conversation);
-
-    container.appendChild(item);
-  });
-}
-
-function openConversation(conversation) {
-  state.conversationId = conversation.id;
-  state.messages = conversation.messages || [];
-
-  chatContent.innerHTML = "";
-
-  state.messages.forEach(message => {
-    addMessage(message.role,message.content,message.image || null);
-  });
-
-  renderHistory();
-  closeSidebar();
-}
-
-/* -----------------------------------------------
-   MOBILE SIDEBAR
------------------------------------------------- */
-
-function openSidebar() {
-  $("sidebar").classList.add("open");
-  $("mobileOverlay").classList.add("show");
-}
-
-function closeSidebar() {
-  $("sidebar").classList.remove("open");
-  $("mobileOverlay").classList.remove("show");
-}
-
-$("menuBtn").onclick = openSidebar;
-$("mobileOverlay").onclick = closeSidebar;
-
-/* -----------------------------------------------
-   INITIALIZE
------------------------------------------------- */
-
-async function initialize() {
-  showWelcome();
-  updateProfile();
-  setMode("chat");
-  await checkSession();
-}
-
-initialize();
+renderHistory();
+checkAccount();
+icons();
+messageInput.focus();
 </script>
-
 </body>
 </html>
