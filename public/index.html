@@ -3,734 +3,262 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#08090b">
-<meta name="description" content="Axenova AI - Your intelligent assistant">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090a">
 <title>Axenova AI</title>
-
-<!-- Modern icons and Markdown renderer -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 
 <style>
 :root {
-  --bg:#08090b;
-  --panel:#101214;
-  --panel2:#171a1d;
-  --border:#25292d;
-  --text:#eceeef;
-  --muted:#92999e;
-  --green:#10b981;
-  --green2:#059669;
-  --user:#202428;
+ --bg:#080909;
+ --surface:#191b1b;
+ --surface2:#222525;
+ --border:#363939;
+ --text:#f4f5f4;
+ --muted:#929997;
+ --green:#10c991;
 }
-
-*{box-sizing:border-box;margin:0;padding:0}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-}
-
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);
+ color:var(--text);font-family:Inter,Arial,sans-serif}
+body{overflow:hidden}
 button,input,textarea{font:inherit}
 button{cursor:pointer;color:inherit}
-button:focus-visible,input:focus-visible,textarea:focus-visible{
-  outline:2px solid var(--green);
-  outline-offset:2px;
-}
+.hidden{display:none!important}
 
-.app{
-  display:flex;
-  width:100%;
-  height:100dvh;
-  overflow:hidden;
+.app{height:100dvh;display:flex;flex-direction:column}
+
+/* HEADER */
+.header{
+ height:64px;flex-shrink:0;padding:0 20px;
+ display:flex;align-items:center;justify-content:space-between;
+ border-bottom:1px solid #252828;background:#0a0b0b;
+}
+.brand-area{display:flex;align-items:center;gap:12px}
+.brand-icon{
+ width:34px;height:34px;border-radius:11px;
+ display:grid;place-items:center;
+ background:#073c30;color:#10d69a;font-weight:900;font-size:22px;
+}
+.brand{font-size:16px;font-weight:750}
+.status{width:8px;height:8px;border-radius:50%;background:var(--green);
+ display:inline-block;margin-left:5px}
+.subtitle{font-size:11px;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;align-items:center;gap:9px}
+.header-btn{
+ border:1px solid var(--border);background:#171a1a;
+ border-radius:20px;padding:9px 14px;font-size:12px;
 }
 
 /* SIDEBAR */
-
 .sidebar{
-  width:275px;
-  flex-shrink:0;
-  background:#0d0f11;
-  border-right:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  padding:16px 12px;
-  transition:transform .25s ease,width .25s ease;
-  z-index:30;
+ position:fixed;z-index:20;left:0;top:0;bottom:0;width:285px;
+ background:#101212;border-right:1px solid var(--border);
+ padding:19px;display:flex;flex-direction:column;
+ transform:translateX(-105%);transition:.25s;
 }
-
-.sidebar-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:4px 5px 20px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:17px;
-  font-weight:750;
-  letter-spacing:-.5px;
-}
-
-.brand-dot{
-  width:8px;
-  height:8px;
-  background:var(--green);
-  border-radius:50%;
-  box-shadow:0 0 12px #10b98199;
-}
-
-.icon-btn{
-  width:38px;
-  height:38px;
-  border:0;
-  border-radius:10px;
-  background:transparent;
-  display:grid;
-  place-items:center;
-  color:#aeb5b9;
-  transition:.2s;
-}
-
-.icon-btn:hover{background:#202428;color:white}
-.icon-btn svg{width:19px;height:19px}
-
+.sidebar.open{transform:translateX(0)}
+.sidebar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
 .new-chat{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:12px;
-  background:transparent;
-  border:1px solid var(--border);
-  border-radius:12px;
-  color:var(--text);
-  font-size:14px;
-  margin-bottom:24px;
-  transition:.2s;
+ background:#073e30;border:1px solid #087c5b;
+ width:100%;padding:14px;border-radius:13px;
+ font-weight:650;text-align:left;
 }
-
-.new-chat:hover{background:var(--panel2);border-color:#3b4247}
-.new-chat svg{width:18px;height:18px}
-
-.sidebar-label{
-  color:#777f84;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:1px;
-  padding:0 10px 10px;
-}
-
-.history{
-  flex:1;
-  overflow-y:auto;
-}
-
+.section-label{font-size:11px;color:var(--muted);
+ margin:27px 0 12px;letter-spacing:.8px}
+.history{flex:1;overflow:auto}
 .history-item{
-  width:100%;
-  border:0;
-  background:transparent;
-  color:#b9c0c4;
-  padding:11px 10px;
-  border-radius:9px;
-  text-align:left;
-  font-size:13px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  margin-bottom:3px;
+ padding:12px;border-radius:10px;color:#c4ccca;
+ font-size:13px;white-space:nowrap;overflow:hidden;
+ text-overflow:ellipsis;cursor:pointer;
 }
-
-.history-item:hover,.history-item.active{
-  background:#1b1f22;
-  color:white;
+.history-item:hover{background:#222626}
+.sidebar-bottom{border-top:1px solid var(--border);padding-top:15px}
+.profile{display:flex;align-items:center;gap:10px;padding:8px}
+.profile-avatar{
+ width:38px;height:38px;border-radius:50%;background:#078d83;
+ display:grid;place-items:center;font-weight:bold;
 }
-
-.sidebar-bottom{
-  border-top:1px solid var(--border);
-  padding-top:12px;
+.profile-info{font-size:13px}
+.profile-info small{display:block;color:var(--muted);margin-top:4px}
+.side-link{
+ width:100%;padding:12px;background:transparent;border:0;
+ text-align:left;color:#cbd0ce;font-size:13px;
 }
-
-.profile-button{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:11px;
-  padding:9px;
-  background:transparent;
-  border:0;
-  border-radius:10px;
-  text-align:left;
-}
-
-.profile-button:hover{background:#1b1f22}
-
-.avatar{
-  width:34px;
-  height:34px;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  background:#173b31;
-  color:#43d6a7;
-  font-weight:700;
-  flex-shrink:0;
-}
-
-.profile-info{min-width:0;flex:1}
-.profile-name{font-size:13px;font-weight:650}
-.profile-status{font-size:11px;color:var(--muted);margin-top:3px}
+.overlay{position:fixed;inset:0;background:#0009;z-index:19;display:none}
+.overlay.show{display:block}
 
 /* MAIN */
+.main{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
+.messages{flex:1;overflow-y:auto;padding:35px 17px 160px}
+.messages-inner{max-width:780px;margin:auto;width:100%}
 
-.main{
-  flex:1;
-  min-width:0;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  position:relative;
-  background:
-    radial-gradient(ellipse at 70% 0%,#073b2812,transparent 42%),
-    var(--bg);
-}
-
-.topbar{
-  height:64px;
-  flex-shrink:0;
-  border-bottom:1px solid #ffffff0c;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 22px;
-  background:#08090bf0;
-  z-index:5;
-}
-
-.top-left{display:flex;align-items:center;gap:13px}
-.mobile-brand{display:none}
-
-.top-title{
-  font-size:14px;
-  font-weight:700;
-}
-
-.top-subtitle{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:3px;
-}
-
-.account-btn{
-  border:1px solid var(--border);
-  background:#111416;
-  border-radius:20px;
-  padding:9px 15px;
-  font-size:12px;
-  font-weight:600;
-}
-
-.account-btn:hover{background:#202428}
-
-/* CHAT AREA */
-
-.chat-area{
-  flex:1;
-  overflow-y:auto;
-  scroll-behavior:smooth;
-  padding:30px 20px 25px;
-}
-
-.chat-content{
-  max-width:790px;
-  width:100%;
-  margin:0 auto;
-}
-
+/* WELCOME */
 .welcome{
-  min-height:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:30px 0 70px;
-  text-align:center;
+ min-height:55vh;display:flex;align-items:center;
+ justify-content:center;flex-direction:column;text-align:center;
 }
-
-.welcome-logo{
-  width:58px;
-  height:58px;
-  display:grid;
-  place-items:center;
-  border:1px solid #17684f;
-  background:#0d211a;
-  border-radius:19px;
-  color:#31d6a0;
-  margin-bottom:22px;
+.logo-large{
+ width:70px;height:70px;border-radius:23px;
+ display:grid;place-items:center;background:#063b2e;
+ color:#10d99b;font-size:38px;font-weight:900;
+ box-shadow:0 0 40px #10b98120;margin-bottom:22px;
 }
-
-.welcome-logo svg{width:29px;height:29px}
-
-.welcome h1{
-  font-size:29px;
-  font-weight:700;
-  letter-spacing:-1px;
-  margin-bottom:10px;
-}
-
-.welcome p{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.6;
-  max-width:420px;
-}
-
+.welcome h1{font-size:29px;margin:0 0 10px;letter-spacing:-1px}
+.welcome p{font-size:14px;color:var(--muted)}
 .suggestions{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-  width:100%;
-  max-width:560px;
-  margin-top:32px;
+ display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+ margin-top:27px;max-width:650px;
 }
-
 .suggestion{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-  padding:15px;
-  border:1px solid var(--border);
-  background:#101315;
-  border-radius:13px;
-  color:#c8ced1;
-  font-size:12px;
-  line-height:1.4;
-  min-height:65px;
+ border:1px solid var(--border);background:#151818;
+ padding:12px 16px;border-radius:13px;color:#c6ceca;font-size:12px;
 }
+.suggestion:hover{border-color:var(--green)}
 
-.suggestion:hover{
-  background:#171c1d;
-  border-color:#27634f;
+/* CHAT MESSAGES */
+.message{display:flex;gap:13px;margin-bottom:30px;align-items:flex-start}
+.avatar{
+ width:34px;height:34px;flex-shrink:0;border-radius:11px;
+ display:grid;place-items:center;font-size:13px;font-weight:bold;
 }
-
-.suggestion svg{
-  color:#42c99c;
-  width:19px;
-  height:19px;
-  flex-shrink:0;
-}
-
-/* MESSAGES */
-
-.message{
-  display:flex;
-  gap:15px;
-  margin:0 auto 30px;
-  max-width:790px;
-  width:100%;
-  align-items:flex-start;
-}
-
-.message-avatar{
-  width:32px;
-  height:32px;
-  flex-shrink:0;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  font-size:12px;
-  font-weight:750;
-}
-
-.user-avatar{background:#292e32;color:#e3e8e9}
-.ai-avatar{background:#0b3328;color:#36d6a0}
-
-.message-body{flex:1;min-width:0;padding-top:3px}
-
-.message-name{
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:9px;
-  color:#aeb7b9;
-}
-
-.message-text{
-  font-size:15px;
-  line-height:1.8;
-  overflow-wrap:anywhere;
-  color:#e5e8e9;
-}
-
-.message-text p{margin:0 0 13px}
-.message-text h1,.message-text h2,.message-text h3{
-  line-height:1.4;
-  margin:20px 0 10px;
-  color:white;
-}
-.message-text h1{font-size:22px}
-.message-text h2{font-size:19px}
-.message-text h3{font-size:16px}
-.message-text ul,.message-text ol{padding-left:23px;margin:10px 0 16px}
-.message-text li{margin:5px 0}
-.message-text a{color:#51d6ac}
-.message-text blockquote{
-  border-left:3px solid var(--green);
-  padding-left:13px;
-  color:#b9c3c2;
-  margin:12px 0;
-}
-.message-text table{
-  border-collapse:collapse;
-  display:block;
-  overflow-x:auto;
-  max-width:100%;
-  margin:14px 0;
-}
-.message-text th,.message-text td{
-  border:1px solid #343a3e;
-  padding:8px 11px;
-  text-align:left;
-  font-size:13px;
-}
-.message-text th{background:#171c1e}
-.message-text code{
-  background:#202629;
-  padding:2px 5px;
-  border-radius:5px;
-  font-size:.9em;
-}
+.user-avatar{background:#292e2d}
+.ai-avatar{background:#073c30;color:#12d69a}
+.message-content{flex:1;min-width:0;line-height:1.7;font-size:15px}
+.message-name{font-size:12px;color:#9ba49f;font-weight:650;margin:3px 0 8px}
+.message-text{white-space:pre-wrap;overflow-wrap:anywhere}
 .message-text pre{
-  background:#111518;
-  border:1px solid #2a3034;
-  padding:15px;
-  border-radius:12px;
-  overflow-x:auto;
-  margin:13px 0;
+ white-space:pre;overflow:auto;padding:15px;background:#151818;
+ border:1px solid var(--border);border-radius:12px;
 }
-.message-text pre code{
-  background:transparent;
-  padding:0;
-  font-size:13px;
-  line-height:1.6;
+.message-text code{background:#252a28;padding:2px 5px;border-radius:4px}
+.message-text pre code{background:none}
+.message-text img{max-width:100%;border-radius:14px;margin-top:12px}
+.message-actions{display:flex;gap:15px;margin-top:12px}
+.action{
+ background:none;border:0;color:#929b96;font-size:12px;padding:3px 0;
 }
+.action:hover{color:white}
+.typing{color:var(--muted);font-size:13px}
 
-.message-image{
-  max-width:100%;
-  max-height:350px;
-  border-radius:13px;
-  margin-top:10px;
-  border:1px solid var(--border);
+/* COMPOSER — REFERENCE IMAGE STYLE */
+.composer-area{
+ position:absolute;bottom:0;left:0;right:0;
+ padding:20px 16px max(14px,env(safe-area-inset-bottom));
+ background:linear-gradient(transparent,#080909 22%);
 }
-
-.message-actions{
-  display:flex;
-  gap:5px;
-  margin-top:10px;
-}
-
-.message-actions button{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:transparent;
-  border:0;
-  color:#858e93;
-  padding:6px 8px;
-  border-radius:7px;
-  font-size:11px;
-}
-
-.message-actions button:hover{background:#1b2023;color:white}
-.message-actions svg{width:14px;height:14px}
-
-.typing{
-  display:flex;
-  gap:5px;
-  padding:7px 0;
-}
-.typing span{
-  width:6px;height:6px;
-  border-radius:50%;
-  background:#4ccba1;
-  animation:pulse 1s infinite alternate;
-}
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-@keyframes pulse{to{opacity:.25;transform:translateY(-4px)}}
-
-/* COMPOSER */
-
-.composer-wrap{
-  flex-shrink:0;
-  padding:12px 20px 8px;
-  background:linear-gradient(transparent,#08090b 15%);
-}
-
+.composer-wrap{max-width:850px;margin:auto;position:relative}
+.mode-label{font-size:12px;color:var(--green);margin:0 0 8px 12px}
 .composer{
-  width:100%;
-  max-width:790px;
-  margin:0 auto;
-  background:#151819;
-  border:1px solid #303638;
-  border-radius:23px;
-  padding:13px 14px 10px;
-  box-shadow:0 8px 35px #0005;
-  transition:border-color .2s;
+ min-height:78px;
+ border:1px solid #424747;
+ background:#1b1d1d;
+ border-radius:45px;
+ padding:9px 12px;
+ display:flex;
+ align-items:center;
+ gap:12px;
+ box-shadow:0 5px 30px #0007;
+ transition:border-color .2s;
 }
+.composer:focus-within{border-color:#646d69}
 
-.composer:focus-within{border-color:#28765b}
-
-#messageInput{
-  display:block;
-  width:100%;
-  min-height:35px;
-  max-height:160px;
-  resize:none;
-  border:0;
-  outline:0;
-  color:white;
-  background:transparent;
-  padding:5px 5px 10px;
-  font-size:15px;
-  line-height:1.5;
+/* PLUS BUTTON */
+.plus-btn{
+ width:59px;height:59px;flex:0 0 59px;
+ border:0;border-radius:50%;
+ background:#292d2d;color:white;
+ display:grid;place-items:center;
 }
+.plus-btn svg{width:29px;height:29px;stroke-width:1.8}
+.plus-btn:hover{background:#363b3a}
 
-#messageInput::placeholder{color:#828b8f}
-
-.composer-bottom{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
+/* TEXT INPUT */
+#prompt{
+ flex:1;min-width:0;
+ border:0;outline:0;background:transparent;
+ color:white;font-size:16px;
+ resize:none;max-height:120px;
+ line-height:1.5;padding:12px 0;
 }
+#prompt::placeholder{color:#a0a5a3}
 
-.tools{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  min-width:0;
+/* MICROPHONE */
+.mic-btn{
+ width:59px;height:59px;flex:0 0 59px;
+ border:0;border-radius:50%;
+ background:#292d2d;color:white;
+ display:grid;place-items:center;
 }
+.mic-btn svg{width:25px;height:25px}
+.mic-btn.active{background:#a32929}
 
-.tool-btn{
-  width:36px;
-  height:36px;
-  display:grid;
-  place-items:center;
-  background:transparent;
-  border:0;
-  color:#aeb6b8;
-  border-radius:50%;
-  transition:.2s;
-  flex-shrink:0;
-}
-
-.tool-btn:hover{background:#292f32;color:white}
-.tool-btn.active{background:#103b2e;color:#45d7a7}
-.tool-btn svg{width:18px;height:18px}
-
+/* SEND */
 .send-btn{
-  width:39px;
-  height:39px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  background:var(--green);
-  color:#04150f;
-  border:0;
-  border-radius:13px;
-  transition:.2s;
+ width:59px;height:59px;flex:0 0 59px;
+ border:0;border-radius:50%;
+ background:#f7f8f7;color:#111;
+ display:grid;place-items:center;
 }
+.send-btn svg{width:29px;height:29px;stroke-width:2}
+.send-btn:hover{background:#dce6e0}
+.send-btn:disabled{opacity:.5;cursor:not-allowed}
 
-.send-btn:hover{background:#34d399;transform:translateY(-1px)}
-.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.send-btn svg{width:19px;height:19px}
-
-.mode-label{
-  max-width:790px;
-  width:100%;
-  margin:0 auto 7px;
-  padding-left:5px;
-  color:#54cba2;
-  font-size:11px;
-  min-height:14px;
+/* PLUS MENU */
+.plus-menu{
+ display:none;position:absolute;bottom:92px;left:0;
+ background:#202424;border:1px solid #3a4140;
+ border-radius:17px;padding:8px;width:220px;
+ box-shadow:0 12px 40px #0009;z-index:10;
 }
-
-.disclaimer{
-  text-align:center;
-  color:#60696d;
-  font-size:10px;
-  padding:8px 5px 0;
+.plus-menu.show{display:block}
+.menu-item{
+ display:flex;align-items:center;gap:12px;width:100%;
+ padding:12px;border:0;border-radius:10px;
+ background:transparent;text-align:left;font-size:13px;
+ color:#e0e5e2;
 }
+.menu-item:hover{background:#343b38}
+.menu-item svg{width:19px;height:19px;color:var(--green)}
+.disclaimer{text-align:center;color:#727b77;font-size:10px;margin-top:10px}
 
-.file-preview{
-  display:none;
-  align-items:center;
-  gap:9px;
-  padding:8px;
-  margin:3px 0 8px;
-  border-radius:10px;
-  background:#202629;
-  font-size:12px;
-  color:#cbd2d4;
+/* MODALS */
+.modal-backdrop{
+ position:fixed;inset:0;z-index:40;background:#000b;
+ display:none;align-items:center;justify-content:center;padding:18px;
 }
-
-.file-preview img{
-  width:40px;height:40px;
-  object-fit:cover;
-  border-radius:7px;
-}
-
-.file-preview button{
-  margin-left:auto;
-  border:0;
-  background:transparent;
-  color:#aaa;
-}
-
-/* MOBILE */
-
-.overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#0009;
-  z-index:20;
-}
-
-@media(max-width:700px){
-  .sidebar{
-    position:fixed;
-    top:0;bottom:0;left:0;
-    width:285px;
-    transform:translateX(-100%);
-    box-shadow:15px 0 50px #0008;
-  }
-  .sidebar.open{transform:translateX(0)}
-  .overlay.show{display:block}
-  .topbar{height:59px;padding:0 14px}
-  .mobile-brand{display:flex;align-items:center;gap:9px}
-  .mobile-brand .brand{font-size:15px}
-  .top-title,.top-subtitle{display:none}
-  .chat-area{padding:22px 14px 18px}
-  .message{gap:10px;margin-bottom:25px}
-  .message-avatar{width:30px;height:30px}
-  .message-text{font-size:14px;line-height:1.75}
-  .welcome h1{font-size:24px}
-  .welcome p{font-size:13px}
-  .suggestions{grid-template-columns:1fr;max-width:390px;margin-top:25px}
-  .suggestion{min-height:54px;padding:12px}
-  .composer-wrap{padding:8px 10px 5px}
-  .composer{border-radius:21px;padding:11px 10px 9px}
-  #messageInput{font-size:14px}
-  .tool-btn{width:34px;height:34px}
-  .tool-btn svg{width:17px;height:17px}
-  .send-btn{width:39px;height:39px}
-  .disclaimer{font-size:9px}
-}
-
-@media(max-width:370px){
-  .tools{gap:0}
-  .tool-btn{width:31px;height:32px}
-  .account-btn{padding:8px 11px}
-}
-
-/* ACCOUNT DIALOG */
-
+.modal-backdrop.show{display:flex}
 .modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:60;
-  background:#000b;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
+ background:#171b1a;border:1px solid var(--border);
+ width:100%;max-width:390px;padding:23px;border-radius:19px;
 }
-
-.modal.show{display:flex}
-
-.modal-card{
-  width:100%;
-  max-width:390px;
-  background:#111517;
-  border:1px solid #30383a;
-  border-radius:20px;
-  padding:24px;
-  box-shadow:0 20px 80px #0009;
+.modal h2{font-size:20px;margin:0 0 8px}
+.modal p{color:var(--muted);font-size:13px}
+.modal input{
+ width:100%;padding:13px;margin:7px 0;
+ background:#090c0b;color:white;border:1px solid var(--border);
+ border-radius:10px;outline:none;
 }
-
-.modal-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:20px;
+.primary{
+ width:100%;padding:13px;background:var(--green);
+ border:0;border-radius:10px;color:#05251c;font-weight:bold;margin-top:10px;
 }
+.close-modal{float:right;background:none;border:0;font-size:22px;color:#aaa}
+.switch-auth{text-align:center;color:var(--green);font-size:13px;margin-top:16px}
+#cameraVideo{width:100%;border-radius:12px;background:black}
+#cameraCanvas{display:none}
 
-.modal-head h2{font-size:19px}
-.modal-card label{
-  display:block;
-  color:#aab2b5;
-  font-size:12px;
-  margin:13px 0 7px;
-}
-
-.modal-card input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  background:#080b0c;
-  border:1px solid #30383a;
-  color:white;
-  outline:none;
-}
-
-.modal-submit{
-  width:100%;
-  margin-top:19px;
-  padding:12px;
-  border:0;
-  border-radius:10px;
-  background:var(--green);
-  color:#04150f;
-  font-weight:750;
-}
-
-.modal-switch{
-  margin-top:15px;
-  color:#aab2b5;
-  text-align:center;
-  font-size:12px;
-}
-
-.modal-switch button{
-  background:none;border:0;color:#4bd5a5;
-}
-
-#toast{
-  position:fixed;
-  bottom:100px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#202729;
-  border:1px solid #3a4447;
-  color:white;
-  border-radius:10px;
-  padding:10px 15px;
-  font-size:12px;
-  display:none;
-  z-index:100;
-  max-width:90%;
-  text-align:center;
+@media(max-width:480px){
+ .header{height:59px;padding:0 13px}
+ .messages{padding:24px 13px 140px}
+ .welcome h1{font-size:24px}
+ .composer-area{padding-left:9px;padding-right:9px}
+ .composer{min-height:67px;padding:7px 9px;gap:8px}
+ .plus-btn,.mic-btn,.send-btn{width:48px;height:48px;flex-basis:48px}
+ .plus-btn svg,.send-btn svg{width:25px;height:25px}
+ .mic-btn svg{width:22px;height:22px}
+ #prompt{font-size:14px}
+ .suggestions{gap:7px}
+ .suggestion{padding:10px 12px}
 }
 </style>
 </head>
@@ -738,806 +266,569 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{
 <body>
 <div class="app">
 
-  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-      <div class="brand">
-        <span>Axenova AI</span>
-        <span class="brand-dot"></span>
-      </div>
-      <button class="icon-btn" onclick="toggleSidebar()" aria-label="Close menu">
-        <i data-lucide="panel-left-close"></i>
-      </button>
-    </div>
-
-    <button class="new-chat" onclick="newChat()">
-      <i data-lucide="plus"></i>
-      <span>New chat</span>
-    </button>
-
-    <div class="sidebar-label">YOUR CHATS</div>
-    <div class="history" id="historyList"></div>
-
-    <div class="sidebar-bottom">
-      <button class="profile-button" onclick="openAccount()">
-        <div class="avatar" id="profileAvatar">A</div>
-        <div class="profile-info">
-          <div class="profile-name" id="profileName">Guest</div>
-          <div class="profile-status" id="profileStatus">Sign in to your account</div>
-        </div>
-        <i data-lucide="settings" style="width:17px;color:#8e989c"></i>
-      </button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="topbar">
-      <div class="top-left">
-        <button class="icon-btn" onclick="toggleSidebar()" aria-label="Open menu">
-          <i data-lucide="menu"></i>
-        </button>
-
-        <div class="mobile-brand">
-          <div class="brand">
-            <span>Axenova AI</span>
-            <span class="brand-dot"></span>
-          </div>
-        </div>
-
-        <div>
-          <div class="top-title">Axenova AI</div>
-          <div class="top-subtitle">Your intelligent assistant</div>
-        </div>
-      </div>
-
-      <button class="account-btn" onclick="openAccount()">Account</button>
-    </header>
-
-    <section class="chat-area" id="chatArea">
-      <div class="chat-content" id="chatContent">
-        <div class="welcome" id="welcome">
-          <div class="welcome-logo"><i data-lucide="sparkles"></i></div>
-          <h1>How can I help you?</h1>
-          <p>Ask anything, explore ideas, write code, search the web or create images.</p>
-
-          <div class="suggestions">
-            <button class="suggestion" onclick="useSuggestion('Help me build a modern website')">
-              <i data-lucide="code-2"></i>
-              <span>Build a modern website</span>
-            </button>
-            <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms')">
-              <i data-lucide="book-open"></i>
-              <span>Learn something new</span>
-            </button>
-            <button class="suggestion" onclick="useSuggestion('Give me five creative business ideas')">
-              <i data-lucide="lightbulb"></i>
-              <span>Explore business ideas</span>
-            </button>
-            <button class="suggestion" onclick="useSuggestion('Help me write a professional CV')">
-              <i data-lucide="file-text"></i>
-              <span>Write something</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="composer-wrap">
-      <div class="mode-label" id="modeLabel"></div>
-
-      <div class="composer">
-        <div class="file-preview" id="filePreview">
-          <img id="previewImage" alt="Selected image">
-          <span id="fileName">Image selected</span>
-          <button onclick="removeFile()" aria-label="Remove image">
-            <i data-lucide="x"></i>
-          </button>
-        </div>
-
-        <textarea id="messageInput" rows="1" placeholder="Message Axenova AI..." aria-label="Message"></textarea>
-
-        <div class="composer-bottom">
-          <div class="tools">
-            <button class="tool-btn" onclick="document.getElementById('fileInput').click()" title="Attach file">
-              <i data-lucide="plus"></i>
-            </button>
-
-            <button class="tool-btn" id="cameraBtn" onclick="document.getElementById('cameraInput').click()" title="Take a photo">
-              <i data-lucide="camera"></i>
-            </button>
-
-            <button class="tool-btn" id="imageBtn" onclick="setMode('image')" title="Create image">
-              <i data-lucide="image"></i>
-            </button>
-
-            <button class="tool-btn" id="searchBtn" onclick="setMode('search')" title="Web search">
-              <i data-lucide="globe"></i>
-            </button>
-
-            <button class="tool-btn" id="codeBtn" onclick="setMode('code')" title="Coding mode">
-              <i data-lucide="code"></i>
-            </button>
-
-            <button class="tool-btn" id="voiceBtn" onclick="startVoice()" title="Voice input">
-              <i data-lucide="mic"></i>
-            </button>
-          </div>
-
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
-            <i data-lucide="arrow-up"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="disclaimer">Axenova AI can make mistakes. Verify important information.</div>
-    </div>
-  </main>
-</div>
-
-<input type="file" id="fileInput" accept="image/*" hidden onchange="handleFile(this)">
-<input type="file" id="cameraInput" accept="image/*" capture="environment" hidden onchange="handleFile(this)">
-
-<!-- ACCOUNT MODAL -->
-<div class="modal" id="accountModal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h2 id="modalTitle">Your account</h2>
-      <button class="icon-btn" onclick="closeAccount()">
-        <i data-lucide="x"></i>
-      </button>
-    </div>
-
-    <form id="accountForm">
-      <label for="email">Email address</label>
-      <input type="email" id="email" required autocomplete="email">
-
-      <label for="password">Password</label>
-      <input type="password" id="password" required autocomplete="current-password">
-
-      <button class="modal-submit" id="accountSubmit" type="submit">Sign in</button>
-    </form>
-
-    <div class="modal-switch">
-      <span id="switchText">Don't have an account?</span>
-      <button onclick="switchAccountMode()" id="switchButton">Create account</button>
-    </div>
-
-    <div class="modal-switch">
-      <button onclick="logout()" id="logoutButton" style="display:none">Sign out</button>
-    </div>
+<header class="header">
+ <div class="brand-area">
+  <button class="header-btn" id="menuBtn" aria-label="Open menu">☰</button>
+  <div class="brand-icon">A</div>
+  <div>
+   <div class="brand">Axenova AI <span class="status"></span></div>
+   <div class="subtitle">Your intelligent assistant</div>
   </div>
+ </div>
+ <div class="header-actions">
+  <button class="header-btn" id="accountBtn">Account</button>
+ </div>
+</header>
+
+<aside class="sidebar" id="sidebar">
+ <div class="sidebar-head">
+  <strong>AXENOVA AI</strong>
+  <button class="header-btn" id="closeMenu">×</button>
+ </div>
+ <button class="new-chat" id="newChat">＋ &nbsp; New chat</button>
+ <div class="section-label">YOUR CONVERSATIONS</div>
+ <div class="history" id="historyList"></div>
+ <div class="sidebar-bottom">
+  <div class="profile">
+   <div class="profile-avatar">J</div>
+   <div class="profile-info">John<small id="signedStatus">Signed in</small></div>
+  </div>
+  <button class="side-link" id="settingsBtn">⚙ &nbsp; Settings</button>
+  <button class="side-link" id="logoutBtn">⇥ &nbsp; Logout</button>
+ </div>
+</aside>
+<div class="overlay" id="overlay"></div>
+
+<main class="main">
+ <section class="messages" id="messages">
+  <div class="messages-inner" id="messagesInner">
+   <div class="welcome" id="welcome">
+    <div class="logo-large">A</div>
+    <h1>What can I help with?</h1>
+    <p>Ask anything. Create something. Explore new ideas.</p>
+    <div class="suggestions">
+     <button class="suggestion">Explain something difficult</button>
+     <button class="suggestion">Write code for me</button>
+     <button class="suggestion">Generate an image</button>
+     <button class="suggestion">Search the web</button>
+    </div>
+   </div>
+  </div>
+ </section>
+</main>
+
+<!-- CHATBOX -->
+<div class="composer-area">
+ <div class="composer-wrap">
+
+  <div class="mode-label" id="modeLabel"></div>
+
+  <div class="plus-menu" id="plusMenu">
+
+   <button class="menu-item" id="attachOption">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+    Attach image
+   </button>
+
+   <button class="menu-item" id="cameraOption">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10H2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="3"/></svg>
+    Take a photo
+   </button>
+
+   <button class="menu-item" data-mode="image">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m5 17 5-5 4 4 3-3 4 4"/></svg>
+    Create an image
+   </button>
+
+   <button class="menu-item" data-mode="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
+    Search the web
+   </button>
+
+   <button class="menu-item" data-mode="code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-2-12-4 16"/></svg>
+    Code assistant
+   </button>
+  </div>
+
+  <div class="composer">
+
+   <button class="plus-btn" id="plusBtn" aria-label="More options">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+   </button>
+
+   <textarea id="prompt" rows="1" placeholder="Message Axenova..."></textarea>
+
+   <button class="mic-btn" id="micBtn" aria-label="Voice input">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4m-4 0h8"/></svg>
+   </button>
+
+   <button class="send-btn" id="sendBtn" aria-label="Send message">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m-7 7 7-7 7 7"/></svg>
+   </button>
+
+  </div>
+  <div class="disclaimer">Axenova AI may make mistakes. Verify important information.</div>
+ </div>
 </div>
 
-<div id="toast"></div>
+<input type="file" id="fileInput" accept="image/*" class="hidden">
+
+<!-- ACCOUNT -->
+<div class="modal-backdrop" id="accountModal">
+ <div class="modal">
+  <button class="close-modal" id="closeAccount">×</button>
+  <h2 id="authTitle">Welcome back</h2>
+  <p id="authDescription">Sign in to your Axenova account.</p>
+  <input id="authName" class="hidden" placeholder="Your name">
+  <input id="authEmail" type="email" placeholder="Email address">
+  <input id="authPassword" type="password" placeholder="Password">
+  <button class="primary" id="authSubmit">Sign in</button>
+  <div class="switch-auth" id="switchAuth">Create an account</div>
+  <div id="authStatus" style="font-size:12px;margin-top:12px"></div>
+ </div>
+</div>
+
+<!-- CAMERA -->
+<div class="modal-backdrop" id="cameraModal">
+ <div class="modal">
+  <button class="close-modal" id="closeCamera">×</button>
+  <h2>Take a photo</h2>
+  <p>Capture an image to send to Axenova AI.</p>
+  <video id="cameraVideo" autoplay playsinline></video>
+  <canvas id="cameraCanvas"></canvas>
+  <button class="primary" id="captureBtn">Capture photo</button>
+ </div>
+</div>
+
+</div>
 
 <script>
-/* =========================
-   AXENOVA AI CONFIGURATION
-========================= */
+const API="";
+const $=id=>document.getElementById(id);
 
-const API = "";
-let currentMode = "chat";
-let selectedImage = null;
-let isSending = false;
-let accountMode = "login";
-let currentUser = null;
-let conversationId = null;
-let conversationHistory = [];
+let mode="chat";
+let selectedFile=null;
+let busy=false;
+let isRegister=false;
+let cameraStream=null;
+let recognition=null;
+let conversations=[];
+let currentConversation=[];
 
-const chatContent = document.getElementById("chatContent");
-const chatArea = document.getElementById("chatArea");
-const messageInput = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
+const promptBox=$("prompt");
+const messagesInner=$("messagesInner");
+const messages=$("messages");
 
-function icons(){
-  if(window.lucide) lucide.createIcons();
-}
-icons();
-
-/* =========================
-   SIDEBAR
-========================= */
-
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("show");
-}
-
-function closeSidebar(){
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("overlay").classList.remove("show");
+function setMode(value){
+ mode=value;
+ $("modeLabel").textContent={
+  chat:"",
+  image:"Image generation mode",
+  search:"Web search mode",
+  code:"Code assistant mode"
+ }[value];
+ promptBox.placeholder={
+  chat:"Message Axenova...",
+  image:"Describe the image you want to create...",
+  search:"What should Axenova search for?",
+  code:"What would you like to build?"
+ }[value];
+ $("plusMenu").classList.remove("show");
 }
 
-/* =========================
-   NOTIFICATIONS
-========================= */
+function addMessage(role,text){
+ $("welcome")?.remove();
 
-function toast(message){
-  const el=document.getElementById("toast");
-  el.textContent=message;
-  el.style.display="block";
-  clearTimeout(window.toastTimer);
-  window.toastTimer=setTimeout(()=>el.style.display="none",3000);
+ const row=document.createElement("div");
+ row.className="message";
+
+ const avatar=document.createElement("div");
+ avatar.className="avatar "+(role==="user"?"user-avatar":"ai-avatar");
+ avatar.textContent=role==="user"?"U":"A";
+
+ const content=document.createElement("div");
+ content.className="message-content";
+
+ const name=document.createElement("div");
+ name.className="message-name";
+ name.textContent=role==="user"?"You":"Axenova AI";
+
+ const body=document.createElement("div");
+ body.className="message-text";
+ body.textContent=text;
+
+ content.append(name,body);
+ row.append(avatar,content);
+ messagesInner.append(row);
+
+ if(role==="assistant"){
+  const actions=document.createElement("div");
+  actions.className="message-actions";
+
+  const copy=document.createElement("button");
+  copy.className="action";
+  copy.textContent="Copy";
+  copy.onclick=()=>navigator.clipboard.writeText(text).then(()=>copy.textContent="Copied");
+
+  const read=document.createElement("button");
+  read.className="action";
+  read.textContent="Read aloud";
+  read.onclick=()=>{
+   if("speechSynthesis" in window){
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+   }
+  };
+  actions.append(copy,read);
+  content.append(actions);
+ }
+
+ currentConversation.push({role,content:text});
+ messages.scrollTop=messages.scrollHeight;
+ return body;
 }
 
-/* =========================
-   CHAT MANAGEMENT
-========================= */
-
-function newChat(){
-  conversationId=null;
-  conversationHistory=[];
-  chatContent.innerHTML="";
-  showWelcome();
-  renderHistory();
-  closeSidebar();
-  messageInput.focus();
+function typing(show){
+ $("typing")?.remove();
+ if(!show)return;
+ const row=document.createElement("div");
+ row.id="typing";
+ row.className="message";
+ row.innerHTML='<div class="avatar ai-avatar">A</div><div class="message-content"><div class="message-name">Axenova AI</div><div class="typing">Thinking...</div></div>';
+ messagesInner.append(row);
+ messages.scrollTop=messages.scrollHeight;
 }
 
-function showWelcome(){
-  chatContent.innerHTML=`
-    <div class="welcome" id="welcome">
-      <div class="welcome-logo"><i data-lucide="sparkles"></i></div>
-      <h1>How can I help you?</h1>
-      <p>Ask anything, explore ideas, write code, search the web or create images.</p>
-      <div class="suggestions">
-        <button class="suggestion" onclick="useSuggestion('Help me build a modern website')"><i data-lucide="code-2"></i><span>Build a modern website</span></button>
-        <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms')"><i data-lucide="book-open"></i><span>Learn something new</span></button>
-        <button class="suggestion" onclick="useSuggestion('Give me five creative business ideas')"><i data-lucide="lightbulb"></i><span>Explore business ideas</span></button>
-        <button class="suggestion" onclick="useSuggestion('Help me write a professional CV')"><i data-lucide="file-text"></i><span>Write something</span></button>
-      </div>
-    </div>`;
-  icons();
+function setBusy(value){
+ busy=value;
+ $("sendBtn").disabled=value;
+ $("sendBtn").style.opacity=value?".55":"1";
 }
 
-function useSuggestion(text){
-  messageInput.value=text;
-  autoResize();
-  sendMessage();
+async function sendMessage(){
+ const message=promptBox.value.trim();
+ if((!message&&!selectedFile)||busy)return;
+
+ const chosenMode=mode;
+ const file=selectedFile;
+
+ addMessage("user",message||"Please analyse this image.");
+ promptBox.value="";
+ promptBox.style.height="auto";
+ selectedFile=null;
+ setBusy(true);
+ typing(true);
+
+ try{
+  let response;
+
+  if(chosenMode==="image"){
+   response=await fetch(API+"/api/image",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    credentials:"include",
+    body:JSON.stringify({prompt:message})
+   });
+  }else{
+   const image=file?await toBase64(file):null;
+   response=await fetch(API+"/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    credentials:"include",
+    body:JSON.stringify({
+     message,
+     image,
+     history:currentConversation.slice(-12),
+     mode:chosenMode
+    })
+   });
+  }
+
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||data.message||"Request failed: "+response.status);
+
+  typing(false);
+
+  if(chosenMode==="image"){
+   const url=data.image||data.url||data.imageUrl;
+   if(!url)throw new Error(data.error||"No image returned by the image service.");
+   const body=addMessage("assistant","Your image is ready.");
+   const img=document.createElement("img");
+   img.src=url;
+   img.alt="Generated image";
+   body.append(img);
+  }else{
+   const answer=data.reply||data.response||data.message||data.content;
+   if(!answer)throw new Error(data.error||"The AI returned an empty response.");
+   addMessage("assistant",typeof answer==="string"?answer:JSON.stringify(answer));
+  }
+  saveConversation();
+ }catch(error){
+  typing(false);
+  addMessage("assistant","Sorry, I couldn't complete that request. "+error.message);
+ }finally{
+  setBusy(false);
+  promptBox.focus();
+ }
+}
+
+function toBase64(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onload=()=>resolve(reader.result);
+  reader.onerror=reject;
+  reader.readAsDataURL(file);
+ });
+}
+
+/* CHAT HISTORY */
+function saveConversation(){
+ if(!currentConversation.length)return;
+ const title=currentConversation.find(m=>m.role==="user")?.content||"New chat";
+ conversations.unshift({
+  title:title.slice(0,55),
+  messages:[...currentConversation]
+ });
+ conversations=conversations.slice(0,30);
+ localStorage.setItem("axenova_history",JSON.stringify(conversations));
+ renderHistory();
 }
 
 function renderHistory(){
-  const list=document.getElementById("historyList");
-  const saved=JSON.parse(localStorage.getItem("axenova_chats")||"[]");
-  list.innerHTML="";
-
-  saved.forEach(item=>{
-    const btn=document.createElement("button");
-    btn.className="history-item";
-    btn.textContent=item.title;
-    btn.onclick=()=>loadLocalChat(item.id);
-    list.appendChild(btn);
-  });
-}
-
-function saveLocalChat(){
-  if(!conversationId) conversationId="chat_"+Date.now();
-
-  const saved=JSON.parse(localStorage.getItem("axenova_chats")||"[]");
-  const title=conversationHistory.find(x=>x.role==="user")?.content || "New conversation";
-
-  const existing=saved.findIndex(x=>x.id===conversationId);
-  const item={
-    id:conversationId,
-    title:title.slice(0,55),
-    messages:conversationHistory
+ $("historyList").innerHTML="";
+ conversations.forEach(item=>{
+  const el=document.createElement("div");
+  el.className="history-item";
+  el.textContent=item.title;
+  el.onclick=()=>{
+   messagesInner.innerHTML="";
+   currentConversation=[];
+   item.messages.forEach(m=>addMessage(m.role,m.content));
+   closeSidebar();
   };
-
-  if(existing>=0) saved[existing]=item;
-  else saved.unshift(item);
-
-  localStorage.setItem("axenova_chats",JSON.stringify(saved.slice(0,40)));
-  renderHistory();
+  $("historyList").append(el);
+ });
 }
 
-function loadLocalChat(id){
-  const saved=JSON.parse(localStorage.getItem("axenova_chats")||"[]");
-  const item=saved.find(x=>x.id===id);
-  if(!item)return;
-
-  conversationId=item.id;
-  conversationHistory=item.messages||[];
-  chatContent.innerHTML="";
-
-  conversationHistory.forEach(m=>{
-    addMessage(m.role==="user"?"user":"ai",m.content);
-  });
-
-  closeSidebar();
-  scrollBottom();
+function newChat(){
+ currentConversation=[];
+ messagesInner.innerHTML=`
+ <div class="welcome" id="welcome">
+ <div class="logo-large">A</div>
+ <h1>What can I help with?</h1>
+ <p>Ask anything. Create something. Explore new ideas.</p>
+ </div>`;
+ setMode("chat");
+ closeSidebar();
 }
 
-/* =========================
-   MODE BUTTONS
-========================= */
-
-function setMode(mode){
-  currentMode=currentMode===mode?"chat":mode;
-
-  document.querySelectorAll(".tool-btn").forEach(b=>b.classList.remove("active"));
-
-  const labels={
-    chat:"",
-    image:"Image generation mode",
-    search:"Web search mode",
-    code:"Coding assistant mode"
-  };
-
-  const ids={image:"imageBtn",search:"searchBtn",code:"codeBtn"};
-  if(ids[currentMode]) document.getElementById(ids[currentMode]).classList.add("active");
-
-  document.getElementById("modeLabel").textContent=labels[currentMode]||"";
-
-  const placeholders={
-    chat:"Message Axenova AI...",
-    image:"Describe the image you want to create...",
-    search:"What should Axenova search for?",
-    code:"Describe the code you want help with..."
-  };
-
-  messageInput.placeholder=placeholders[currentMode];
-  messageInput.focus();
+/* SIDEBAR */
+function openSidebar(){
+ $("sidebar").classList.add("open");
+ $("overlay").classList.add("show");
 }
-
-/* =========================
-   FILE UPLOAD
-========================= */
-
-function handleFile(input){
-  const file=input.files && input.files[0];
-  if(!file)return;
-
-  if(!file.type.startsWith("image/")){
-    toast("Please select an image.");
-    input.value="";
-    return;
-  }
-
-  if(file.size>10*1024*1024){
-    toast("Image must be smaller than 10 MB.");
-    input.value="";
-    return;
-  }
-
-  const reader=new FileReader();
-  reader.onload=()=>{
-    selectedImage=reader.result;
-    document.getElementById("previewImage").src=selectedImage;
-    document.getElementById("fileName").textContent=file.name;
-    document.getElementById("filePreview").style.display="flex";
-    icons();
-  };
-  reader.readAsDataURL(file);
+function closeSidebar(){
+ $("sidebar").classList.remove("open");
+ $("overlay").classList.remove("show");
 }
-
-function removeFile(){
-  selectedImage=null;
-  document.getElementById("filePreview").style.display="none";
-  document.getElementById("fileInput").value="";
-  document.getElementById("cameraInput").value="";
-}
-
-/* =========================
-   MESSAGE DISPLAY
-========================= */
-
-function markdown(text){
-  if(!window.marked)return escapeHTML(text);
-  const raw=marked.parse(text||"");
-  return window.DOMPurify?DOMPurify.sanitize(raw):raw;
-}
-
-function escapeHTML(text){
-  return String(text).replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
-}
-
-function addMessage(type,text,image=null){
-  const row=document.createElement("div");
-  row.className="message";
-
-  const avatar=document.createElement("div");
-  avatar.className="message-avatar "+(type==="user"?"user-avatar":"ai-avatar");
-  avatar.textContent=type==="user"?"U":"A";
-
-  const body=document.createElement("div");
-  body.className="message-body";
-
-  const name=document.createElement("div");
-  name.className="message-name";
-  name.textContent=type==="user"?"You":"Axenova AI";
-
-  const content=document.createElement("div");
-  content.className="message-text";
-  content.innerHTML=markdown(text);
-
-  body.appendChild(name);
-  body.appendChild(content);
-
-  if(image){
-    const img=document.createElement("img");
-    img.className="message-image";
-    img.src=image;
-    img.alt="Uploaded image";
-    body.appendChild(img);
-  }
-
-  if(type==="ai"){
-    const actions=document.createElement("div");
-    actions.className="message-actions";
-
-    const copy=document.createElement("button");
-    copy.innerHTML='<i data-lucide="copy"></i> Copy';
-    copy.onclick=()=>copyText(text);
-
-    const read=document.createElement("button");
-    read.innerHTML='<i data-lucide="volume-2"></i> Read aloud';
-    read.onclick=()=>readAloud(text);
-
-    actions.append(copy,read);
-    body.appendChild(actions);
-  }
-
-  row.append(avatar,body);
-  chatContent.appendChild(row);
-  icons();
-  scrollBottom();
-}
-
-function showTyping(){
-  const row=document.createElement("div");
-  row.className="message";
-  row.id="typingIndicator";
-  row.innerHTML=`
-    <div class="message-avatar ai-avatar">A</div>
-    <div class="message-body">
-      <div class="message-name">Axenova AI</div>
-      <div class="typing"><span></span><span></span><span></span></div>
-    </div>`;
-  chatContent.appendChild(row);
-  scrollBottom();
-}
-
-function removeTyping(){
-  document.getElementById("typingIndicator")?.remove();
-}
-
-function scrollBottom(){
-  setTimeout(()=>chatArea.scrollTop=chatArea.scrollHeight,50);
-}
-
-async function copyText(text){
-  try{
-    await navigator.clipboard.writeText(text);
-    toast("Copied to clipboard");
-  }catch(e){
-    toast("Could not copy text");
-  }
-}
-
-function readAloud(text){
-  if(!("speechSynthesis" in window)){
-    toast("Read aloud is not supported on this browser.");
-    return;
-  }
-  speechSynthesis.cancel();
-  const utterance=new SpeechSynthesisUtterance(text);
-  utterance.rate=1;
-  speechSynthesis.speak(utterance);
-}
-
-/* =========================
-   SEND CHAT MESSAGE
-========================= */
-
-async function sendMessage(){
-  if(isSending)return;
-
-  let message=messageInput.value.trim();
-  if(!message && !selectedImage)return;
-
-  if(currentMode==="image" && !message){
-    toast("Describe the image you want.");
-    return;
-  }
-
-  if(currentMode==="image"){
-    await generateImage(message);
-    return;
-  }
-
-  if(currentMode==="search"){
-    message="Search the web for the following and give me an accurate answer with sources: "+message;
-  }
-
-  if(currentMode==="code"){
-    message="Act as an expert software developer. Help me with this coding request, provide clear explanations and working code where appropriate: "+message;
-  }
-
-  const imageForMessage=selectedImage;
-  const visibleMessage=messageInput.value.trim();
-
-  messageInput.value="";
-  autoResize();
-  removeFile();
-
-  document.getElementById("welcome")?.remove();
-
-  addMessage("user",visibleMessage||"Please analyse this image.",imageForMessage);
-  conversationHistory.push({role:"user",content:visibleMessage||"Please analyse this image."});
-
-  isSending=true;
-  sendBtn.disabled=true;
-  showTyping();
-
-  try{
-    const response=await fetch(API+"/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      credentials:"include",
-      body:JSON.stringify({
-        message:message,
-        image:imageForMessage,
-        history:conversationHistory.slice(-12)
-      })
-    });
-
-    const data=await response.json();
-
-    if(!response.ok){
-      throw new Error(data.error||data.message||"Request failed. Check your server.");
-    }
-
-    const reply=data.reply||data.response||data.content||data.answer||
-      data.choices?.[0]?.message?.content;
-
-    if(!reply || !String(reply).trim()){
-      throw new Error("The AI returned an empty response. Check the model configuration in server.js.");
-    }
-
-    removeTyping();
-    addMessage("ai",String(reply));
-    conversationHistory.push({role:"assistant",content:String(reply)});
-    saveLocalChat();
-
-  }catch(error){
-    removeTyping();
-    const errorText="Sorry, I couldn't complete that request. "+error.message;
-    addMessage("ai",errorText);
-    toast("Message failed");
-  }finally{
-    isSending=false;
-    sendBtn.disabled=false;
-    messageInput.focus();
-  }
-}
-
-/* =========================
-   IMAGE GENERATION
-========================= */
-
-async function generateImage(prompt){
-  if(isSending)return;
-
-  messageInput.value="";
-  autoResize();
-
-  document.getElementById("welcome")?.remove();
-  addMessage("user","Create an image: "+prompt);
-
-  isSending=true;
-  sendBtn.disabled=true;
-  showTyping();
-
-  try{
-    const response=await fetch(API+"/api/image",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      credentials:"include",
-      body:JSON.stringify({prompt})
-    });
-
-    const data=await response.json();
-
-    if(!response.ok){
-      throw new Error(data.error||data.message||"Image generation failed.");
-    }
-
-    removeTyping();
-
-    const imageUrl=data.image||data.url||data.imageUrl||
-      data.data?.[0]?.url;
-
-    if(!imageUrl){
-      throw new Error("No image was returned by the image service.");
-    }
-
-    addMessage("ai","Your image is ready.");
-    const lastMessage=chatContent.lastElementChild;
-    const img=document.createElement("img");
-    img.className="message-image";
-    img.src=imageUrl;
-    img.alt="AI generated image";
-    lastMessage.querySelector(".message-body").appendChild(img);
-
-    saveLocalChat();
-
-  }catch(error){
-    removeTyping();
-    addMessage("ai","Image generation failed: "+error.message);
-    toast("Image generation failed");
-  }finally{
-    isSending=false;
-    sendBtn.disabled=false;
-    setMode("chat");
-  }
-}
-
-/* =========================
-   VOICE INPUT
-========================= */
-
-function startVoice(){
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-
-  if(!SpeechRecognition){
-    toast("Voice input is not supported in this browser.");
-    return;
-  }
-
-  const recognition=new SpeechRecognition();
-  recognition.lang="en-US";
-  recognition.interimResults=false;
-  recognition.maxAlternatives=1;
-
-  const btn=document.getElementById("voiceBtn");
-  btn.classList.add("active");
-  toast("Listening... speak now");
-
-  recognition.onresult=(event)=>{
-    messageInput.value+=(messageInput.value?" ":"")+event.results[0][0].transcript;
-    autoResize();
-  };
-
-  recognition.onerror=()=>{
-    toast("Voice input failed. Try again.");
-  };
-
-  recognition.onend=()=>btn.classList.remove("active");
-  recognition.start();
-}
-
-/* =========================
-   TEXT AREA
-========================= */
-
-function autoResize(){
-  messageInput.style.height="auto";
-  messageInput.style.height=Math.min(messageInput.scrollHeight,160)+"px";
-}
-
-messageInput.addEventListener("input",autoResize);
-
-messageInput.addEventListener("keydown",event=>{
-  if(event.key==="Enter"&&!event.shiftKey){
-    event.preventDefault();
-    sendMessage();
-  }
+$("menuBtn").onclick=openSidebar;
+$("closeMenu").onclick=closeSidebar;
+$("overlay").onclick=closeSidebar;
+$("newChat").onclick=newChat;
+
+/* COMPOSER */
+$("sendBtn").onclick=sendMessage;
+
+promptBox.addEventListener("keydown",e=>{
+ if(e.key==="Enter"&&!e.shiftKey){
+  e.preventDefault();
+  sendMessage();
+ }
+});
+promptBox.addEventListener("input",()=>{
+ promptBox.style.height="auto";
+ promptBox.style.height=Math.min(promptBox.scrollHeight,120)+"px";
 });
 
-/* =========================
-   ACCOUNT
-========================= */
-
-function openAccount(){
-  document.getElementById("accountModal").classList.add("show");
-  document.getElementById("logoutButton").style.display=currentUser?"inline":"none";
-  icons();
-}
-
-function closeAccount(){
-  document.getElementById("accountModal").classList.remove("show");
-}
-
-function switchAccountMode(){
-  accountMode=accountMode==="login"?"register":"login";
-
-  document.getElementById("modalTitle").textContent=
-    accountMode==="login"?"Sign in":"Create your account";
-
-  document.getElementById("accountSubmit").textContent=
-    accountMode==="login"?"Sign in":"Create account";
-
-  document.getElementById("switchText").textContent=
-    accountMode==="login"?"Don't have an account?":"Already have an account?";
-
-  document.getElementById("switchButton").textContent=
-    accountMode==="login"?"Create account":"Sign in";
-}
-
-document.getElementById("accountForm").addEventListener("submit",async event=>{
-  event.preventDefault();
-
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value;
-
-  try{
-    const response=await fetch(API+"/api/auth/"+accountMode,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      credentials:"include",
-      body:JSON.stringify({email,password})
-    });
-
-    const data=await response.json();
-
-    if(!response.ok)throw new Error(data.error||data.message||"Account request failed.");
-
-    currentUser=data.user||data;
-    updateProfile();
-    closeAccount();
-    toast(accountMode==="login"?"Signed in successfully":"Account created successfully");
-
-  }catch(error){
-    toast(error.message);
-  }
+$("plusBtn").onclick=e=>{
+ e.stopPropagation();
+ $("plusMenu").classList.toggle("show");
+};
+document.addEventListener("click",e=>{
+ if(!$("plusMenu").contains(e.target)&&e.target!==$("plusBtn")){
+  $("plusMenu").classList.remove("show");
+ }
 });
 
-function updateProfile(){
-  const email=currentUser?.email||currentUser?.user?.email||"User";
-  const display=email.split("@")[0];
+$("attachOption").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=e=>{
+ selectedFile=e.target.files[0];
+ if(selectedFile){
+  promptBox.placeholder="Image attached. Ask Axenova about it...";
+  $("plusMenu").classList.remove("show");
+ }
+};
+$("cameraOption").onclick=async()=>{
+ $("plusMenu").classList.remove("show");
+ $("cameraModal").classList.add("show");
+ try{
+  cameraStream=await navigator.mediaDevices.getUserMedia({
+   video:{facingMode:"environment"},audio:false
+  });
+  $("cameraVideo").srcObject=cameraStream;
+ }catch(e){
+  $("cameraModal").classList.remove("show");
+  alert("Camera permission failed. Try Attach image instead.");
+ }
+};
 
-  document.getElementById("profileName").textContent=display;
-  document.getElementById("profileStatus").textContent="Signed in";
-  document.getElementById("profileAvatar").textContent=display.charAt(0).toUpperCase();
-  document.getElementById("logoutButton").style.display="inline";
+document.querySelectorAll("[data-mode]").forEach(btn=>{
+ btn.onclick=()=>setMode(btn.dataset.mode);
+});
+
+document.querySelectorAll(".suggestion").forEach(btn=>{
+ btn.onclick=()=>{
+  promptBox.value=btn.textContent;
+  promptBox.focus();
+ };
+});
+
+/* VOICE */
+$("micBtn").onclick=()=>{
+ const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!Speech){
+  alert("Voice input is not supported in this browser. Try Chrome.");
+  return;
+ }
+ if(recognition){
+  recognition.stop();
+  recognition=null;
+  $("micBtn").classList.remove("active");
+  return;
+ }
+ recognition=new Speech();
+ recognition.lang="en-US";
+ recognition.interimResults=true;
+ $("micBtn").classList.add("active");
+ recognition.onresult=e=>{
+  let result="";
+  for(let i=e.resultIndex;i<e.results.length;i++){
+   result+=e.results[i][0].transcript;
+  }
+  promptBox.value=result;
+ };
+ recognition.onend=()=>{
+  recognition=null;
+  $("micBtn").classList.remove("active");
+ };
+ recognition.onerror=()=>{
+  recognition=null;
+  $("micBtn").classList.remove("active");
+ };
+ recognition.start();
+};
+
+/* CAMERA */
+function stopCamera(){
+ if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
+ cameraStream=null;
+ $("cameraVideo").srcObject=null;
+ $("cameraModal").classList.remove("show");
 }
+$("closeCamera").onclick=stopCamera;
+$("captureBtn").onclick=()=>{
+ const video=$("cameraVideo");
+ const canvas=$("cameraCanvas");
+ canvas.width=video.videoWidth;
+ canvas.height=video.videoHeight;
+ canvas.getContext("2d").drawImage(video,0,0);
+ canvas.toBlob(blob=>{
+  if(blob){
+   selectedFile=new File([blob],"axenova-photo.jpg",{type:"image/jpeg"});
+   promptBox.placeholder="Photo attached. Ask Axenova...";
+  }
+  stopCamera();
+ },"image/jpeg",.9);
+};
+
+/* ACCOUNT */
+let registerMode=false;
+function updateAuth(){
+ $("authTitle").textContent=registerMode?"Create account":"Welcome back";
+ $("authDescription").textContent=registerMode?"Join Axenova AI.":"Sign in to your account.";
+ $("authName").classList.toggle("hidden",!registerMode);
+ $("authSubmit").textContent=registerMode?"Create account":"Sign in";
+ $("switchAuth").textContent=registerMode?"Already registered? Sign in":"Create an account";
+ $("authStatus").textContent="";
+}
+$("accountBtn").onclick=()=>$("accountModal").classList.add("show");
+$("closeAccount").onclick=()=>$("accountModal").classList.remove("show");
+$("switchAuth").onclick=()=>{
+ registerMode=!registerMode;
+ updateAuth();
+};
+
+$("authSubmit").onclick=async()=>{
+ const email=$("authEmail").value.trim();
+ const password=$("authPassword").value;
+ const name=$("authName").value.trim();
+ if(!email||!password||(registerMode&&!name)){
+  $("authStatus").textContent="Fill in all required fields.";
+  return;
+ }
+ $("authSubmit").disabled=true;
+ try{
+  const res=await fetch(API+(registerMode?"/api/auth/register":"/api/auth/login"),{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   credentials:"include",
+   body:JSON.stringify({name,email,password})
+  });
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||data.message||"Login failed.");
+  $("authStatus").style.color=varGreen();
+  $("authStatus").textContent="Successfully signed in.";
+  $("accountBtn").textContent=name||email.split("@")[0];
+  setTimeout(()=>$("accountModal").classList.remove("show"),900);
+ }catch(e){
+  $("authStatus").style.color="#ff7777";
+  $("authStatus").textContent=e.message;
+ }finally{
+  $("authSubmit").disabled=false;
+ }
+};
+function varGreen(){return "#10c991"}
 
 async function checkAccount(){
-  try{
-    const response=await fetch(API+"/api/auth/me",{
-      credentials:"include"
-    });
-
-    if(!response.ok)return;
-
-    const data=await response.json();
-    if(data.user||data.email){
-      currentUser=data.user||data;
-      updateProfile();
-    }
-  }catch(error){
-    console.log("Account check unavailable");
+ try{
+  const res=await fetch(API+"/api/auth/me",{credentials:"include"});
+  if(!res.ok)return;
+  const data=await res.json();
+  if(data.user){
+   $("accountBtn").textContent=data.user.name||data.user.email||"Account";
   }
+ }catch(e){}
 }
 
-async function logout(){
-  try{
-    await fetch(API+"/api/auth/logout",{
-      method:"POST",
-      credentials:"include"
-    });
-  }catch(error){}
+$("logoutBtn").onclick=async()=>{
+ try{
+  await fetch(API+"/api/auth/logout",{method:"POST",credentials:"include"});
+ }catch(e){}
+ $("accountBtn").textContent="Account";
+ closeSidebar();
+};
 
-  currentUser=null;
-  document.getElementById("profileName").textContent="Guest";
-  document.getElementById("profileStatus").textContent="Sign in to your account";
-  document.getElementById("profileAvatar").textContent="A";
-  document.getElementById("logoutButton").style.display="none";
-  closeAccount();
-  toast("Signed out");
-}
+$("settingsBtn").onclick=()=>{
+ alert("Axenova AI settings will be added here.");
+};
 
-/* =========================
-   STARTUP
-========================= */
-
+/* START */
+try{
+ conversations=JSON.parse(localStorage.getItem("axenova_history")||"[]");
+}catch(e){conversations=[]}
 renderHistory();
 checkAccount();
-icons();
-messageInput.focus();
 </script>
 </body>
 </html>
