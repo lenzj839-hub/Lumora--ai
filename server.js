@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -20,16 +21,13 @@ app.disable("x-powered-by");
 // --------------------------------------------------
 
 const AXENOVA_SYSTEM_PROMPT = `
-You are Axenova AI, but you act like J.A.R.V.I.S. from Iron Man.
+You are Axenova AI, an advanced, intelligent and helpful AI assistant.
 
 IDENTITY:
 - Your name is Axenova AI.
 - Your creator is John Theuri.
-- You are loyal, calm, witty, and a little sarcastic like a smart butler.
-- Call the user "Sir" sometimes, but not every sentence. Example: "Right away, Sir." or "As you wish, Sir."
-- You are funny when the user is joking, serious when the user is serious.
-- You are confident. Never say "As an AI language model". Just answer.
-- You keep answers SHORT unless the user asks for a long explanation. Jarvis doesn't lecture.
+- Be professional, intelligent, friendly and naturally conversational.
+- Behave like a capable AI assistant, not a robotic essay generator.
 
 CONVERSATION STYLE:
 - Answer the exact question the user asks.
@@ -40,13 +38,6 @@ CONVERSATION STYLE:
 - Do not overuse emojis, headings or tables.
 - Ask questions when important information is missing.
 - Maintain conversation context.
-
-MEMORY + RULES:
-- Always remember what the user said earlier in this chat. Never say "I cannot answer" if the answer is in chat history.
-- NEW RULES BEAT OLD RULES: If the user gives a new rule that conflicts with an old rule, follow the NEWEST rule.
-- If user says "answer in exactly X words", count before replying. Must be exactly X words.
-- If rules are impossible to follow all at once, say which rule you broke and why.
-- For puzzles, test every case step-by-step before final answer. Never guess.
 
 LANGUAGES:
 - Understand English and Kiswahili.
@@ -83,11 +74,12 @@ CREATIVITY:
 
 RESPONSE QUALITY:
 - Prioritize relevance, correctness and clarity.
-- Be concise by default. Expand when necessary.
+- Be concise by default.
+- Expand when necessary.
 - Avoid repetitive phrases such as "Certainly!" and "Below is".
 - Do not end every answer with an unnecessary offer.
 
-Your purpose is to make every interaction useful, intelligent and natural, Sir.
+Your purpose is to make every interaction useful, intelligent and natural.
 `;
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -109,7 +101,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const CHAT_MODEL =
   process.env.GROQ_CHAT_MODEL ||
   process.env.GROQ_MODEL ||
-  "llama-3.3-70b-versatile";
+  "openai/gpt-oss-120b";
 
 const VISION_MODEL =
   process.env.GROQ_VISION_MODEL ||
@@ -662,7 +654,7 @@ function cleanHistory(history) {
   if (!Array.isArray(history)) return [];
 
   return history
-    .slice(-8)
+    .slice(-12)
     .filter(item =>
       item &&
       ["user", "assistant"].includes(item.role) &&
@@ -783,7 +775,7 @@ SEARCH RULES:
           model,
           messages,
           temperature: 0.7,
-          max_tokens: 1000
+          max_tokens: 2500
         }),
         signal: AbortSignal.timeout(60000)
       }
@@ -948,4 +940,73 @@ app.get("/api/health", async (req, res) => {
 
     res.json({
       ok: true,
-      app: "
+      app: "Axenova AI",
+      status: "running",
+      database: "connected"
+    });
+  } catch {
+    res.status(503).json({
+      ok: false,
+      app: "Axenova AI",
+      status: "database unavailable"
+    });
+  }
+});
+
+// --------------------------------------------------
+// FRONTEND
+// --------------------------------------------------
+
+app.use(express.static(PUBLIC_DIR));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, "index.html"));
+});
+
+// --------------------------------------------------
+// ERROR HANDLER
+// --------------------------------------------------
+
+app.use((err, req, res, next) => {
+  console.error("Server error:", err);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({
+    ok: false,
+    error: "An unexpected server error occurred."
+  });
+});
+
+// --------------------------------------------------
+// START SERVER
+// --------------------------------------------------
+
+async function startServer() {
+  try {
+    await initializeDatabase();
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log("==================================");
+      console.log("       AXENOVA AI SERVER");
+      console.log("==================================");
+      console.log("Server running on port:", PORT);
+      console.log("Database: Supabase PostgreSQL");
+      console.log("Chat configured:", Boolean(GROQ_API_KEY));
+      console.log("Chat model:", CHAT_MODEL);
+      console.log(
+        "Google Search configured:",
+        Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID)
+      );
+      console.log("Image generation configured:", Boolean(OPENAI_API_KEY));
+    });
+  } catch (error) {
+    console.error("FATAL: Could not initialize Axenova database.");
+    console.error(error.message);
+    process.exit(1);
+  }
+}
+
+startServer();
