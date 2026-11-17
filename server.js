@@ -96,7 +96,8 @@ const ACTIVE_JWT_SECRET =
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+const POLLINATIONS_API_KEY = process.env.POLLINATIONS_API_KEY;
 
 const CHAT_MODEL =
   process.env.GROQ_CHAT_MODEL ||
@@ -106,6 +107,10 @@ const CHAT_MODEL =
 const VISION_MODEL =
   process.env.GROQ_VISION_MODEL ||
   "meta-llama/llama-4-scout-17b-16e-instruct";
+
+const IMAGE_MODEL =
+  process.env.POLLINATIONS_IMAGE_MODEL ||
+  "black-forest-labs/flux.1-schnell";
 
 const PUBLIC_DIR = path.join(__dirname, "public");
 
@@ -821,15 +826,15 @@ SEARCH RULES:
 });
 
 // --------------------------------------------------
-// IMAGE GENERATION
+// IMAGE GENERATION - POLLINATIONS
 // --------------------------------------------------
 
 app.post("/api/image", async (req, res) => {
   try {
-    if (!OPENAI_API_KEY) {
+    if (!POLLINATIONS_API_KEY) {
       return res.status(503).json({
         ok: false,
-        error: "Image generation is not configured. Add OPENAI_API_KEY in Render."
+        error: "Image generation is not configured. Add POLLINATIONS_API_KEY in Render."
       });
     }
 
@@ -850,56 +855,77 @@ app.post("/api/image", async (req, res) => {
     }
 
     const response = await fetch(
-      "https://api.openai.com/v1/images/generations",
+      "https://gen.pollinations.ai/v1/images/generations",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          Authorization: `Bearer ${POLLINATIONS_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "gpt-image-1",
+          model: IMAGE_MODEL,
           prompt,
           size: "1024x1024",
-          quality: "medium"
+          response_format: "url"
         }),
         signal: AbortSignal.timeout(120000)
       }
     );
 
-    const data = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+
+    let data;
+
+    if (contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const errorText = await response.text();
+
+      console.error("Pollinations unexpected response:", errorText.slice(0, 500));
+
+      return res.status(response.ok ? 502 : response.status).json({
+        ok: false,
+        error: "The image provider returned an unexpected response."
+      });
+    }
 
     if (!response.ok) {
-      console.error("OpenAI image error:", data);
+      console.error("Pollinations image error:", data);
 
       return res.status(response.status).json({
         ok: false,
-        error: data.error?.message || "Image generation failed."
+        error: data.error?.message ||
+          data.message ||
+          "Image generation failed. Check your Pollinations key and available balance."
       });
     }
 
     const generated = data.data?.[0];
 
-    if (!generated) {
+    const imageUrl =
+      generated?.url ||
+      (generated?.b64_json
+        ? `data:image/png;base64,${generated.b64_json}`
+        : null);
+
+    if (!imageUrl) {
       return res.status(502).json({
         ok: false,
         error: "The image service returned no image."
       });
     }
 
-    const imageUrl = generated.b64_json
-      ? `data:image/png;base64,${generated.b64_json}`
-      : generated.url;
-
-    res.json({
+    return res.json({
       ok: true,
       image: imageUrl,
-      url: imageUrl
+      url: imageUrl,
+      provider: "Pollinations"
     });
-  } catch (error) {
-    console.error("Image generation error:", error);
 
-    res.status(500).json({
+  } catch (error) {
+    console.error("Pollinations image generation error:", error);
+
+    return res.status(500).json({
       ok: false,
       error: error.name === "TimeoutError"
         ? "Image generation took too long. Please try again."
@@ -929,8 +955,10 @@ app.get("/health", async (req, res) => {
     database: databaseConnected ? "Supabase PostgreSQL" : "disconnected",
     googleSearch: Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID),
     chat: Boolean(GROQ_API_KEY),
-    imageGeneration: Boolean(OPENAI_API_KEY),
-    chatModel: CHAT_MODEL
+    imageGeneration: Boolean(POLLINATIONS_API_KEY),
+    imageProvider: "Pollinations",
+    chatModel: CHAT_MODEL,
+    imageModel: IMAGE_MODEL
   });
 });
 
@@ -996,11 +1024,18 @@ async function startServer() {
       console.log("Database: Supabase PostgreSQL");
       console.log("Chat configured:", Boolean(GROQ_API_KEY));
       console.log("Chat model:", CHAT_MODEL);
+
       console.log(
         "Google Search configured:",
         Boolean(GOOGLE_API_KEY && GOOGLE_CSE_ID)
       );
-      console.log("Image generation configured:", Boolean(OPENAI_API_KEY));
+
+      console.log(
+        "Pollinations image generation configured:",
+        Boolean(POLLINATIONS_API_KEY)
+      );
+
+      console.log("Image model:", IMAGE_MODEL);
     });
   } catch (error) {
     console.error("FATAL: Could not initialize Axenova database.");
