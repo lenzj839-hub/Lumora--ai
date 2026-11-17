@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080a09">
 <meta name="description" content="Axenova AI - Think bigger. Create more.">
 <title>Axenova AI</title>
@@ -20,9 +20,9 @@ html,body{
  background:var(--bg);color:var(--text);
  font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
 }
-body{overflow:hidden}
+body{overflow:hidden;touch-action:pan-y}
 button,input,textarea{font:inherit}
-button{cursor:pointer;color:inherit}
+button{cursor:pointer;color:inherit;touch-action:manipulation}
 .hidden{display:none!important}
 .app{height:100dvh;display:flex;flex-direction:column}
 
@@ -109,7 +109,11 @@ button{cursor:pointer;color:inherit}
 .ai-avatar{background:#063d2e;color:#12d99b;border:1px solid #087b58;box-shadow:0 0 18px #10c99115}
 .message-content{flex:1;min-width:0}
 .message-name{font-size:13px;font-weight:750;color:#aeb9b2;margin:3px 0 10px}
-.message-text{font-size:16.5px;line-height:1.85;color:#e6ece8;overflow-wrap:anywhere}
+.message-text{
+ font-size:16.5px;line-height:1.85;color:#e6ece8;overflow-wrap:anywhere;
+ user-select:text;-webkit-user-select:text;
+}
+.message-text *{user-select:text;-webkit-user-select:text}
 .user-message{justify-content:flex-end}
 .user-message .avatar{order:2}
 .user-message .message-content{flex:0 1 auto;max-width:82%;display:flex;flex-direction:column;align-items:flex-end}
@@ -141,12 +145,38 @@ button{cursor:pointer;color:inherit}
 .action:hover{color:var(--green)}
 .typing{font-size:13px;color:var(--muted);padding:5px 0}
 
-.generated-image{
+.generated-image,.user-image{
  display:block;width:100%;max-width:600px;height:auto;
  border-radius:15px;margin-top:13px;border:1px solid #303936;
  background:#151a17;
 }
+.user-image{max-width:320px}
 .image-caption{font-size:12px;color:var(--muted);margin-top:9px}
+.download-image{
+ display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+ border:1px solid #17654c;background:#103426;color:#cffff0;
+ border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;
+}
+.download-image:hover{background:#155039}
+.download-image:disabled{opacity:.5;cursor:wait}
+
+.image-preview{
+ display:none;align-items:center;gap:12px;
+ padding:10px 13px;margin:0 5px 10px;
+ background:#15221b;border:1px solid #17654c;border-radius:14px;
+}
+.image-preview.show{display:flex}
+.preview-thumb{
+ width:62px;height:62px;object-fit:cover;border-radius:9px;
+ border:1px solid #3b5145;
+}
+.preview-info{flex:1;min-width:0}
+.preview-info strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preview-info small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.remove-image{
+ border:0;background:#392323;color:#ffaaaa;
+ width:34px;height:34px;border-radius:50%;font-size:19px;
+}
 
 .composer-area{
  position:absolute;bottom:0;left:0;right:0;padding:20px 15px max(14px,env(safe-area-inset-bottom));
@@ -179,7 +209,7 @@ button{cursor:pointer;color:inherit}
 
 .modal-backdrop{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:#000b;padding:18px}
 .modal-backdrop.show{display:flex}
-.modal{width:100%;max-width:400px;background:#171d19;border:1px solid var(--border);border-radius:20px;padding:22px}
+.modal{width:100%;max-width:400px;background:#171d19;border:1px solid var(--border);border-radius:20px;padding:22px;max-height:90dvh;overflow-y:auto}
 .modal h2{font-size:20px;margin:0 0 8px}
 .modal p{font-size:13px;color:var(--muted)}
 .close-modal{float:right;background:none;border:0;color:#aaa;font-size:23px}
@@ -194,7 +224,7 @@ button{cursor:pointer;color:inherit}
  .brand-icon{width:39px;height:39px}
  .brand{font-size:15px}
  .subtitle{font-size:10px}
- .messages{padding:26px 13px 170px}
+ .messages{padding:26px 13px 190px}
  .welcome h1{font-size:27px}
  .welcome p{font-size:13px}
  .message{gap:10px;margin-bottom:28px}
@@ -207,6 +237,7 @@ button{cursor:pointer;color:inherit}
  .plus-btn svg,.mic-btn svg,.send-btn svg{width:24px;height:24px}
  #prompt{font-size:14px}
  .disclaimer{font-size:9px}
+ .user-image{max-width:240px}
 }
 </style>
 </head>
@@ -271,6 +302,7 @@ button{cursor:pointer;color:inherit}
 <div class="composer-area">
  <div class="composer-wrap">
   <div class="mode-label" id="modeLabel"></div>
+
   <div class="plus-menu" id="plusMenu">
    <button class="menu-item" id="attachOption">
     <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Attach an image
@@ -287,6 +319,15 @@ button{cursor:pointer;color:inherit}
    <button class="menu-item" data-mode="code">
     <svg viewBox="0 0 24 24"><path d="m8 8-5 4 5 4m8-8 5 4-5 4m-2-12-4 16"/></svg>Code assistant
    </button>
+  </div>
+
+  <div class="image-preview" id="imagePreview">
+   <img class="preview-thumb" id="previewThumb" alt="Selected image preview">
+   <div class="preview-info">
+    <strong id="previewName">Image attached</strong>
+    <small>Describe what you want Axenova to do with this image.</small>
+   </div>
+   <button class="remove-image" id="removeImage" title="Remove image">×</button>
   </div>
 
   <div class="composer">
@@ -340,6 +381,7 @@ const $=id=>document.getElementById(id);
 
 let mode="chat";
 let selectedFile=null;
+let previewURL=null;
 let busy=false;
 let registerMode=false;
 let cameraStream=null;
@@ -411,6 +453,49 @@ function showWelcome(){
  attachSuggestionEvents();
 }
 
+/* ---------- IMAGE PREVIEW ---------- */
+
+function clearSelectedImage(){
+ selectedFile=null;
+ $("fileInput").value="";
+
+ if(previewURL){
+  URL.revokeObjectURL(previewURL);
+  previewURL=null;
+ }
+
+ $("previewThumb").removeAttribute("src");
+ $("imagePreview").classList.remove("show");
+ promptBox.placeholder="Message Axenova...";
+}
+
+function selectImage(file){
+ if(!file)return;
+
+ if(!file.type.startsWith("image/")){
+  alert("Please select an image file.");
+  return;
+ }
+
+ if(file.size>8*1024*1024){
+  alert("This image is too large. Please choose an image smaller than 8 MB.");
+  return;
+ }
+
+ clearSelectedImage();
+ selectedFile=file;
+ previewURL=URL.createObjectURL(file);
+
+ $("previewThumb").src=previewURL;
+ $("previewName").textContent=file.name||"Selected photo";
+ $("imagePreview").classList.add("show");
+
+ promptBox.placeholder="Describe what you want Axenova to do with this image...";
+ promptBox.focus();
+}
+
+$("removeImage").onclick=clearSelectedImage;
+
 /* ---------- MESSAGE DISPLAY ---------- */
 
 function addMessage(role,text,options={}){
@@ -435,21 +520,29 @@ function addMessage(role,text,options={}){
 
  if(role==="assistant"){
   body.innerHTML=formatAI(text);
-
-  // Display a generated image when one exists.
-  if(options.image){
-   const img=document.createElement("img");
-   img.className="generated-image";
-   img.src=options.image;
-   img.alt="Image generated by Axenova AI";
-   img.loading="lazy";
-   img.onerror=()=>{
-    img.alt="This generated image could not be loaded.";
-   };
-   body.appendChild(img);
-  }
  }else{
   body.textContent=text;
+ }
+
+ if(options.image){
+  const img=document.createElement("img");
+  img.className=role==="user"?"user-image":"generated-image";
+  img.src=options.image;
+  img.alt=role==="user"?"Image uploaded by you":"Image generated by Axenova AI";
+  img.loading="lazy";
+  img.onerror=()=>{
+   img.alt="This image could not be loaded.";
+  };
+  body.appendChild(img);
+
+  if(role==="assistant"){
+   const download=document.createElement("button");
+   download.className="download-image";
+   download.type="button";
+   download.textContent="↓ Download image";
+   download.onclick=()=>downloadImage(options.image,download);
+   body.appendChild(download);
+  }
  }
 
  content.append(name,body);
@@ -468,7 +561,9 @@ function addMessage(role,text,options={}){
     await navigator.clipboard.writeText(text);
     copy.textContent="Copied";
     setTimeout(()=>copy.textContent="Copy",1500);
-   }catch(e){copy.textContent="Copy unavailable"}
+   }catch(e){
+    copy.textContent="Copy unavailable";
+   }
   };
 
   const read=document.createElement("button");
@@ -494,6 +589,62 @@ function addMessage(role,text,options={}){
  return body;
 }
 
+/* ---------- IMAGE DOWNLOAD ---------- */
+
+async function downloadImage(url,button){
+ const oldText=button.textContent;
+ button.disabled=true;
+ button.textContent="Preparing download...";
+
+ try{
+  if(url.startsWith("data:")){
+   const link=document.createElement("a");
+   link.href=url;
+   link.download="axenova-generated-image.png";
+   document.body.appendChild(link);
+   link.click();
+   link.remove();
+  }else{
+   const response=await fetch(url);
+
+   if(!response.ok)throw new Error("Download request failed.");
+
+   const blob=await response.blob();
+   const objectURL=URL.createObjectURL(blob);
+
+   const link=document.createElement("a");
+   link.href=objectURL;
+   link.download="axenova-generated-image.png";
+   document.body.appendChild(link);
+   link.click();
+   link.remove();
+
+   setTimeout(()=>URL.revokeObjectURL(objectURL),2000);
+  }
+
+  button.textContent="Download started";
+  setTimeout(()=>button.textContent=oldText,1800);
+
+ }catch(error){
+  console.error("Image download failed:",error);
+  button.textContent="Open image instead";
+
+  const opened=window.open(url,"_blank","noopener");
+
+  if(!opened){
+   alert("The image could not be downloaded automatically. Please open the image and save it from your browser.");
+  }
+
+  setTimeout(()=>{
+   button.textContent=oldText;
+   button.disabled=false;
+  },2000);
+  return;
+ }
+
+ button.disabled=false;
+}
+
 /* ---------- AUTOMATIC IMAGE DETECTION ---------- */
 
 function isImageRequest(message){
@@ -506,6 +657,19 @@ function isImageRequest(message){
   /\b(create|generate|draw|make|design|paint|illustrate|render|produce)\b/i;
 
  return visualWords.test(text) && actionWords.test(text);
+}
+
+/* ---------- IMAGE STYLE DEFAULT ---------- */
+
+function prepareImagePrompt(message){
+ const requestedStyle =
+  /\b(anime|cartoon|manga|comic|pixar|3d render|watercolor|watercolour|oil painting|sketch|illustration|digital painting|pixel art|claymation|papercraft)\b/i;
+
+ if(requestedStyle.test(message)){
+  return message;
+ }
+
+ return "Create a highly realistic, photorealistic image. Use natural lighting, realistic textures, accurate details and professional photographic quality. Do not use anime or cartoon styling unless explicitly requested. User's request: "+message;
 }
 
 /* ---------- MODES ---------- */
@@ -521,7 +685,7 @@ function setMode(value){
  };
 
  const placeholders={
-  chat:"Message Axenova...",
+  chat:selectedFile?"Describe what you want Axenova to do with this image...":"Message Axenova...",
   image:"Describe the image you want to create...",
   search:"What should Axenova search for?",
   code:"What would you like to build?"
@@ -763,6 +927,7 @@ function newChat(){
  currentConversation=[];
  currentConversationId=null;
  currentTitle="New chat";
+ clearSelectedImage();
  showWelcome();
  setMode("chat");
  renderHistory();
@@ -787,6 +952,12 @@ async function sendMessage(){
 
  if((!message&&!selectedFile)||busy)return;
 
+ if(selectedFile&&!message){
+  alert("Please describe what you want Axenova to do with your image before sending it.");
+  promptBox.focus();
+  return;
+ }
+
  if(!signedInUser){
   $("accountModal").classList.add("show");
   $("authStatus").textContent="Please sign in to use Axenova.";
@@ -796,43 +967,55 @@ async function sendMessage(){
  const selectedMode=mode;
  const file=selectedFile;
 
- // Automatically generate images even when normal Chat mode is selected.
+ // An uploaded image must be handled by the vision chat endpoint,
+ // never by the image-generation endpoint.
  const generateImage =
-  selectedMode==="image" ||
-  (selectedMode==="chat" && isImageRequest(message));
+  !file && (
+   selectedMode==="image" ||
+   (selectedMode==="chat" && isImageRequest(message))
+  );
 
  if(generateImage&&!message){
   alert("Please describe the image you want Axenova to create.");
   return;
  }
 
- addMessage("user",message||"Please analyse this image.");
-
- if(currentConversation.length===1){
-  currentTitle=message.slice(0,55)||"Image conversation";
- }
-
- promptBox.value="";
- promptBox.style.height="auto";
- selectedFile=null;
- $("fileInput").value="";
-
  setBusy(true);
  typing(true);
 
  try{
+  // Convert the image before displaying/saving the message.
+  const imageData=file?await toBase64(file):null;
+
+  // Display the actual uploaded image in the user's message.
+  addMessage("user",message,{image:imageData});
+
+  if(currentConversation.length===1){
+   currentTitle=message.slice(0,55)||"Image conversation";
+  }
+
+  promptBox.value="";
+  promptBox.style.height="auto";
+  clearSelectedImage();
+
   let response;
 
   if(generateImage){
+   const imagePrompt=prepareImagePrompt(message);
+
    response=await fetch(API+"/api/image",{
     method:"POST",
     credentials:"include",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({prompt:message})
+    body:JSON.stringify({prompt:imagePrompt})
    });
 
   }else{
-   const image=file?await toBase64(file):null;
+   // Do not resend old image data inside history.
+   const history=currentConversation
+    .slice(0,-1)
+    .slice(-12)
+    .map(m=>({role:m.role,content:m.content}));
 
    response=await fetch(API+"/api/chat",{
     method:"POST",
@@ -840,8 +1023,8 @@ async function sendMessage(){
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
      message,
-     image,
-     history:currentConversation.slice(0,-1).slice(-12),
+     image:imageData,
+     history,
      mode:selectedMode
     })
    });
@@ -869,7 +1052,6 @@ async function sendMessage(){
     );
    }
 
-   // Save the image together with the assistant message.
    addMessage("assistant","Your image is ready.",{
     image:imageUrl
    });
@@ -957,11 +1139,8 @@ $("attachOption").onclick=()=>{
 };
 
 $("fileInput").onchange=e=>{
- selectedFile=e.target.files[0]||null;
-
- if(selectedFile){
-  promptBox.placeholder="Image attached. Ask Axenova...";
- }
+ const file=e.target.files[0];
+ if(file)selectImage(file);
 };
 
 document.querySelectorAll("[data-mode]").forEach(button=>{
@@ -1031,6 +1210,10 @@ $("cameraOption").onclick=async()=>{
  $("cameraModal").classList.add("show");
 
  try{
+  if(!navigator.mediaDevices?.getUserMedia){
+   throw new Error("Camera is unavailable.");
+  }
+
   cameraStream=await navigator.mediaDevices.getUserMedia({
    video:{facingMode:"environment"},
    audio:false
@@ -1069,13 +1252,13 @@ $("captureBtn").onclick=()=>{
 
  canvas.toBlob(blob=>{
   if(blob){
-   selectedFile=new File(
+   const file=new File(
     [blob],
     "axenova-photo.jpg",
     {type:"image/jpeg"}
    );
 
-   promptBox.placeholder="Photo attached. Ask Axenova...";
+   selectImage(file);
   }
 
   stopCamera();
@@ -1228,6 +1411,7 @@ $("logoutBtn").onclick=async()=>{
  currentTitle="New chat";
 
  clearTimeout(saveTimer);
+ clearSelectedImage();
  showWelcome();
  updateProfile(null);
  closeSidebar();
